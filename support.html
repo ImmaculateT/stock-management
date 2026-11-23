@@ -1,0 +1,1993 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+  <title>Maricopa · Support</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    /* ---------- RESET & GLOBAL ---------- */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+    }
+
+    body {
+      background: #f4f7fc;
+      display: flex;
+      min-height: 100vh;
+    }
+
+    /* ---------- SIDEBAR ---------- */
+    .sidebar {
+      width: 260px;
+      background: #1a2b3c;
+      color: #e0e9f2;
+      display: flex;
+      flex-direction: column;
+      padding: 28px 16px;
+      transition: all 0.2s ease;
+      flex-shrink: 0;
+      box-shadow: 2px 0 12px rgba(0, 0, 0, 0.05);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .sidebar::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image: url('https://lh3.googleusercontent.com/gps-cs-s/ANWiy9RlL5m_9yx9qFp1KsgIQMk4nifrcAOL4MRZ1LG83j6MOM1CwpJ1qW8CbQ9QxwMhRiR8FYh6ocg9kUnJtf636i7edyX06zBTL-13zvEx945Od7fmU11Al7jDJFrFDojlmjsllaq8qQ=s680-w680-h510-rw');
+      background-size: cover;
+      background-position: center;
+      opacity: 0.18;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .sidebar::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(26, 43, 60, 0.92) 0%, rgba(26, 43, 60, 0.75) 100%);
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .sidebar > * { position: relative; z-index: 2; }
+
+    .sidebar-brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 0 12px 32px 12px;
+      font-weight: 700;
+      font-size: 1.5rem;
+      letter-spacing: -0.02em;
+      color: white;
+      cursor: pointer;
+      transition: opacity 0.15s;
+      text-decoration: none;
+    }
+    .sidebar-brand:hover { opacity: 0.85; }
+    .sidebar-brand i { font-size: 2rem; color: #f0b34b; }
+    .sidebar-brand span {
+      background: linear-gradient(135deg, #ffffff, #e8eef5);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .sidebar-nav { display: flex; flex-direction: column; gap: 6px; flex: 1; }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 12px 16px;
+      border-radius: 12px;
+      color: #b8c9db;
+      text-decoration: none;
+      font-weight: 500;
+      font-size: 0.95rem;
+      transition: all 0.15s ease;
+      cursor: pointer;
+      border: none;
+      background: transparent;
+      width: 100%;
+      text-align: left;
+      font-family: inherit;
+    }
+    .nav-item i { width: 20px; font-size: 1.1rem; text-align: center; }
+    .nav-item.active {
+      background: #2f4a64;
+      color: white;
+      box-shadow: 0 6px 12px -6px rgba(0, 80, 200, 0.2);
+      border-left: 3px solid #f0b34b;
+    }
+    .nav-item:hover:not(.active) { background: #233545; color: #e0e9f2; }
+    .nav-item:active { transform: scale(0.98); }
+
+    .sidebar-footer {
+      border-top: 1px solid #2e4458;
+      padding-top: 20px;
+      margin-top: 12px;
+    }
+    .sidebar-footer .nav-item { color: #8faec9; }
+
+    /* ---------- MAIN CONTENT ---------- */
+    .main-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      padding: 24px 32px;
+      overflow-x: auto;
+    }
+
+    .top-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 28px;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .page-title h1 {
+      font-size: 1.8rem;
+      font-weight: 600;
+      color: #0b1d2e;
+      letter-spacing: -0.02em;
+    }
+    .page-title p {
+      color: #5b6f84;
+      font-size: 0.9rem;
+      margin-top: 4px;
+    }
+    .page-title p i { color: #d6952c; margin-right: 6px; }
+
+    .header-actions { display: flex; align-items: center; gap: 16px; }
+
+    .search-box {
+      display: flex;
+      align-items: center;
+      background: white;
+      padding: 8px 16px;
+      border-radius: 40px;
+      gap: 10px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+      border: 1px solid #dae3ec;
+    }
+    .search-box i { color: #8da1b5; font-size: 1rem; }
+    .search-box input {
+      border: none;
+      outline: none;
+      font-size: 0.9rem;
+      background: transparent;
+      width: 200px;
+      color: #1f3449;
+    }
+    .search-box input::placeholder { color: #9bb0c5; }
+
+    .user-profile {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: white;
+      padding: 6px 12px 6px 16px;
+      border-radius: 40px;
+      border: 1px solid #dae3ec;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      user-select: none;
+    }
+    .user-profile:hover {
+      border-color: #b0c8e0;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+    }
+    .user-profile:active { transform: scale(0.98); }
+    .user-profile span { font-weight: 500; font-size: 0.9rem; color: #1f3449; }
+
+    .avatar {
+      background: #1a2b3c;
+      color: #f0b34b;
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      font-weight: 600;
+      font-size: 0.9rem;
+      border: 1px solid #f0b34b40;
+    }
+
+    /* ---------- CONNECTION BANNER ---------- */
+    .connection-banner {
+      display: none;
+      align-items: center;
+      gap: 12px;
+      background: #fff5f5;
+      border: 1px solid #f3cdcd;
+      color: #b13b3b;
+      padding: 12px 18px;
+      border-radius: 16px;
+      margin-bottom: 18px;
+      font-size: 0.88rem;
+      font-weight: 500;
+      animation: fadeSlideDown 0.3s ease;
+    }
+    .connection-banner.show { display: flex; }
+    .connection-banner i { font-size: 1.1rem; color: #e05c5c; flex-shrink: 0; }
+    .connection-banner button {
+      margin-left: auto;
+      background: #b13b3b;
+      color: white;
+      border: none;
+      padding: 7px 16px;
+      border-radius: 40px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+      transition: all 0.15s;
+      white-space: nowrap;
+    }
+    .connection-banner button:hover { background: #8f2e2e; }
+    .connection-banner button:active { transform: scale(0.96); }
+
+    @keyframes fadeSlideDown {
+      from { opacity: 0; transform: translateY(-8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ---------- STATS STRIP ---------- */
+    .stats-strip {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .stat-pill {
+      background: white;
+      border: 1px solid #e9eff6;
+      border-radius: 18px;
+      padding: 16px 18px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
+      transition: all 0.15s ease;
+    }
+    .stat-pill:hover { border-color: #cbdae9; transform: translateY(-1px); }
+
+    .stat-pill i {
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 12px;
+      font-size: 1.1rem;
+      background: #fef4e6;
+      color: #d6952c;
+      flex-shrink: 0;
+    }
+    .stat-pill .stat-info { display: flex; flex-direction: column; }
+    .stat-pill .stat-value {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: #0b1d2e;
+      line-height: 1.1;
+    }
+    .stat-pill .stat-label {
+      font-size: 0.78rem;
+      color: #687e94;
+      font-weight: 500;
+      margin-top: 2px;
+    }
+
+    /* ---------- QUICK CONTACT CARDS ---------- */
+    .contact-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .contact-card {
+      background: white;
+      border: 1px solid #e9eff6;
+      border-radius: 20px;
+      padding: 20px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
+      transition: all 0.15s ease;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .contact-card:hover {
+      border-color: #cbdae9;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+    }
+
+    .contact-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 14px;
+      background: #fef4e6;
+      color: #d6952c;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.15rem;
+      margin-bottom: 4px;
+    }
+
+    .contact-card h3 {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: #0b1d2e;
+    }
+    .contact-card p {
+      font-size: 0.85rem;
+      color: #5d768e;
+      line-height: 1.5;
+    }
+    .contact-card a {
+      font-size: 0.85rem;
+      color: #1d6ab0;
+      text-decoration: none;
+      font-weight: 500;
+      margin-top: auto;
+    }
+    .contact-card a:hover { text-decoration: underline; }
+
+    /* ---------- TOOLBAR ---------- */
+    .toolbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 18px;
+      flex-wrap: wrap;
+    }
+    .toolbar-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 20px;
+      border-radius: 40px;
+      font-size: 0.88rem;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+      border: 1px solid transparent;
+      transition: all 0.15s ease;
+      white-space: nowrap;
+      text-decoration: none;
+    }
+    .btn:active { transform: scale(0.96); }
+    .btn:disabled { opacity: 0.55; cursor: not-allowed; transform: none; }
+
+    .btn-primary {
+      background: #1a2b3c;
+      color: #f0e9df;
+      border-color: #1a2b3c;
+      box-shadow: 0 6px 14px -6px rgba(26, 43, 60, 0.4);
+    }
+    .btn-primary:hover:not(:disabled) { background: #233a50; border-color: #233a50; }
+    .btn-primary i { color: #f0b34b; }
+
+    .btn-outline {
+      background: white;
+      border-color: #d0ddee;
+      color: #2a4b6e;
+    }
+    .btn-outline:hover:not(:disabled) { background: #f5f9ff; border-color: #b0c8e0; }
+    .btn-outline i { font-size: 0.85rem; }
+
+    .btn-danger {
+      background: white;
+      border-color: #f3cdcd;
+      color: #b13b3b;
+    }
+    .btn-danger:hover:not(:disabled) { background: #fff5f5; border-color: #e8b0b0; }
+
+    .filter-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .filter-select {
+      background: white;
+      border: 1px solid #d0ddee;
+      border-radius: 40px;
+      padding: 9px 16px;
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: #2a4b6e;
+      font-family: inherit;
+      cursor: pointer;
+      outline: none;
+      transition: 0.15s;
+    }
+    .filter-select:hover { border-color: #b0c8e0; }
+    .filter-select:focus {
+      border-color: #d6952c;
+      box-shadow: 0 0 0 3px rgba(214, 149, 44, 0.12);
+    }
+
+    /* ---------- TABLE ---------- */
+    .table-section {
+      background: white;
+      border-radius: 24px;
+      border: 1px solid #e9eff6;
+      padding: 8px 0 8px 0;
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.02);
+      overflow: hidden;
+      margin-bottom: 24px;
+    }
+
+    .table-wrapper { overflow-x: auto; padding: 0 4px; }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 900px;
+    }
+
+    th {
+      text-align: left;
+      padding: 16px 18px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      color: #5d768e;
+      background: #f9fcff;
+      border-bottom: 1px solid #e2ebf4;
+      white-space: nowrap;
+      user-select: none;
+    }
+    th.sortable { cursor: pointer; }
+    th.sortable:hover { color: #2a4b6e; background: #f0f6fd; }
+    th .sort-icon { margin-left: 6px; font-size: 0.65rem; color: #a3b8cc; }
+
+    td {
+      padding: 14px 18px;
+      font-size: 0.88rem;
+      color: #1e3145;
+      border-bottom: 1px solid #edf2f9;
+      white-space: nowrap;
+      vertical-align: middle;
+    }
+    tr:last-child td { border-bottom: none; }
+    tbody tr { transition: background 0.1s; }
+    tbody tr:hover { background: #fafdff; }
+
+    .ticket-info { display: flex; align-items: center; gap: 12px; }
+
+    .ticket-icon {
+      background: #fef4e6;
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 10px;
+      color: #d6952c;
+      font-size: 0.95rem;
+      flex-shrink: 0;
+    }
+
+    .ticket-id { font-weight: 600; color: #0b1d2e; }
+    .ticket-subject {
+      font-size: 0.75rem;
+      color: #8da1b5;
+      margin-top: 2px;
+      display: block;
+    }
+
+    .badge {
+      padding: 4px 12px;
+      border-radius: 40px;
+      font-weight: 500;
+      font-size: 0.78rem;
+      display: inline-block;
+      white-space: nowrap;
+    }
+    .badge.open        { background: #fff3e0; color: #b1590e; }
+    .badge.in-progress { background: #e3f0fd; color: #1d6ab0; }
+    .badge.resolved    { background: #e6f3e6; color: #1e6d3a; }
+    .badge.closed      { background: #eef1f5; color: #5d768e; }
+
+    .priority {
+      font-weight: 600;
+      font-size: 0.78rem;
+      padding: 3px 10px;
+      border-radius: 40px;
+      display: inline-block;
+    }
+    .priority.low    { background: #e6f3e6; color: #1e6d3a; }
+    .priority.medium { background: #fff3e0; color: #b1590e; }
+    .priority.high   { background: #ffe6e6; color: #b13b3b; }
+    .priority.urgent { background: #b13b3b; color: white; }
+
+    .row-actions { display: flex; gap: 6px; justify-content: flex-end; }
+
+    .icon-btn {
+      width: 32px;
+      height: 32px;
+      border-radius: 9px;
+      border: 1px solid #e2ebf4;
+      background: white;
+      color: #5d768e;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.8rem;
+      cursor: pointer;
+      transition: all 0.12s ease;
+      font-family: inherit;
+    }
+    .icon-btn:hover { background: #f5f9ff; border-color: #b0c8e0; color: #2a4b6e; }
+    .icon-btn:active { transform: scale(0.92); }
+    .icon-btn.edit:hover { color: #b1590e; border-color: #f0d0a8; background: #fffaf3; }
+    .icon-btn.delete:hover { color: #b13b3b; border-color: #f3cdcd; background: #fff5f5; }
+
+    /* loading / empty */
+    .loading-state {
+      padding: 60px 24px;
+      text-align: center;
+      color: #8da1b5;
+    }
+    .loading-state i {
+      font-size: 2.4rem;
+      color: #d7e3ef;
+      margin-bottom: 16px;
+      display: block;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .empty-state {
+      padding: 60px 24px;
+      text-align: center;
+      color: #8da1b5;
+    }
+    .empty-state i {
+      font-size: 3rem;
+      color: #d7e3ef;
+      margin-bottom: 16px;
+      display: block;
+    }
+    .empty-state h3 {
+      font-size: 1.1rem;
+      color: #5d768e;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+    .empty-state p { font-size: 0.88rem; }
+
+    .table-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 24px 12px 24px;
+      font-size: 0.85rem;
+      color: #5d768e;
+      border-top: 1px solid #edf2f9;
+      margin-top: 4px;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .pagination { display: flex; gap: 6px; align-items: center; }
+
+    .page-btn {
+      background: white;
+      border: 1px solid #dae3ec;
+      width: 32px;
+      height: 32px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.8rem;
+      color: #3b5e7e;
+      cursor: pointer;
+      transition: 0.1s;
+      font-family: inherit;
+    }
+    .page-btn.active {
+      background: #1a2b3c;
+      border-color: #1a2b3c;
+      color: white;
+    }
+    .page-btn:hover:not(.active):not(:disabled) {
+      background: #f2f7ff;
+      border-color: #b8cee3;
+    }
+    .page-btn:active:not(:disabled) { transform: scale(0.94); }
+    .page-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    /* ---------- FAQ ---------- */
+    .faq-section {
+      background: white;
+      border-radius: 24px;
+      border: 1px solid #e9eff6;
+      padding: 24px 28px;
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.02);
+      margin-bottom: 24px;
+    }
+
+    .faq-section h2 {
+      font-size: 1.15rem;
+      font-weight: 600;
+      color: #0b1d2e;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .faq-section h2 i { color: #d6952c; }
+
+    .faq-item {
+      border-top: 1px solid #edf2f9;
+      padding: 14px 0;
+    }
+    .faq-item:first-of-type { border-top: none; }
+
+    .faq-question {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+      font-weight: 500;
+      color: #1e3145;
+      font-size: 0.95rem;
+      gap: 12px;
+      user-select: none;
+    }
+    .faq-question:hover { color: #d6952c; }
+    .faq-question i {
+      color: #a3b8cc;
+      transition: transform 0.2s ease;
+      flex-shrink: 0;
+    }
+    .faq-item.open .faq-question i { transform: rotate(180deg); color: #d6952c; }
+
+    .faq-answer {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.25s ease, padding 0.25s ease;
+      font-size: 0.88rem;
+      color: #5d768e;
+      line-height: 1.6;
+    }
+    .faq-item.open .faq-answer {
+      max-height: 300px;
+      padding-top: 10px;
+    }
+
+    /* ---------- MODAL ---------- */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(11, 29, 46, 0.55);
+      backdrop-filter: blur(3px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      z-index: 1000;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.25s ease;
+    }
+    .modal-overlay.open { opacity: 1; visibility: visible; }
+
+    .modal {
+      background: white;
+      border-radius: 28px;
+      width: 100%;
+      max-width: 640px;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: 0 32px 80px rgba(0, 0, 0, 0.3);
+      transform: translateY(24px) scale(0.97);
+      transition: all 0.25s cubic-bezier(0.34, 1.4, 0.64, 1);
+    }
+    .modal-overlay.open .modal { transform: translateY(0) scale(1); }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 24px 28px 18px 28px;
+      border-bottom: 1px solid #edf2f9;
+      position: sticky;
+      top: 0;
+      background: white;
+      z-index: 2;
+      border-radius: 28px 28px 0 0;
+    }
+    .modal-header h2 {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: #0b1d2e;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .modal-header h2 i { color: #d6952c; font-size: 1.1rem; }
+
+    .modal-close {
+      width: 36px;
+      height: 36px;
+      border-radius: 12px;
+      border: 1px solid #e2ebf4;
+      background: white;
+      color: #5d768e;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.95rem;
+      transition: all 0.12s ease;
+      font-family: inherit;
+    }
+    .modal-close:hover { background: #fff5f5; border-color: #f3cdcd; color: #b13b3b; }
+    .modal-close:active { transform: scale(0.92); }
+
+    .modal-body { padding: 24px 28px 8px 28px; }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .form-group.full { grid-column: 1 / -1; }
+
+    .form-group label {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: #3b5e7e;
+      letter-spacing: 0.01em;
+    }
+    .form-group label .req { color: #d64545; margin-left: 2px; }
+
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      padding: 11px 14px;
+      border: 1px solid #d0ddee;
+      border-radius: 12px;
+      font-size: 0.9rem;
+      font-family: inherit;
+      color: #1f3449;
+      background: white;
+      outline: none;
+      transition: all 0.15s ease;
+      width: 100%;
+    }
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+      border-color: #d6952c;
+      box-shadow: 0 0 0 3px rgba(214, 149, 44, 0.13);
+    }
+    .form-group input::placeholder,
+    .form-group textarea::placeholder { color: #a3b8cc; }
+    .form-group textarea { resize: vertical; min-height: 70px; }
+
+    .input-hint { font-size: 0.72rem; color: #8da1b5; margin-top: 2px; }
+
+    .modal-footer {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      padding: 20px 28px 26px 28px;
+      border-top: 1px solid #edf2f9;
+      margin-top: 16px;
+      flex-wrap: wrap;
+      position: sticky;
+      bottom: 0;
+      background: white;
+      border-radius: 0 0 28px 28px;
+    }
+
+    /* ---------- TOAST ---------- */
+    .toast {
+      position: fixed;
+      bottom: 28px;
+      right: 28px;
+      background: #1a2b3c;
+      color: #f0e9df;
+      padding: 14px 22px;
+      border-radius: 14px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.25);
+      border-left: 4px solid #f0b34b;
+      transform: translateY(120%);
+      opacity: 0;
+      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      z-index: 2000;
+      pointer-events: none;
+      max-width: 340px;
+    }
+    .toast.show { transform: translateY(0); opacity: 1; }
+    .toast i { color: #f0b34b; font-size: 1.1rem; flex-shrink: 0; }
+    .toast.error { border-left-color: #e05c5c; }
+    .toast.error i { color: #e05c5c; }
+    .toast.warning { border-left-color: #f0b34b; }
+    .toast.warning i { color: #f0b34b; }
+
+    /* ---------- RESPONSIVE ---------- */
+    @media (max-width: 900px) {
+      .sidebar { width: 80px; padding: 28px 8px; }
+      .sidebar-brand span, .nav-item span { display: none; }
+      .sidebar-brand i { margin: 0 auto; }
+      .nav-item { justify-content: center; padding: 14px 0; }
+      .nav-item i { font-size: 1.3rem; }
+      .sidebar-footer .nav-item span { display: none; }
+      .main-content { padding: 20px; }
+    }
+
+    @media (max-width: 700px) {
+      .form-grid { grid-template-columns: 1fr; }
+      .form-group.full { grid-column: 1; }
+    }
+
+    @media (max-width: 600px) {
+      .main-content { padding: 16px; }
+      .top-header { flex-direction: column; align-items: stretch; }
+      .header-actions { justify-content: space-between; flex-wrap: wrap; }
+      .search-box { flex: 1; }
+      .search-box input { width: 100%; }
+      .user-profile span { display: none; }
+      .user-profile { padding: 6px; }
+      .toolbar { flex-direction: column; align-items: stretch; }
+      .toolbar-left { width: 100%; }
+      .filter-group { width: 100%; }
+      .filter-select { flex: 1; }
+      .table-footer { flex-direction: column; align-items: flex-start; }
+      .toast { left: 16px; right: 16px; bottom: 16px; max-width: none; }
+      .modal-body { padding: 20px 20px 4px 20px; }
+      .modal-header { padding: 20px 20px 16px 20px; }
+      .modal-footer { padding: 16px 20px 22px 20px; }
+      .connection-banner { flex-wrap: wrap; }
+      .connection-banner button { margin-left: 0; width: 100%; }
+    }
+
+    .no-wrap { white-space: nowrap; }
+  </style>
+</head>
+<body>
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <a href="home.html" class="sidebar-brand">
+      <i class="fas fa-cubes"></i>
+      <span>Maricopa</span>
+    </a>
+
+    <nav class="sidebar-nav">
+      <a href="home.html" class="nav-item">
+        <i class="fas fa-chart-pie"></i>
+        <span>Dashboard</span>
+      </a>
+      <a href="inventory.html" class="nav-item">
+        <i class="fas fa-boxes"></i>
+        <span>Inventory</span>
+      </a>
+      <a href="orders.html" class="nav-item">
+        <i class="fas fa-truck"></i>
+        <span>Orders</span>
+      </a>
+      <a href="analytics.html" class="nav-item">
+        <i class="fas fa-chart-line"></i>
+        <span>Analytics</span>
+      </a>
+      <a href="settings.html" class="nav-item">
+        <i class="fas fa-cog"></i>
+        <span>Settings</span>
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <a href="support.html" class="nav-item active">
+        <i class="fas fa-circle-question"></i>
+        <span>Support</span>
+      </a>
+      <a href="logout.html" class="nav-item">
+        <i class="fas fa-right-from-bracket"></i>
+        <span>Logout</span>
+      </a>
+    </div>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <main class="main-content">
+    <header class="top-header">
+      <div class="page-title">
+        <h1>Support</h1>
+        <p><i class="fas fa-headset"></i> Maricopa · Get help, report issues, track tickets</p>
+      </div>
+
+      <div class="header-actions">
+        <div class="search-box">
+          <i class="fas fa-search"></i>
+          <input type="text" id="searchInput" placeholder="Search tickets, subjects, requesters...">
+        </div>
+        <div class="user-profile" id="userProfile">
+          <span>Alex Rivera</span>
+          <div class="avatar">AR</div>
+        </div>
+      </div>
+    </header>
+
+    <!-- CONNECTION BANNER -->
+    <div class="connection-banner" id="connectionBanner">
+      <i class="fas fa-plug-circle-exclamation"></i>
+      <span id="connectionMessage">Cannot reach the server. Check your connection and try again.</span>
+      <button id="btnRetryConnection">
+        <i class="fas fa-rotate"></i> Retry
+      </button>
+    </div>
+
+    <!-- STATS STRIP -->
+    <div class="stats-strip">
+      <div class="stat-pill">
+        <i class="fas fa-ticket"></i>
+        <div class="stat-info">
+          <span class="stat-value" id="statTotal">0</span>
+          <span class="stat-label">Total tickets</span>
+        </div>
+      </div>
+      <div class="stat-pill">
+        <i class="fas fa-envelope-open-text"></i>
+        <div class="stat-info">
+          <span class="stat-value" id="statOpen">0</span>
+          <span class="stat-label">Open</span>
+        </div>
+      </div>
+      <div class="stat-pill">
+        <i class="fas fa-spinner"></i>
+        <div class="stat-info">
+          <span class="stat-value" id="statProgress">0</span>
+          <span class="stat-label">In progress</span>
+        </div>
+      </div>
+      <div class="stat-pill">
+        <i class="fas fa-circle-check"></i>
+        <div class="stat-info">
+          <span class="stat-value" id="statResolved">0</span>
+          <span class="stat-label">Resolved</span>
+        </div>
+      </div>
+      <div class="stat-pill">
+        <i class="fas fa-fire"></i>
+        <div class="stat-info">
+          <span class="stat-value" id="statUrgent">0</span>
+          <span class="stat-label">Urgent</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- QUICK CONTACT CARDS -->
+    <div class="contact-grid">
+      <div class="contact-card">
+        <div class="contact-icon"><i class="fas fa-phone-volume"></i></div>
+        <h3>Call us</h3>
+        <p>Mon–Fri, 8:00 AM – 6:00 PM EAT</p>
+        <a href="tel:+254700000000">+254 700 000 000</a>
+      </div>
+      <div class="contact-card">
+        <div class="contact-icon"><i class="fas fa-envelope"></i></div>
+        <h3>Email support</h3>
+        <p>Response within 1 business day</p>
+        <a href="mailto:support@maricopa.co.ke">support@maricopa.co.ke</a>
+      </div>
+      <div class="contact-card">
+        <div class="contact-icon"><i class="fas fa-comments"></i></div>
+        <h3>Live chat</h3>
+        <p>Average wait time: under 3 min</p>
+        <a href="#" id="liveChatLink">Start a chat →</a>
+      </div>
+      <div class="contact-card">
+        <div class="contact-icon"><i class="fas fa-book-open"></i></div>
+        <h3>Knowledge base</h3>
+        <p>Guides, API docs, troubleshooting</p>
+        <a href="#" id="kbLink">Browse docs →</a>
+      </div>
+    </div>
+
+    <!-- TOOLBAR -->
+    <div class="toolbar">
+      <div class="toolbar-left">
+        <button class="btn btn-primary" id="btnAddTicket">
+          <i class="fas fa-plus"></i> New ticket
+        </button>
+        <button class="btn btn-outline" id="btnExport">
+          <i class="fas fa-download"></i> Export CSV
+        </button>
+        <button class="btn btn-danger" id="btnClearAll">
+          <i class="fas fa-trash-can"></i> Clear all
+        </button>
+      </div>
+      <div class="filter-group">
+        <select class="filter-select" id="filterStatus">
+          <option value="">All statuses</option>
+          <option value="open">Open</option>
+          <option value="in-progress">In progress</option>
+          <option value="resolved">Resolved</option>
+          <option value="closed">Closed</option>
+        </select>
+        <select class="filter-select" id="filterPriority">
+          <option value="">All priorities</option>
+          <option value="low">Low</option>
+          <option value="medium">Medium</option>
+          <option value="high">High</option>
+          <option value="urgent">Urgent</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- TABLE -->
+    <div class="table-section">
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th class="sortable" data-sort="id">Ticket <span class="sort-icon"><i class="fas fa-sort"></i></span></th>
+              <th class="sortable" data-sort="requester">Requester <span class="sort-icon"><i class="fas fa-sort"></i></span></th>
+              <th class="sortable" data-sort="category">Category <span class="sort-icon"><i class="fas fa-sort"></i></span></th>
+              <th class="sortable" data-sort="priority">Priority <span class="sort-icon"><i class="fas fa-sort"></i></span></th>
+              <th class="sortable" data-sort="date">Created <span class="sort-icon"><i class="fas fa-sort"></i></span></th>
+              <th class="sortable" data-sort="status">Status <span class="sort-icon"><i class="fas fa-sort"></i></span></th>
+              <th style="text-align:right;">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="ticketsBody"></tbody>
+        </table>
+
+        <div class="loading-state" id="loadingState" style="display:none;">
+          <i class="fas fa-spinner"></i>
+          <p>Loading tickets…</p>
+        </div>
+
+        <div class="empty-state" id="emptyState" style="display:none;">
+          <i class="fas fa-inbox"></i>
+          <h3>No support tickets</h3>
+          <p>Click "New ticket" to file your first request.</p>
+        </div>
+      </div>
+
+      <div class="table-footer">
+        <span id="footerInfo">Showing 0 tickets</span>
+        <div class="pagination" id="pagination"></div>
+      </div>
+    </div>
+
+    <!-- FAQ -->
+    <div class="faq-section">
+      <h2><i class="fas fa-circle-question"></i> Frequently asked questions</h2>
+
+      <div class="faq-item">
+        <div class="faq-question">
+          <span>How do I add a new inventory item?</span>
+          <i class="fas fa-chevron-down"></i>
+        </div>
+        <div class="faq-answer">
+          Go to <strong>Inventory</strong> → click <em>Add stock item</em>. Fill in the required fields (name, SKU, category, quantity, price) and save. The item appears in the table immediately.
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-question">
+          <span>Why is my order status not updating?</span>
+          <i class="fas fa-chevron-down"></i>
+        </div>
+        <div class="faq-answer">
+          Order status updates require a connection to the API. If the red banner at the top of the page says the server is unreachable, click <em>Retry</em> after your connection is restored. You can also check the <strong>Orders</strong> page and edit the status manually.
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-question">
+          <span>What is the difference between "Low stock" and "Out of stock"?</span>
+          <i class="fas fa-chevron-down"></i>
+        </div>
+        <div class="faq-answer">
+          <strong>Low stock</strong> means the quantity is at or below the item's threshold (default 10). <strong>Out of stock</strong> means the quantity is zero. Both appear in the inventory stats strip.
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-question">
+          <span>How do I export my data?</span>
+          <i class="fas fa-chevron-down"></i>
+        </div>
+        <div class="faq-answer">
+          Every table (Inventory, Orders, Support) has an <em>Export CSV</em> button in the toolbar. The file is named with the date so you can keep historical snapshots.
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-question">
+          <span>Can I recover a deleted item?</span>
+          <i class="fas fa-chevron-down"></i>
+        </div>
+        <div class="faq-answer">
+          Deletions are permanent from the UI. If you need recovery, contact support with the item SKU or order ID — we keep server-side backups for 30 days.
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- ADD / EDIT TICKET MODAL -->
+  <div class="modal-overlay" id="modalOverlay">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <div class="modal-header">
+        <h2 id="modalTitle"><i class="fas fa-ticket"></i> New ticket</h2>
+        <button class="modal-close" id="modalClose" aria-label="Close">
+          <i class="fas fa-xmark"></i>
+        </button>
+      </div>
+
+      <form id="ticketForm">
+        <div class="modal-body">
+          <div class="form-grid">
+            <div class="form-group full">
+              <label for="ticketSubject">Subject <span class="req">*</span></label>
+              <input type="text" id="ticketSubject" name="subject" placeholder="e.g. Order #ord_abc123 stuck in processing" required>
+            </div>
+
+            <div class="form-group">
+              <label for="ticketRequester">Requester <span class="req">*</span></label>
+              <input type="text" id="ticketRequester" name="requester" placeholder="e.g. Alex Rivera" required>
+            </div>
+
+            <div class="form-group">
+              <label for="ticketEmail">Email</label>
+              <input type="email" id="ticketEmail" name="email" placeholder="alex@maricopa.co.ke">
+            </div>
+
+            <div class="form-group">
+              <label for="ticketCategory">Category <span class="req">*</span></label>
+              <select id="ticketCategory" name="category" required>
+                <option value="" disabled selected>Select category</option>
+                <option value="Inventory">Inventory</option>
+                <option value="Orders">Orders</option>
+                <option value="Billing">Billing</option>
+                <option value="Account">Account</option>
+                <option value="API">API / Integration</option>
+                <option value="Bug report">Bug report</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="ticketPriority">Priority <span class="req">*</span></label>
+              <select id="ticketPriority" name="priority" required>
+                <option value="low">Low</option>
+                <option value="medium" selected>Medium</option>
+                <option value="high">High</option>
+                <option value="urgent">Urgent</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="ticketStatus">Status <span class="req">*</span></label>
+              <select id="ticketStatus" name="status" required>
+                <option value="open" selected>Open</option>
+                <option value="in-progress">In progress</option>
+                <option value="resolved">Resolved</option>
+                <option value="closed">Closed</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="ticketDate">Created on <span class="req">*</span></label>
+              <input type="date" id="ticketDate" name="date" required>
+            </div>
+
+            <div class="form-group full">
+              <label for="ticketDescription">Description <span class="req">*</span></label>
+              <textarea id="ticketDescription" name="description" placeholder="Describe the issue, steps to reproduce, expected vs actual behaviour…" required></textarea>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline" id="modalCancel">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="modalSave">
+            <i class="fas fa-check"></i> Save ticket
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- TOAST -->
+  <div class="toast" id="toast">
+    <i class="fas fa-check-circle" id="toastIcon"></i>
+    <span id="toastMessage">Action completed</span>
+  </div>
+
+  <script>
+    (function() {
+      'use strict';
+
+      // ============================================================
+      // BACKEND CONFIGURATION
+      // ============================================================
+      const API = {
+        BASE_URL: 'http://localhost:3000/api',
+        ENDPOINTS: {
+          list:   '/support',
+          create: '/support',
+          update: '/support/:id',
+          delete: '/support/:id',
+          clear:  '/support'
+        },
+        url(key, params) {
+          let path = this.ENDPOINTS[key] || '';
+          if (params && params.id) path = path.replace(':id', encodeURIComponent(params.id));
+          return this.BASE_URL + path;
+        }
+      };
+
+      // ============================================================
+      // DATA SERVICE
+      // ============================================================
+      const DataService = {
+        async _request(url, options = {}) {
+          let res;
+          try {
+            res = await fetch(url, {
+              headers: { 'Accept': 'application/json', ...(options.headers || {}) },
+              ...options
+            });
+          } catch (networkErr) {
+            const err = new Error('NETWORK');
+            err.isNetwork = true;
+            err.cause = networkErr;
+            throw err;
+          }
+
+          if (!res.ok) {
+            let body = null;
+            try { body = await res.json(); } catch (_) { /* ignore */ }
+            const err = new Error((body && body.error) || ('Request failed (' + res.status + ')'));
+            err.status = res.status;
+            err.body = body;
+            throw err;
+          }
+
+          if (res.status === 204) return null;
+          try { return await res.json(); } catch (_) { return null; }
+        },
+
+        fetchTickets() { return this._request(API.url('list')); },
+
+        createTicket(t) {
+          return this._request(API.url('create'), {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(t)
+          });
+        },
+
+        updateTicket(id, t) {
+          return this._request(API.url('update', { id }), {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(t)
+          });
+        },
+
+        deleteTicket(id) {
+          return this._request(API.url('delete', { id }), { method: 'DELETE' });
+        },
+
+        clearAll() {
+          return this._request(API.url('clear'), { method: 'DELETE' });
+        }
+      };
+
+      // ============================================================
+      // STATE
+      // ============================================================
+      const PAGE_SIZE = 8;
+
+      let tickets = [];
+      let editingId = null;
+      let currentPage = 1;
+      let sortKey = 'date';
+      let sortDir = 'desc';
+      let filters = { search: '', status: '', priority: '' };
+      let isLoading = false;
+      let serverReachable = true;
+
+      // ============================================================
+      // DOM REFS
+      // ============================================================
+      const tbody = document.getElementById('ticketsBody');
+      const emptyState = document.getElementById('emptyState');
+      const loadingState = document.getElementById('loadingState');
+      const footerInfo = document.getElementById('footerInfo');
+      const pagination = document.getElementById('pagination');
+      const searchInput = document.getElementById('searchInput');
+      const filterStatus = document.getElementById('filterStatus');
+      const filterPriority = document.getElementById('filterPriority');
+      const statTotal = document.getElementById('statTotal');
+      const statOpen = document.getElementById('statOpen');
+      const statProgress = document.getElementById('statProgress');
+      const statResolved = document.getElementById('statResolved');
+      const statUrgent = document.getElementById('statUrgent');
+
+      const modalOverlay = document.getElementById('modalOverlay');
+      const modalTitle = document.getElementById('modalTitle');
+      const ticketForm = document.getElementById('ticketForm');
+      const modalSave = document.getElementById('modalSave');
+
+      const connectionBanner = document.getElementById('connectionBanner');
+      const connectionMessage = document.getElementById('connectionMessage');
+      const btnRetryConnection = document.getElementById('btnRetryConnection');
+
+      // ============================================================
+      // TOAST
+      // ============================================================
+      const toast = document.getElementById('toast');
+      const toastMessage = document.getElementById('toastMessage');
+      const toastIcon = document.getElementById('toastIcon');
+      let toastTimeout = null;
+
+      function showToast(message, type = 'success', duration = 3200) {
+        if (toastTimeout) clearTimeout(toastTimeout);
+        toastMessage.textContent = message;
+        toast.classList.remove('error', 'warning');
+
+        if (type === 'error') {
+          toastIcon.className = 'fas fa-circle-exclamation';
+          toast.classList.add('error');
+        } else if (type === 'warning') {
+          toastIcon.className = 'fas fa-triangle-exclamation';
+          toast.classList.add('warning');
+        } else {
+          toastIcon.className = 'fas fa-check-circle';
+        }
+
+        toast.classList.add('show');
+        toastTimeout = setTimeout(() => toast.classList.remove('show'), duration);
+      }
+
+      // ============================================================
+      // CONNECTION STATUS
+      // ============================================================
+      function setServerReachable(reachable, reason = '') {
+        const wasDown = !serverReachable;
+        serverReachable = reachable;
+
+        if (!reachable) {
+          connectionBanner.classList.add('show');
+          connectionMessage.textContent = reason || 'Cannot reach the server. Check your connection and try again.';
+          document.getElementById('btnAddTicket').disabled = true;
+          document.getElementById('btnClearAll').disabled = true;
+          document.getElementById('btnExport').disabled = true;
+        } else {
+          connectionBanner.classList.remove('show');
+          document.getElementById('btnAddTicket').disabled = false;
+          document.getElementById('btnClearAll').disabled = false;
+          document.getElementById('btnExport').disabled = false;
+          if (wasDown) showToast('Reconnected to server.', 'success');
+        }
+      }
+
+      function handleServiceError(err, actionLabel) {
+        if (err && err.isNetwork) {
+          setServerReachable(false, 'Server unreachable. Is the backend running on ' + API.BASE_URL + '?');
+          showToast('Server not connected — ' + actionLabel + ' failed.', 'error', 4200);
+          return;
+        }
+        if (err && err.status === 409) {
+          showToast(err.message || 'Conflict.', 'error');
+          return;
+        }
+        if (err && err.status === 400) {
+          const detail = err.body && err.body.details ? err.body.details.join(', ') : (err.message || 'Invalid data');
+          showToast('Validation error: ' + detail, 'error');
+          return;
+        }
+        if (err && err.status === 404) {
+          showToast('Ticket not found — it may have been deleted elsewhere.', 'error');
+          return;
+        }
+        showToast((err && err.message) || (actionLabel + ' failed.'), 'error');
+      }
+
+      // ============================================================
+      // HELPERS
+      // ============================================================
+      function formatNumber(n) { return Number(n || 0).toLocaleString('en-KE'); }
+
+      function formatDate(dateStr) {
+        if (!dateStr) return '—';
+        try {
+          const d = new Date(dateStr);
+          if (isNaN(d)) return dateStr;
+          return d.toLocaleDateString('en-KE', { year: 'numeric', month: 'short', day: 'numeric' });
+        } catch (_) { return dateStr; }
+      }
+
+      function statusLabel(s) {
+        const map = { open: 'Open', 'in-progress': 'In progress', resolved: 'Resolved', closed: 'Closed' };
+        return map[s] || s;
+      }
+
+      function statusClass(s) { return 'badge ' + (s || 'open'); }
+
+      function priorityClass(p) { return 'priority ' + (p || 'medium'); }
+
+      function ticketIcon(category) {
+        const map = {
+          'Inventory': 'fa-boxes',
+          'Orders': 'fa-truck',
+          'Billing': 'fa-file-invoice-dollar',
+          'Account': 'fa-user-circle',
+          'API': 'fa-code',
+          'Bug report': 'fa-bug',
+          'Other': 'fa-circle-question'
+        };
+        return map[category] || 'fa-ticket';
+      }
+
+      function escapeHtml(str) {
+        if (str === null || str === undefined) return '';
+        return String(str)
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;')
+          .replace(/'/g, '&#039;');
+      }
+
+      // ============================================================
+      // FILTERING + SORTING
+      // ============================================================
+      function getFilteredTickets() {
+        const q = filters.search.trim().toLowerCase();
+        return tickets.filter(t => {
+          if (q) {
+            const hay = (
+              (t.id || '') + ' ' +
+              (t.subject || '') + ' ' +
+              (t.requester || '') + ' ' +
+              (t.description || '') + ' ' +
+              (t.category || '')
+            ).toLowerCase();
+            if (!hay.includes(q)) return false;
+          }
+          if (filters.status && t.status !== filters.status) return false;
+          if (filters.priority && t.priority !== filters.priority) return false;
+          return true;
+        });
+      }
+
+      function getSortedTickets(items) {
+        const dir = sortDir === 'asc' ? 1 : -1;
+        return items.slice().sort((a, b) => {
+          let av, bv;
+          switch (sortKey) {
+            case 'id':        av = (a.id || '').toLowerCase(); bv = (b.id || '').toLowerCase(); break;
+            case 'requester': av = (a.requester || '').toLowerCase(); bv = (b.requester || '').toLowerCase(); break;
+            case 'category':  av = (a.category || '').toLowerCase(); bv = (b.category || '').toLowerCase(); break;
+            case 'priority': {
+              const order = { urgent: 4, high: 3, medium: 2, low: 1 };
+              av = order[a.priority] ?? 0; bv = order[b.priority] ?? 0;
+              break;
+            }
+            case 'date':    av = new Date(a.date || 0).getTime(); bv = new Date(b.date || 0).getTime(); break;
+            case 'status': {
+              const order = { open: 0, 'in-progress': 1, resolved: 2, closed: 3 };
+              av = order[a.status] ?? 0; bv = order[b.status] ?? 0;
+              break;
+            }
+            default: av = ''; bv = '';
+          }
+          if (av < bv) return -1 * dir;
+          if (av > bv) return 1 * dir;
+          return 0;
+        });
+      }
+
+      // ============================================================
+      // STATS
+      // ============================================================
+      function updateStats() {
+        const total = tickets.length;
+        let open = 0, progress = 0, resolved = 0, urgent = 0;
+        tickets.forEach(t => {
+          if (t.status === 'open') open++;
+          else if (t.status === 'in-progress') progress++;
+          else if (t.status === 'resolved') resolved++;
+          if (t.priority === 'urgent') urgent++;
+        });
+        statTotal.textContent = formatNumber(total);
+        statOpen.textContent = formatNumber(open);
+        statProgress.textContent = formatNumber(progress);
+        statResolved.textContent = formatNumber(resolved);
+        statUrgent.textContent = formatNumber(urgent);
+      }
+
+      // ============================================================
+      // RENDER TABLE
+      // ============================================================
+      function renderTable() {
+        if (isLoading) {
+          tbody.style.display = 'none';
+          emptyState.style.display = 'none';
+          loadingState.style.display = 'block';
+          footerInfo.textContent = 'Loading…';
+          pagination.innerHTML = '';
+          return;
+        }
+
+        loadingState.style.display = 'none';
+
+        const filtered = getFilteredTickets();
+        const sorted = getSortedTickets(filtered);
+
+        const totalPages = Math.max(1, Math.ceil(sorted.length / PAGE_SIZE));
+        if (currentPage > totalPages) currentPage = totalPages;
+        if (currentPage < 1) currentPage = 1;
+
+        const start = (currentPage - 1) * PAGE_SIZE;
+        const pageItems = sorted.slice(start, start + PAGE_SIZE);
+
+        tbody.innerHTML = '';
+        if (pageItems.length === 0) {
+          emptyState.style.display = 'block';
+          tbody.style.display = 'none';
+        } else {
+          emptyState.style.display = 'none';
+          tbody.style.display = '';
+          pageItems.forEach(t => {
+            const tr = document.createElement('tr');
+            tr.setAttribute('data-id', t.id);
+            tr.innerHTML = `
+              <td>
+                <div class="ticket-info">
+                  <div class="ticket-icon"><i class="fas ${ticketIcon(t.category)}"></i></div>
+                  <div>
+                    <div class="ticket-id">#${escapeHtml(t.id)}</div>
+                    <span class="ticket-subject">${escapeHtml(t.subject || '—')}</span>
+                  </div>
+                </div>
+              </td>
+              <td>${escapeHtml(t.requester || '—')}</td>
+              <td>${escapeHtml(t.category || '—')}</td>
+              <td><span class="${priorityClass(t.priority)}">${escapeHtml(t.priority || 'medium')}</span></td>
+              <td class="no-wrap">${formatDate(t.date)}</td>
+              <td><span class="${statusClass(t.status)}">${statusLabel(t.status)}</span></td>
+              <td>
+                <div class="row-actions">
+                  <button class="icon-btn edit" data-edit="${t.id}" title="Edit ticket" aria-label="Edit ticket">
+                    <i class="fas fa-pen"></i>
+                  </button>
+                  <button class="icon-btn delete" data-delete="${t.id}" title="Delete ticket" aria-label="Delete ticket">
+                    <i class="fas fa-trash"></i>
+                  </button>
+                </div>
+              </td>
+            `;
+            tbody.appendChild(tr);
+          });
+        }
+
+        const showing = pageItems.length;
+        footerInfo.textContent = sorted.length === 0
+          ? 'Showing 0 tickets'
+          : `Showing ${start + 1}–${start + showing} of ${sorted.length} ticket${sorted.length !== 1 ? 's' : ''}`;
+
+        renderPagination(totalPages);
+
+        document.querySelectorAll('th.sortable').forEach(th => {
+          const icon = th.querySelector('.sort-icon i');
+          if (th.dataset.sort === sortKey) {
+            icon.className = sortDir === 'asc' ? 'fas fa-sort-up' : 'fas fa-sort-down';
+            th.style.color = '#d6952c';
+          } else {
+            icon.className = 'fas fa-sort';
+            th.style.color = '';
+          }
+        });
+
+        updateStats();
+      }
+
+      function renderPagination(totalPages) {
+        pagination.innerHTML = '';
+        if (totalPages <= 1) return;
+
+        const prev = document.createElement('button');
+        prev.className = 'page-btn';
+        prev.innerHTML = '<i class="fas fa-chevron-left"></i>';
+        prev.disabled = currentPage === 1;
+        prev.addEventListener('click', () => {
+          if (currentPage > 1) { currentPage--; renderTable(); }
+        });
+        pagination.appendChild(prev);
+
+        let startPage = Math.max(1, currentPage - 2);
+        let endPage = Math.min(totalPages, startPage + 4);
+        if (endPage - startPage < 4) startPage = Math.max(1, endPage - 4);
+
+        for (let i = startPage; i <= endPage; i++) {
+          const btn = document.createElement('button');
+          btn.className = 'page-btn' + (i === currentPage ? ' active' : '');
+          btn.textContent = i;
+          btn.addEventListener('click', () => { currentPage = i; renderTable(); });
+          pagination.appendChild(btn);
+        }
+
+        const next = document.createElement('button');
+        next.className = 'page-btn';
+        next.innerHTML = '<i class="fas fa-chevron-right"></i>';
+        next.disabled = currentPage === totalPages;
+        next.addEventListener('click', () => {
+          if (currentPage < totalPages) { currentPage++; renderTable(); }
+        });
+        pagination.appendChild(next);
+      }
+
+      // ============================================================
+      // LOAD DATA
+      // ============================================================
+      async function loadTickets(showSpinner = true) {
+        if (showSpinner) {
+          isLoading = true;
+          renderTable();
+        }
+
+        try {
+          const data = await DataService.fetchTickets();
+          tickets = Array.isArray(data) ? data : [];
+          setServerReachable(true);
+        } catch (err) {
+          handleServiceError(err, 'Loading tickets');
+          tickets = [];
+        } finally {
+          isLoading = false;
+          renderTable();
+        }
+      }
+
+      // ============================================================
+      // MODAL
+      // ============================================================
+      function openModal(ticket = null) {
+        if (!serverReachable) {
+          showToast('Cannot edit while the server is offline.', 'warning');
+          return;
+        }
+
+        editingId = ticket ? ticket.id : null;
+        modalTitle.innerHTML = ticket
+          ? '<i class="fas fa-pen-to-square"></i> Edit ticket'
+          : '<i class="fas fa-ticket"></i> New ticket';
+        modalSave.innerHTML = ticket
+          ? '<i class="fas fa-check"></i> Update ticket'
+          : '<i class="fas fa-check"></i> Save ticket';
+
+        ticketForm.reset();
+        if (ticket) {
+          document.getElementById('ticketSubject').value = ticket.subject || '';
+          document.getElementById('ticketRequester').value = ticket.requester || '';
+          document.getElementById('ticketEmail').value = ticket.email || '';
+          document.getElementById('ticketCategory').value = ticket.category || '';
+          document.getElementById('ticketPriority').value = ticket.priority || 'medium';
+          document.getElementById('ticketStatus').value = ticket.status || 'open';
+          document.getElementById('ticketDate').value = ticket.date || new Date().toISOString().slice(0, 10);
+          document.getElementById('ticketDescription').value = ticket.description || '';
+        } else {
+          document.getElementById('ticketDate').value = new Date().toISOString().slice(0, 10);
+        }
+
+        modalOverlay.classList.add('open');
+        setTimeout(() => document.getElementById('ticketSubject').focus(), 120);
+      }
+
+      function closeModal() {
+        modalOverlay.classList.remove('open');
+        editingId = null;
+        ticketForm.reset();
+      }
+
+      // ============================================================
+      // FORM SUBMIT
+      // ============================================================
+      ticketForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
+
+        const subject = document.getElementById('ticketSubject').value.trim();
+        const requester = document.getElementById('ticketRequester').value.trim();
+        const email = document.getElementById('ticketEmail').value.trim();
+        const category = document.getElementById('ticketCategory').value;
+        const priority = document.getElementById('ticketPriority').value;
+        const status = document.getElementById('ticketStatus').value;
+        const date = document.getElementById('ticketDate').value;
+        const description = document.getElementById('ticketDescription').value.trim();
+
+        if (!subject) { showToast('Subject is required.', 'error'); return; }
+        if (!requester) { showToast('Requester is required.', 'error'); return; }
+        if (!category) { showToast('Please select a category.', 'error'); return; }
+        if (!priority) { showToast('Please select a priority.', 'error'); return; }
+        if (!status) { showToast('Please select a status.', 'error'); return; }
+        if (!date) { showToast('Created date is required.', 'error'); return; }
+        if (!description) { showToast('Description is required.', 'error'); return; }
+
+        const payload = { subject, requester, email, category, priority, status, date, description };
+
+        modalSave.disabled = true;
+        modalSave.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving…';
+
+        try {
+          if (editingId) {
+            const updated = await DataService.updateTicket(editingId, payload);
+            const idx = tickets.findIndex(t => t.id === editingId);
+            if (idx !== -1) tickets[idx] = { ...tickets[idx], ...updated, ...payload };
+            showToast('Ticket updated successfully.');
+          } else {
+            const created = await DataService.createTicket(payload);
+            tickets.push(created || { ...payload, id: 'temp_' + Date.now() });
+            showToast('Ticket created successfully.');
+          }
+          setServerReachable(true);
+          closeModal();
+          currentPage = 1;
+          renderTable();
+        } catch (err) {
+          console.error('Save error:', err);
+          handleServiceError(err, 'Saving ticket');
+        } finally {
+          modalSave.disabled = false;
+          modalSave.innerHTML = editingId
+            ? '<i class="fas fa-check"></i> Update ticket'
+            : '<i class="fas fa-check"></i> Save ticket';
+        }
+      });
+
+      // ============================================================
+      // ROW ACTIONS
+      // ============================================================
+      tbody.addEventListener('click', async function(e) {
+        const editBtn = e.target.closest('[data-edit]');
+        const delBtn = e.target.closest('[data-delete]');
+
+        if (editBtn) {
+          const id = editBtn.getAttribute('data-edit');
+          const t = tickets.find(x => x.id === id);
+          if (t) openModal(t);
+          return;
+        }
+
+        if (delBtn) {
+          const id = delBtn.getAttribute('data-delete');
+          const t = tickets.find(x => x.id === id);
+          if (!t) return;
+          if (!confirm('Delete ticket #' + t.id + ' ("' + t.subject + '")? This cannot be undone.')) return;
+
+          try {
+            await DataService.deleteTicket(id);
+            tickets = tickets.filter(x => x.id !== id);
+            showToast('Ticket deleted.');
+            setServerReachable(true);
+            renderTable();
+          } catch (err) {
+            console.error('Delete error:', err);
+            handleServiceError(err, 'Deleting ticket');
+          }
+        }
+      });
+
+      // ============================================================
+      // TOOLBAR
+      // ============================================================
+      document.getElementById('btnAddTicket').addEventListener('click', () => openModal());
+
+      document.getElementById('btnExport').addEventListener('click', exportCSV);
+
+      document.getElementById('btnClearAll').addEventListener('click', async function() {
+        if (tickets.length === 0) {
+          showToast('Ticket list is already empty.', 'warning');
+          return;
+        }
+        if (!confirm('Delete ALL ' + tickets.length + ' tickets? This cannot be undone.')) return;
+
+        const btn = this;
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Clearing…';
+
+        try {
+          await DataService.clearAll();
+          tickets = [];
+          currentPage = 1;
+          setServerReachable(true);
+          renderTable();
+          showToast('All tickets cleared.');
+        } catch (err) {
+          console.error('Clear error:', err);
+          handleServiceError(err, 'Clearing tickets');
+        } finally {
+          btn.disabled = false;
+          btn.innerHTML = '<i class="fas fa-trash-can"></i> Clear all';
+        }
+      });
+
+      function exportCSV() {
+        if (tickets.length === 0) {
+          showToast('Nothing to export — ticket list is empty.', 'warning');
+          return;
+        }
+        const headers = ['ID', 'Subject', 'Requester', 'Email', 'Category', 'Priority', 'Status', 'Created', 'Description'];
+        const rows = tickets.map(t => [
+          t.id, t.subject, t.requester, t.email || '',
+          t.category, t.priority, statusLabel(t.status), t.date, t.description || ''
+        ]);
+        const csv = [headers, ...rows]
+          .map(r => r.map(cell => '"' + String(cell).replace(/"/g, '""') + '"').join(','))
+          .join('\r\n');
+
+        const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'maricopa-support-' + new Date().toISOString().slice(0, 10) + '.csv';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        showToast('Tickets exported as CSV.');
+      }
+
+      // ============================================================
+      // RETRY CONNECTION
+      // ============================================================
+      btnRetryConnection.addEventListener('click', async function() {
+        const btn = this;
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Connecting…';
+        try {
+          await loadTickets();
+        } finally {
+          btn.disabled = false;
+          btn.innerHTML = '<i class="fas fa-rotate"></i> Retry';
+        }
+      });
+
+      // ============================================================
+      // FILTERS + SEARCH
+      // ============================================================
+      searchInput.addEventListener('input', function() {
+        filters.search = this.value;
+        currentPage = 1;
+        renderTable();
+      });
+
+      filterStatus.addEventListener('change', function() {
+        filters.status = this.value;
+        currentPage = 1;
+        renderTable();
+      });
+
+      filterPriority.addEventListener('change', function() {
+        filters.priority = this.value;
+        currentPage = 1;
+        renderTable();
+      });
+
+      // ============================================================
+      // SORTING
+      // ============================================================
+      document.querySelectorAll('th.sortable').forEach(th => {
+        th.addEventListener('click', function() {
+          const key = this.dataset.sort;
+          if (sortKey === key) {
+            sortDir = sortDir === 'asc' ? 'desc' : 'asc';
+          } else {
+            sortKey = key;
+            sortDir = 'asc';
+          }
+          renderTable();
+        });
+      });
+
+      // ============================================================
+      // MODAL EVENTS
+      // ============================================================
+      document.getElementById('modalClose').addEventListener('click', closeModal);
+      document.getElementById('modalCancel').addEventListener('click', closeModal);
+
+      modalOverlay.addEventListener('click', function(e) {
+        if (e.target === modalOverlay) closeModal();
+      });
+
+      document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && modalOverlay.classList.contains('open')) {
+          closeModal();
+        }
+        if (e.key === '/' && !modalOverlay.classList.contains('open')) {
+          const tag = (document.activeElement.tagName || '').toLowerCase();
+          if (tag !== 'input' && tag !== 'textarea' && tag !== 'select') {
+            e.preventDefault();
+            searchInput.focus();
+          }
+        }
+      });
+
+      // ============================================================
+      // FAQ ACCORDION
+      // ============================================================
+      document.querySelectorAll('.faq-question').forEach(q => {
+        q.addEventListener('click', () => {
+          const item = q.parentElement;
+          const wasOpen = item.classList.contains('open');
+          document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('open'));
+          if (!wasOpen) item.classList.add('open');
+        });
+      });
+
+      // ============================================================
+      // CONTACT CARD LINKS
+      // ============================================================
+      document.getElementById('liveChatLink').addEventListener('click', function(e) {
+        e.preventDefault();
+        showToast('Live chat would open here — integrate your provider.', 'warning');
+      });
+
+      document.getElementById('kbLink').addEventListener('click', function(e) {
+        e.preventDefault();
+        showToast('Knowledge base would open here.', 'warning');
+      });
+
+      // ============================================================
+      // USER PROFILE
+      // ============================================================
+      document.getElementById('userProfile').addEventListener('click', function() {
+        showToast('Signed in as Alex Rivera (Admin)', 'success');
+      });
+
+      // ============================================================
+      // INIT
+      // ============================================================
+      loadTickets();
+    })();
+  </script>
+</body>
+</html>
