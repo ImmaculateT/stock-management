@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+  <title>Maricopa · Thank you</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+  <!-- ============================================================
+       THEME BOOTSTRAP — run before paint (no flash)
+       ============================================================ -->
+  <script>
+    (function () {
+      try {
+        var root = document.documentElement;
+
+        var themeMode = localStorage.getItem('mrc.themeMode') || 'system';
+        var resolved = themeMode;
+        if (themeMode === 'system') {
+          var prefersDark = window.matchMedia &&
+            window.matchMedia('(prefers-color-scheme: dark)').matches;
+          resolved = prefersDark ? 'dark' : 'light';
+        }
+        if (resolved === 'dark') root.setAttribute('data-theme', 'dark');
+
+        var accent = localStorage.getItem('mrc.accent') || 'amber';
+        root.setAttribute('data-accent', accent);
+
+        var density = localStorage.getItem('mrc.density') || 'comfortable';
+        if (density === 'compact') root.setAttribute('data-density', 'compact');
+
+        var sidebarImg = localStorage.getItem('mrc.sidebarImage');
+        if (sidebarImg) {
+          root.style.setProperty('--sidebar-image', 'url("' + sidebarImg + '")');
+        }
+      } catch (e) { /* ignore */ }
+    })();
+  </script>
+
+  <style>
+    /* ---------- THEME VARIABLES ---------- */
+    :root {
+      --bg-body: #f4f7fc;
+      --bg-surface: #ffffff;
+      --bg-surface-alt: #f9fcff;
+      --bg-sidebar: #1a2b3c;
+      --text-primary: #0b1d2e;
+      --text-secondary: #5b6f84;
+      --text-muted: #8da1b5;
+      --border-color: #e9eff6;
+      --border-color-strong: #dae3ec;
+      --accent: #f0b34b;
+      --accent-strong: #d6952c;
+      --accent-bg: #fef4e6;
+      --danger: #b13b3b;
+      --danger-bg: #fff5f5;
+      --danger-border: #f3cdcd;
+      --success: #1e6d3a;
+      --success-bg: #e6f3e6;
+      --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.02);
+      --shadow-md: 0 6px 18px rgba(0, 0, 0, 0.02);
+      --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.25);
+    }
+
+    html[data-theme="dark"] {
+      --bg-body: #0e1720;
+      --bg-surface: #16222e;
+      --bg-surface-alt: #1b2a38;
+      --bg-sidebar: #0b141c;
+      --text-primary: #e6eef7;
+      --text-secondary: #9fb2c7;
+      --text-muted: #6e8499;
+      --border-color: #22323f;
+      --border-color-strong: #2c4152;
+      --accent: #f0b34b;
+      --accent-strong: #f0b34b;
+      --accent-bg: #2a2113;
+      --danger: #f08a8a;
+      --danger-bg: #2a1717;
+      --danger-border: #4a2424;
+      --success: #6fd48f;
+      --success-bg: #12261a;
+      --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
+      --shadow-md: 0 6px 18px rgba(0, 0, 0, 0.35);
+      --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.6);
+    }
+
+    html[data-accent="amber"]  { --accent: #f0b34b; --accent-strong: #d6952c; --accent-bg: #fef4e6; }
+    html[data-accent="blue"]   { --accent: #4d9fff; --accent-strong: #2f6cb0; --accent-bg: #e6f0fb; }
+    html[data-accent="green"]  { --accent: #4caf7d; --accent-strong: #1e6d3a; --accent-bg: #e6f3e6; }
+    html[data-accent="red"]    { --accent: #e05c5c; --accent-strong: #b13b3b; --accent-bg: #ffe6e6; }
+    html[data-accent="purple"] { --accent: #8e5bbf; --accent-strong: #6b3f99; --accent-bg: #f0e6fa; }
+
+    html[data-theme="dark"][data-accent="amber"]  { --accent-bg: #2a2113; }
+    html[data-theme="dark"][data-accent="blue"]   { --accent-bg: #142438; }
+    html[data-theme="dark"][data-accent="green"]  { --accent-bg: #12261a; }
+    html[data-theme="dark"][data-accent="red"]    { --accent-bg: #2a1717; }
+    html[data-theme="dark"][data-accent="purple"] { --accent-bg: #221630; }
+
+    /* ---------- RESET ---------- */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+    }
+
+    body {
+      background: var(--bg-body);
+      color: var(--text-primary);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      position: relative;
+      overflow: hidden;
+      transition: background 0.25s ease, color 0.25s ease;
+    }
+
+    /* Soft radial glow behind the card */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(circle at 20% 15%, var(--accent-bg) 0%, transparent 45%),
+        radial-gradient(circle at 80% 85%, var(--accent-bg) 0%, transparent 45%);
+      opacity: 0.7;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ---------- CONFETTI ---------- */
+    .confetti-layer {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 1;
+      overflow: hidden;
+    }
+
+    .confetti {
+      position: absolute;
+      width: 8px;
+      height: 14px;
+      top: -20px;
+      border-radius: 2px;
+      opacity: 0.9;
+      animation: confettiFall linear forwards;
+    }
+
+    @keyframes confettiFall {
+      0%   { transform: translateY(-20px) rotate(0deg);   opacity: 0; }
+      10%  { opacity: 1; }
+      100% { transform: translateY(110vh) rotate(720deg); opacity: 0.9; }
+    }
+
+    /* ---------- CARD ---------- */
+    .thanks-card {
+      position: relative;
+      z-index: 2;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: 32px;
+      box-shadow: var(--shadow-lg);
+      max-width: 560px;
+      width: 100%;
+      padding: 48px 40px 40px;
+      text-align: center;
+      animation: cardIn 0.6s cubic-bezier(0.34, 1.4, 0.64, 1);
+    }
+
+    @keyframes cardIn {
+      from { opacity: 0; transform: translateY(24px) scale(0.96); }
+      to   { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    /* Brand chip */
+    .brand-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 16px 8px 12px;
+      border-radius: 40px;
+      background: var(--accent-bg);
+      color: var(--accent-strong);
+      font-weight: 600;
+      font-size: 0.82rem;
+      letter-spacing: 0.02em;
+      margin-bottom: 26px;
+    }
+    .brand-chip i {
+      font-size: 1.05rem;
+      color: var(--accent-strong);
+    }
+
+    /* Big check icon */
+    .check-circle {
+      width: 96px;
+      height: 96px;
+      border-radius: 50%;
+      background: var(--accent-bg);
+      color: var(--accent-strong);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.6rem;
+      margin: 0 auto 26px;
+      position: relative;
+      animation: pop 0.6s 0.2s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+    }
+    .check-circle::before,
+    .check-circle::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      border: 2px solid var(--accent);
+      opacity: 0;
+      animation: ripple 2.4s 0.6s ease-out infinite;
+    }
+    .check-circle::after { animation-delay: 1.2s; }
+
+    @keyframes pop {
+      from { transform: scale(0); opacity: 0; }
+      to   { transform: scale(1); opacity: 1; }
+    }
+    @keyframes ripple {
+      0%   { transform: scale(1);   opacity: 0.6; }
+      100% { transform: scale(1.6); opacity: 0; }
+    }
+
+    .thanks-title {
+      font-size: 1.9rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      letter-spacing: -0.02em;
+      line-height: 1.2;
+      margin-bottom: 14px;
+    }
+    .thanks-title span {
+      display: block;
+      font-size: 0.95rem;
+      font-weight: 500;
+      color: var(--accent-strong);
+      letter-spacing: 0;
+      margin-top: 6px;
+    }
+
+    .thanks-subtitle {
+      font-size: 0.95rem;
+      color: var(--text-secondary);
+      line-height: 1.65;
+      max-width: 420px;
+      margin: 0 auto 30px;
+    }
+
+    /* Session info chips */
+    .session-info {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 32px;
+    }
+
+    .info-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 14px;
+      border-radius: 40px;
+      background: var(--bg-surface-alt);
+      border: 1px solid var(--border-color);
+      font-size: 0.78rem;
+      color: var(--text-secondary);
+      font-weight: 500;
+    }
+    .info-chip i {
+      color: var(--accent-strong);
+      font-size: 0.85rem;
+    }
+    .info-chip strong {
+      color: var(--text-primary);
+      font-weight: 600;
+    }
+
+    /* Divider */
+    .divider {
+      height: 1px;
+      background: var(--border-color);
+      margin-bottom: 24px;
+    }
+
+    /* Question */
+    .question-prompt {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      margin-bottom: 16px;
+      letter-spacing: 0.01em;
+    }
+
+    /* Buttons */
+    .actions {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 14px 24px;
+      border-radius: 40px;
+      font-size: 0.92rem;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+      border: 1px solid transparent;
+      transition: all 0.15s ease;
+      text-decoration: none;
+      width: 100%;
+    }
+    .btn:active { transform: scale(0.98); }
+
+    .btn-primary {
+      background: var(--bg-sidebar);
+      color: #f0e9df;
+      border-color: var(--bg-sidebar);
+      box-shadow: 0 8px 20px -8px rgba(26, 43, 60, 0.5);
+    }
+    .btn-primary:hover { opacity: 0.92; }
+    .btn-primary i { color: var(--accent); }
+
+    .btn-outline {
+      background: var(--bg-surface);
+      color: var(--text-primary);
+      border-color: var(--border-color-strong);
+    }
+    .btn-outline:hover {
+      background: var(--bg-surface-alt);
+      border-color: var(--accent);
+    }
+    .btn-outline i { color: var(--text-muted); }
+    .btn-outline:hover i { color: var(--accent-strong); }
+
+    /* Footer note */
+    .footer-note {
+      margin-top: 26px;
+      padding-top: 20px;
+      border-top: 1px solid var(--border-color);
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .footer-note i {
+      color: var(--accent-strong);
+      font-size: 0.8rem;
+    }
+    .footer-note a {
+      color: var(--accent-strong);
+      text-decoration: none;
+      font-weight: 500;
+    }
+    .footer-note a:hover { text-decoration: underline; }
+
+    /* ---------- RESPONSIVE ---------- */
+    @media (max-width: 560px) {
+      body { padding: 16px; }
+      .thanks-card { padding: 36px 24px 30px; border-radius: 24px; }
+      .thanks-title { font-size: 1.5rem; }
+      .check-circle { width: 80px; height: 80px; font-size: 2.1rem; margin-bottom: 22px; }
+      .thanks-subtitle { font-size: 0.9rem; }
+      .info-chip { font-size: 0.72rem; padding: 7px 12px; }
+      .btn { padding: 12px 20px; font-size: 0.88rem; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.001ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.001ms !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- CONFETTI -->
+  <div class="confetti-layer" id="confettiLayer" aria-hidden="true"></div>
+
+  <!-- CARD -->
+  <main class="thanks-card" role="main" aria-labelledby="thanksTitle">
+
+    <div class="brand-chip">
+      <i class="fas fa-cubes"></i>
+      Maricopa · Inventory
+    </div>
+
+    <div class="check-circle" aria-hidden="true">
+      <i class="fas fa-check"></i>
+    </div>
+
+    <h1 class="thanks-title" id="thanksTitle">
+      Thank you for following the stocks
+      <span>See you next time 👋</span>
+    </h1>
+
+    <p class="thanks-subtitle" id="thanksSubtitle">
+      Your stock records have been wrapped up for this session. Everything you logged today is saved and ready for your next visit.
+    </p>
+
+    <!-- Session summary chips (filled by JS) -->
+    <div class="session-info" id="sessionInfo">
+      <div class="info-chip">
+        <i class="fas fa-clock"></i>
+        <span>Session ended <strong id="endedAt">just now</strong></span>
+      </div>
+      <div class="info-chip">
+        <i class="fas fa-database"></i>
+        <span><strong id="itemsTracked">0</strong> items tracked</span>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <p class="question-prompt">Haven't finished keeping records?</p>
+
+    <div class="actions">
+      <a href="home.html" class="btn btn-primary" id="btnDashboard">
+        <i class="fas fa-chart-pie"></i>
+        Return to Dashboard
+      </a>
+      <a href="inventory.html" class="btn btn-outline" id="btnInventory">
+        <i class="fas fa-boxes"></i>
+        Keep working with Inventory
+      </a>
+    </div>
+
+    <div class="footer-note">
+      <i class="fas fa-shield-halved"></i>
+      <span>Your data is safely stored. Questions? <a href="support.html">Contact support</a>.</span>
+    </div>
+  </main>
+
+  <script>
+    (function () {
+      'use strict';
+
+      // ============================================================
+      // PERSONALISATION
+      // ============================================================
+      // Read optional context set by the page that navigated here:
+      //   localStorage.mrc.lastSessionEnded → ISO date string
+      //   localStorage.mrc.lastSessionItems → number of items
+      // Both are optional; sensible fallbacks are used.
+      // ============================================================
+      var endedRaw  = localStorage.getItem('mrc.lastSessionEnded');
+      var itemsRaw  = localStorage.getItem('mrc.lastSessionItems');
+
+      var endedAtEl = document.getElementById('endedAt');
+      var itemsEl   = document.getElementById('itemsTracked');
+
+      if (endedRaw) {
+        try {
+          var d = new Date(endedRaw);
+          if (!isNaN(d.getTime())) {
+            endedAtEl.textContent = d.toLocaleString('en-KE', {
+              hour: '2-digit',
+              minute: '2-digit',
+              day: 'numeric',
+              month: 'short'
+            });
+          }
+        } catch (_) { /* ignore */ }
+      } else {
+        endedAtEl.textContent = new Date().toLocaleString('en-KE', {
+          hour: '2-digit',
+          minute: '2-digit'
+        });
+      }
+
+      var n = parseInt(itemsRaw, 10);
+      itemsEl.textContent = Number.isFinite(n) && n > 0 ? n : '—';
+
+      // Personalise subtitle if a custom message was stored
+      // (e.g. after "Clear all" the inventory page could set this).
+      var customMsg = localStorage.getItem('mrc.thanksMessage');
+      if (customMsg) {
+        document.getElementById('thanksSubtitle').textContent = customMsg;
+      }
+
+      // ============================================================
+      // CONFETTI (respects prefers-reduced-motion)
+      // ============================================================
+      var reduceMotion = window.matchMedia &&
+        window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      if (!reduceMotion) {
+        var layer = document.getElementById('confettiLayer');
+        var colors = [
+          'var(--accent)',
+          'var(--accent-strong)',
+          '#4d9fff',
+          '#4caf7d',
+          '#e05c5c',
+          '#8e5bbf'
+        ];
+        var count = 60;
+
+        for (var i = 0; i < count; i++) {
+          var piece = document.createElement('span');
+          piece.className = 'confetti';
+          piece.style.left = (Math.random() * 100) + '%';
+          piece.style.background = colors[Math.floor(Math.random() * colors.length)];
+          piece.style.animationDuration = (2.4 + Math.random() * 2.2) + 's';
+          piece.style.animationDelay = (Math.random() * 1.6) + 's';
+          piece.style.width = (5 + Math.random() * 6) + 'px';
+          piece.style.height = (8 + Math.random() * 10) + 'px';
+          piece.style.transform = 'rotate(' + (Math.random() * 360) + 'deg)';
+          layer.appendChild(piece);
+        }
+
+        // Clean up DOM after animation completes so it doesn't linger
+        setTimeout(function () {
+          layer.innerHTML = '';
+        }, 7000);
+      }
+
+      // ============================================================
+      // CLEAR SESSION FLAGS on unload (so next visit starts fresh)
+      // ============================================================
+      window.addEventListener('beforeunload', function () {
+        try {
+          localStorage.removeItem('mrc.thanksMessage');
+          // Keep lastSessionEnded / lastSessionItems for reference —
+          // they're read-only history, safe to retain.
+        } catch (_) { /* ignore */ }
+      });
+
+      // ============================================================
+      // LIVE THEME SYNC (other tabs)
+      // ============================================================
+      window.addEventListener('storage', function (e) {
+        var root = document.documentElement;
+        if (e.key === 'mrc.themeMode') {
+          var mode = e.newValue || 'system';
+          var prefersDark = window.matchMedia &&
+            window.matchMedia('(prefers-color-scheme: dark)').matches;
+          var resolved = mode === 'system' ? (prefersDark ? 'dark' : 'light') : mode;
+          if (resolved === 'dark') root.setAttribute('data-theme', 'dark');
+          else root.removeAttribute('data-theme');
+        }
+        if (e.key === 'mrc.accent') {
+          root.setAttribute('data-accent', e.newValue || 'amber');
+        }
+      });
+
+      if (window.matchMedia) {
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function (ev) {
+          var mode = localStorage.getItem('mrc.themeMode') || 'system';
+          if (mode !== 'system') return;
+          if (ev.matches) document.documentElement.setAttribute('data-theme', 'dark');
+          else document.documentElement.removeAttribute('data-theme');
+        });
+      }
+
+      // ============================================================
+      // KEYBOARD SHORTCUTS
+      // ============================================================
+      document.addEventListener('keydown', function (e) {
+        // Enter → Dashboard
+        if (e.key === 'Enter' && !e.shiftKey) {
+          var active = document.activeElement;
+          if (active && active.tagName === 'A') return; // let link handle it
+          window.location.href = 'home.html';
+        }
+        // Esc → Inventory
+        if (e.key === 'Escape') {
+          window.location.href = 'inventory.html';
+        }
+      });
+    })();
+  </script>
+</body>
+</html>
