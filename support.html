@@ -1,582 +1,527 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Maricopa · Support</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 
-  <!-- ============================================================
-       THEME BOOTSTRAP — must run before paint (no flash).
-       Reads the same localStorage keys settings.html writes.
-       ============================================================ -->
   <script>
     (function () {
       try {
-        var root = document.documentElement;
+        const root = document.documentElement;
+        const mode = localStorage.getItem('mrc.themeMode') || 'system';
+        const dark = mode === 'dark' ||
+          (mode === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
 
-        var themeMode = localStorage.getItem('mrc.themeMode') || 'system';
-        var resolved = themeMode;
-        if (themeMode === 'system') {
-          var prefersDark = window.matchMedia &&
-            window.matchMedia('(prefers-color-scheme: dark)').matches;
-          resolved = prefersDark ? 'dark' : 'light';
+        if (dark) root.setAttribute('data-theme', 'dark');
+
+        root.setAttribute('data-accent', localStorage.getItem('mrc.accent') || 'amber');
+
+        if (localStorage.getItem('mrc.density') === 'compact') {
+          root.setAttribute('data-density', 'compact');
         }
-        if (resolved === 'dark') root.setAttribute('data-theme', 'dark');
 
-        var accent = localStorage.getItem('mrc.accent') || 'amber';
-        root.setAttribute('data-accent', accent);
-
-        var density = localStorage.getItem('mrc.density') || 'comfortable';
-        if (density === 'compact') root.setAttribute('data-density', 'compact');
-
-        var sidebarImg = localStorage.getItem('mrc.sidebarImage');
-        if (sidebarImg) {
-          root.style.setProperty('--sidebar-image', 'url("' + sidebarImg + '")');
-        }
-      } catch (e) { /* private mode / disabled storage — fall back to defaults */ }
+        const image = localStorage.getItem('mrc.sidebarImage');
+        if (image) root.style.setProperty('--sidebar-image', `url("${image}")`);
+      } catch (e) {}
     })();
   </script>
 
   <style>
-    /* ---------- THEME VARIABLES (mirrors settings.html) ---------- */
     :root {
-      --bg-body: #f4f7fc;
-      --bg-surface: #ffffff;
-      --bg-surface-alt: #f9fcff;
-      --bg-sidebar: #1a2b3c;
-      --bg-sidebar-hover: #233545;
-      --bg-sidebar-active: #2f4a64;
-      --text-primary: #0b1d2e;
-      --text-secondary: #5b6f84;
-      --text-muted: #8da1b5;
-      --text-sidebar: #b8c9db;
-      --text-sidebar-muted: #8faec9;
-      --border-color: #e9eff6;
-      --border-color-strong: #dae3ec;
-      --accent: #f0b34b;
-      --accent-strong: #d6952c;
-      --accent-bg: #fef4e6;
-      --danger: #b13b3b;
-      --danger-bg: #fff5f5;
-      --danger-border: #f3cdcd;
-      --success: #1e6d3a;
-      --success-bg: #e6f3e6;
-      --warning: #b1590e;
-      --warning-bg: #fff0e0;
-      --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.02);
-      --shadow-md: 0 6px 18px rgba(0, 0, 0, 0.02);
-      --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.25);
-      --row-padding: 14px 18px;
-      --sidebar-image: url('https://lh3.googleusercontent.com/gps-cs-s/ANWiy9RlL5m_9yx9qFp1KsgIQMk4nifrcAOL4MRZ1LG83j6MOM1CwpJ1qW8CbQ9QxwMhRiR8FYh6ocg9kUnJtf636i7edyX06zBTL-13zvEx945Od7fmU11Al7jDJFrFDojlmjsllaq8qQ=s680-w680-h510-rw');
+      --bg-body:#f4f7fc;
+      --bg-surface:#fff;
+      --bg-sidebar:#1a2b3c;
+      --bg-sidebar-hover:#233545;
+      --bg-sidebar-active:#2f4a64;
+      --text-primary:#0b1d2e;
+      --text-secondary:#5b6f84;
+      --text-muted:#8da1b5;
+      --text-sidebar:#b8c9db;
+      --border-color:#e9eff6;
+      --border-strong:#dae3ec;
+      --accent:#f0b34b;
+      --accent-strong:#d6952c;
+      --accent-bg:#fef4e6;
+      --danger:#b13b3b;
+      --success:#1e6d3a;
+      --row-padding:14px 18px;
+      --sidebar-image:none;
+      --shadow:0 6px 18px rgba(0,0,0,.04);
     }
 
     html[data-theme="dark"] {
-      --bg-body: #0e1720;
-      --bg-surface: #16222e;
-      --bg-surface-alt: #1b2a38;
-      --bg-sidebar: #0b141c;
-      --bg-sidebar-hover: #16222e;
-      --bg-sidebar-active: #1f3444;
-      --text-primary: #e6eef7;
-      --text-secondary: #9fb2c7;
-      --text-muted: #6e8499;
-      --text-sidebar: #b8c9db;
-      --text-sidebar-muted: #7c93a8;
-      --border-color: #22323f;
-      --border-color-strong: #2c4152;
-      --accent: #f0b34b;
-      --accent-strong: #f0b34b;
-      --accent-bg: #2a2113;
-      --danger: #f08a8a;
-      --danger-bg: #2a1717;
-      --danger-border: #4a2424;
-      --success: #6fd48f;
-      --success-bg: #12261a;
-      --warning: #f0b34b;
-      --warning-bg: #2a2113;
-      --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
-      --shadow-md: 0 6px 18px rgba(0, 0, 0, 0.35);
-      --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.6);
+      --bg-body:#0e1720;
+      --bg-surface:#16222e;
+      --bg-sidebar:#0b141c;
+      --bg-sidebar-hover:#16222e;
+      --bg-sidebar-active:#1f3444;
+      --text-primary:#e6eef7;
+      --text-secondary:#9fb2c7;
+      --text-muted:#6e8499;
+      --border-color:#22323f;
+      --border-strong:#2c4152;
+      --accent-strong:#f0b34b;
+      --accent-bg:#2a2113;
+      --danger:#f08a8a;
+      --success:#6fd48f;
+      --shadow:0 6px 18px rgba(0,0,0,.3);
     }
 
-    html[data-density="compact"] { --row-padding: 8px 12px; }
+    html[data-density="compact"] {--row-padding:8px 12px}
 
-    html[data-accent="amber"]  { --accent: #f0b34b; --accent-strong: #d6952c; --accent-bg: #fef4e6; }
-    html[data-accent="blue"]   { --accent: #4d9fff; --accent-strong: #2f6cb0; --accent-bg: #e6f0fb; }
-    html[data-accent="green"]  { --accent: #4caf7d; --accent-strong: #1e6d3a; --accent-bg: #e6f3e6; }
-    html[data-accent="red"]    { --accent: #e05c5c; --accent-strong: #b13b3b; --accent-bg: #ffe6e6; }
-    html[data-accent="purple"] { --accent: #8e5bbf; --accent-strong: #6b3f99; --accent-bg: #f0e6fa; }
+    html[data-accent="amber"] {--accent:#f0b34b;--accent-strong:#d6952c;--accent-bg:#fef4e6}
+    html[data-accent="blue"] {--accent:#4d9fff;--accent-strong:#2f6cb0;--accent-bg:#e6f0fb}
+    html[data-accent="green"] {--accent:#4caf7d;--accent-strong:#1e6d3a;--accent-bg:#e6f3e6}
+    html[data-accent="red"] {--accent:#e05c5c;--accent-strong:#b13b3b;--accent-bg:#ffe6e6}
+    html[data-accent="purple"] {--accent:#8e5bbf;--accent-strong:#6b3f99;--accent-bg:#f0e6fa}
 
-    html[data-theme="dark"][data-accent="amber"]  { --accent-bg: #2a2113; }
-    html[data-theme="dark"][data-accent="blue"]   { --accent-bg: #142438; }
-    html[data-theme="dark"][data-accent="green"]  { --accent-bg: #12261a; }
-    html[data-theme="dark"][data-accent="red"]    { --accent-bg: #2a1717; }
-    html[data-theme="dark"][data-accent="purple"] { --accent-bg: #221630; }
-
-    /* ---------- RESET & GLOBAL ---------- */
     * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+      margin:0;
+      padding:0;
+      box-sizing:border-box;
+      font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
     }
 
     body {
-      background: var(--bg-body);
-      color: var(--text-primary);
-      display: flex;
-      min-height: 100vh;
-      transition: background 0.25s ease, color 0.25s ease;
+      display:flex;
+      min-height:100vh;
+      background:var(--bg-body);
+      color:var(--text-primary);
+      transition:.25s;
     }
 
-    /* ---------- SIDEBAR ---------- */
+    a {text-decoration:none}
+
+    /* SIDEBAR */
+
     .sidebar {
-      width: 260px;
-      background: var(--bg-sidebar);
-      color: var(--text-sidebar);
-      display: flex;
-      flex-direction: column;
-      padding: 28px 16px;
-      transition: all 0.2s ease;
-      flex-shrink: 0;
-      box-shadow: 2px 0 12px rgba(0, 0, 0, 0.05);
-      position: relative;
-      overflow: hidden;
+      width:260px;
+      flex-shrink:0;
+      display:flex;
+      flex-direction:column;
+      padding:28px 16px;
+      background:var(--bg-sidebar);
+      color:var(--text-sidebar);
+      position:relative;
+      overflow:hidden;
+      box-shadow:2px 0 12px rgba(0,0,0,.05);
     }
 
     .sidebar::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background-image: var(--sidebar-image);
-      background-size: cover;
-      background-position: center;
-      opacity: 0.18;
-      pointer-events: none;
-      z-index: 0;
+      content:"";
+      position:absolute;
+      inset:0;
+      background-image:var(--sidebar-image);
+      background-size:cover;
+      background-position:center;
+      opacity:.18;
+      pointer-events:none;
     }
+
     .sidebar::after {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(180deg, rgba(26, 43, 60, 0.92) 0%, rgba(26, 43, 60, 0.75) 100%);
-      pointer-events: none;
-      z-index: 1;
+      content:"";
+      position:absolute;
+      inset:0;
+      background:linear-gradient(180deg,rgba(26,43,60,.92),rgba(26,43,60,.75));
+      pointer-events:none;
     }
-    html[data-theme="dark"] .sidebar::after {
-      background: linear-gradient(180deg, rgba(11, 20, 28, 0.94) 0%, rgba(11, 20, 28, 0.82) 100%);
-    }
-    .sidebar > * { position: relative; z-index: 2; }
+
+    .sidebar>* {position:relative;z-index:2}
 
     .sidebar-brand {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 0 12px 32px 12px;
-      font-weight: 700;
-      font-size: 1.5rem;
-      letter-spacing: -0.02em;
-      color: white;
-      text-decoration: none;
-      transition: opacity 0.15s;
-    }
-    .sidebar-brand:hover { opacity: 0.85; }
-    .sidebar-brand i { font-size: 2rem; color: var(--accent); }
-    .sidebar-brand span {
-      background: linear-gradient(135deg, #ffffff, #e8eef5);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
+      display:flex;
+      align-items:center;
+      gap:12px;
+      padding:0 12px 32px;
+      color:white;
+      font-size:1.5rem;
+      font-weight:700;
     }
 
-    .sidebar-nav { display: flex; flex-direction: column; gap: 6px; flex: 1; }
+    .sidebar-brand i {color:var(--accent);font-size:2rem}
+
+    .sidebar-nav {
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+      flex:1;
+    }
 
     .nav-item {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      padding: 12px 16px;
-      border-radius: 12px;
-      color: var(--text-sidebar);
-      text-decoration: none;
-      font-weight: 500;
-      font-size: 0.95rem;
-      transition: all 0.15s ease;
-      border: none;
-      background: transparent;
-      width: 100%;
-      text-align: left;
-      font-family: inherit;
-      cursor: pointer;
+      display:flex;
+      align-items:center;
+      gap:14px;
+      padding:12px 16px;
+      border-radius:12px;
+      color:var(--text-sidebar);
+      font-size:.95rem;
+      font-weight:500;
+      transition:.15s;
     }
-    .nav-item i { width: 20px; font-size: 1.1rem; text-align: center; }
+
+    .nav-item i {width:20px;text-align:center}
+
+    .nav-item:hover:not(.active) {
+      background:var(--bg-sidebar-hover);
+      color:white;
+    }
+
     .nav-item.active {
-      background: var(--bg-sidebar-active);
-      color: white;
-      box-shadow: 0 6px 12px -6px rgba(0, 80, 200, 0.2);
-      border-left: 3px solid var(--accent);
+      background:var(--bg-sidebar-active);
+      color:white;
+      border-left:3px solid var(--accent);
     }
-    .nav-item:hover:not(.active) { background: var(--bg-sidebar-hover); color: #e0e9f2; }
-    .nav-item:active { transform: scale(0.98); }
 
     .sidebar-footer {
-      border-top: 1px solid rgba(255, 255, 255, 0.08);
-      padding-top: 20px;
-      margin-top: 12px;
+      border-top:1px solid rgba(255,255,255,.08);
+      padding-top:20px;
+      margin-top:12px;
     }
-    .sidebar-footer .nav-item { color: var(--text-sidebar-muted); }
 
-    /* ---------- MAIN CONTENT ---------- */
+    /* MAIN CONTENT */
+
     .main-content {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      padding: 24px 32px 40px;
-      overflow-x: auto;
-      min-width: 0;
+      flex:1;
+      min-width:0;
+      padding:24px 32px 40px;
+      overflow-x:auto;
     }
 
     .top-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 28px;
-      flex-wrap: wrap;
-      gap: 16px;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      flex-wrap:wrap;
+      gap:16px;
+      margin-bottom:28px;
     }
 
-    .page-title h1 {
-      font-size: 1.8rem;
-      font-weight: 600;
-      color: var(--text-primary);
-      letter-spacing: -0.02em;
-    }
+    .page-title h1 {font-size:1.8rem;font-weight:600}
+
     .page-title p {
-      color: var(--text-secondary);
-      font-size: 0.9rem;
-      margin-top: 4px;
+      color:var(--text-secondary);
+      font-size:.9rem;
+      margin-top:4px;
     }
-    .page-title p i { color: var(--accent-strong); margin-right: 6px; }
 
-    .header-actions { display: flex; align-items: center; gap: 16px; }
+    .page-title p i {color:var(--accent-strong)}
 
     .user-profile {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      background: var(--bg-surface);
-      padding: 6px 12px 6px 16px;
-      border-radius: 40px;
-      border: 1px solid var(--border-color-strong);
-      cursor: pointer;
-      transition: all 0.15s ease;
-      user-select: none;
+      display:flex;
+      align-items:center;
+      gap:12px;
+      background:var(--bg-surface);
+      padding:6px 12px 6px 16px;
+      border:1px solid var(--border-strong);
+      border-radius:40px;
+      cursor:pointer;
     }
-    .user-profile:hover { border-color: var(--accent); box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04); }
-    .user-profile:active { transform: scale(0.98); }
-    .user-profile span { font-weight: 500; font-size: 0.9rem; color: var(--text-primary); }
+
+    .user-profile span {font-size:.9rem;font-weight:500}
 
     .avatar {
-      background: var(--bg-sidebar);
-      color: var(--accent);
-      width: 36px;
-      height: 36px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: 50%;
-      font-weight: 600;
-      font-size: 0.9rem;
-      border: 1px solid rgba(240, 179, 75, 0.25);
+      width:36px;
+      height:36px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      border-radius:50%;
+      background:var(--bg-sidebar);
+      color:var(--accent);
+      font-weight:600;
     }
 
-    /* ---------- HERO ---------- */
+    /* HERO */
+
     .support-hero {
-      text-align: center;
-      padding: 8px 20px 28px;
+      text-align:center;
+      padding:8px 20px 28px;
     }
+
     .support-hero h1 {
-      font-size: 1.9rem;
-      font-weight: 700;
-      letter-spacing: -0.02em;
-      color: var(--text-primary);
-      margin-bottom: 10px;
+      font-size:1.9rem;
+      margin-bottom:10px;
     }
+
     .support-hero p {
-      color: var(--text-secondary);
-      font-size: 0.95rem;
-      max-width: 560px;
-      margin: 0 auto;
-      line-height: 1.6;
+      color:var(--text-secondary);
+      max-width:560px;
+      margin:auto;
+      line-height:1.6;
     }
 
-    /* ---------- GRID LAYOUT ---------- */
+    /* GRID AND CARDS */
+
     .support-grid {
-      display: grid;
-      grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
-      gap: 24px;
-      margin-bottom: 28px;
+      display:grid;
+      grid-template-columns:1.2fr 1fr;
+      gap:24px;
+      margin-bottom:28px;
     }
 
-    /* ---------- CARD ---------- */
     .card {
-      background: var(--bg-surface);
-      border: 1px solid var(--border-color);
-      border-radius: 24px;
-      box-shadow: var(--shadow-md);
-      overflow: hidden;
-      transition: background 0.25s ease, border-color 0.25s ease;
+      background:var(--bg-surface);
+      border:1px solid var(--border-color);
+      border-radius:24px;
+      box-shadow:var(--shadow);
+      overflow:hidden;
     }
 
     .card-header {
-      padding: 22px 24px 16px 24px;
-      border-bottom: 1px solid var(--border-color);
+      padding:22px 24px 16px;
+      border-bottom:1px solid var(--border-color);
     }
+
     .card-header h2 {
-      font-size: 1.05rem;
-      font-weight: 600;
-      color: var(--text-primary);
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      letter-spacing: -0.01em;
+      font-size:1.05rem;
+      display:flex;
+      align-items:center;
+      gap:10px;
     }
-    .card-header h2 i { color: var(--accent-strong); font-size: 0.95rem; }
+
+    .card-header h2 i {color:var(--accent-strong)}
+
     .card-header p {
-      font-size: 0.82rem;
-      color: var(--text-secondary);
-      margin-top: 4px;
-      line-height: 1.4;
+      color:var(--text-secondary);
+      font-size:.82rem;
+      margin-top:4px;
     }
 
-    .card-body { padding: 22px 24px 24px 24px; }
+    .card-body {padding:22px 24px 24px}
 
-    /* ---------- FORM ---------- */
-    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-    .form-group { display: flex; flex-direction: column; gap: 6px; }
-    .form-group.full { grid-column: 1 / -1; }
+    /* FORM */
+
+    .form-grid {
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:14px;
+    }
+
+    .form-group {
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+    }
+
+    .form-group.full {grid-column:1/-1}
 
     .form-group label {
-      font-size: 0.8rem;
-      font-weight: 600;
-      color: var(--text-secondary);
-      letter-spacing: 0.01em;
+      font-size:.8rem;
+      font-weight:600;
+      color:var(--text-secondary);
     }
-    .form-group label .req { color: var(--danger); margin-left: 2px; }
+
+    .req {color:var(--danger)}
 
     .form-group input,
     .form-group select,
     .form-group textarea {
-      padding: 11px 14px;
-      border: 1px solid var(--border-color-strong);
-      border-radius: 12px;
-      font-size: 0.9rem;
-      font-family: inherit;
-      color: var(--text-primary);
-      background: var(--bg-surface);
-      outline: none;
-      transition: all 0.15s ease;
-      width: 100%;
+      width:100%;
+      padding:11px 14px;
+      border:1px solid var(--border-strong);
+      border-radius:12px;
+      background:var(--bg-surface);
+      color:var(--text-primary);
+      font-size:.9rem;
+      outline:none;
+      transition:.15s;
     }
+
     .form-group input:focus,
     .form-group select:focus,
     .form-group textarea:focus {
-      border-color: var(--accent);
-      box-shadow: 0 0 0 3px rgba(240, 179, 75, 0.18);
+      border-color:var(--accent);
+      box-shadow:0 0 0 3px rgba(240,179,75,.18);
     }
-    .form-group input::placeholder,
-    .form-group textarea::placeholder { color: var(--text-muted); }
-    .form-group textarea { resize: vertical; min-height: 130px; line-height: 1.5; }
+
+    .form-group textarea {
+      min-height:130px;
+      resize:vertical;
+    }
 
     .btn-send {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      padding: 12px 22px;
-      border-radius: 40px;
-      background: var(--bg-sidebar);
-      color: #f0e9df;
-      border: 1px solid var(--bg-sidebar);
-      font-family: inherit;
-      font-size: 0.92rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.15s ease;
-      width: 100%;
-      margin-top: 4px;
-      box-shadow: 0 6px 14px -6px rgba(26, 43, 60, 0.4);
+      width:100%;
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      gap:10px;
+      margin-top:14px;
+      padding:13px 22px;
+      border-radius:40px;
+      background:var(--bg-sidebar);
+      color:white;
+      border:1px solid var(--bg-sidebar);
+      font-size:.92rem;
+      font-weight:600;
+      cursor:pointer;
+      transition:.2s;
     }
-    .btn-send:hover:not(:disabled) { opacity: 0.92; }
-    .btn-send:active { transform: scale(0.98); }
-    .btn-send:disabled { opacity: 0.55; cursor: not-allowed; }
-    .btn-send i { color: var(--accent); }
 
-    /* ---------- CONTACT LIST ---------- */
+    .btn-send:hover {opacity:.9}
+    .btn-send:disabled {opacity:.55;cursor:not-allowed}
+    .btn-send i {color:var(--accent)}
+
+    /* CONTACT INFORMATION */
+
     .contact-item {
-      display: flex;
-      gap: 14px;
-      padding: 16px 0;
-      border-bottom: 1px solid var(--border-color);
+      display:flex;
+      gap:14px;
+      padding:16px 0;
+      border-bottom:1px solid var(--border-color);
     }
-    .contact-item:first-child { padding-top: 0; }
-    .contact-item:last-child { border-bottom: none; padding-bottom: 0; }
+
+    .contact-item:first-child {padding-top:0}
+    .contact-item:last-child {border-bottom:none;padding-bottom:0}
 
     .contact-item-icon {
-      width: 40px;
-      height: 40px;
-      border-radius: 12px;
-      background: var(--accent-bg);
-      color: var(--accent-strong);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1rem;
-      flex-shrink: 0;
+      width:40px;
+      height:40px;
+      flex-shrink:0;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      border-radius:12px;
+      background:var(--accent-bg);
+      color:var(--accent-strong);
     }
-    .contact-item-info { min-width: 0; }
+
     .contact-item-info h3 {
-      font-size: 0.85rem;
-      font-weight: 600;
-      color: var(--text-primary);
-      margin-bottom: 3px;
+      font-size:.85rem;
+      margin-bottom:3px;
     }
+
     .contact-item-info p,
     .contact-item-info a {
-      font-size: 0.85rem;
-      color: var(--text-secondary);
-      line-height: 1.5;
-      text-decoration: none;
+      color:var(--text-secondary);
+      font-size:.85rem;
+      line-height:1.5;
     }
-    .contact-item-info a { color: var(--accent-strong); font-weight: 500; }
-    .contact-item-info a:hover { text-decoration: underline; }
 
-    /* ---------- FAQ ---------- */
-    .faq-section {
-      margin-bottom: 28px;
-    }
+    .contact-item-info a {color:var(--accent-strong);font-weight:500}
+
+    /* FAQ */
+
+    .faq-section {margin-bottom:28px}
+
     .faq-section h2 {
-      font-size: 1.15rem;
-      font-weight: 600;
-      color: var(--text-primary);
-      margin-bottom: 14px;
-      text-align: center;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
+      font-size:1.15rem;
+      text-align:center;
+      margin-bottom:14px;
     }
-    .faq-section h2 i { color: var(--accent-strong); }
+
+    .faq-section h2 i {color:var(--accent-strong)}
 
     .faq-item {
-      background: var(--bg-surface);
-      border: 1px solid var(--border-color);
-      border-radius: 16px;
-      margin-bottom: 10px;
-      overflow: hidden;
-      transition: border-color 0.15s;
+      background:var(--bg-surface);
+      border:1px solid var(--border-color);
+      border-radius:16px;
+      margin-bottom:10px;
+      overflow:hidden;
     }
-    .faq-item:hover { border-color: var(--border-color-strong); }
 
     .faq-question {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 12px;
-      padding: 16px 20px;
-      cursor: pointer;
-      font-weight: 600;
-      font-size: 0.9rem;
-      color: var(--text-primary);
-      user-select: none;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:12px;
+      padding:16px 20px;
+      cursor:pointer;
+      font-size:.9rem;
+      font-weight:600;
     }
+
     .faq-question i {
-      color: var(--text-muted);
-      font-size: 0.8rem;
-      transition: transform 0.2s ease, color 0.2s;
-      flex-shrink: 0;
+      color:var(--text-muted);
+      transition:.2s;
     }
-    .faq-item.open .faq-question { color: var(--accent-strong); }
-    .faq-item.open .faq-question i { transform: rotate(180deg); color: var(--accent-strong); }
+
+    .faq-item.open .faq-question {color:var(--accent-strong)}
+    .faq-item.open .faq-question i {transform:rotate(180deg)}
 
     .faq-answer {
-      max-height: 0;
-      overflow: hidden;
-      padding: 0 20px;
-      font-size: 0.85rem;
-      color: var(--text-secondary);
-      line-height: 1.6;
-      transition: max-height 0.25s ease, padding 0.25s ease;
+      max-height:0;
+      overflow:hidden;
+      padding:0 20px;
+      color:var(--text-secondary);
+      font-size:.85rem;
+      line-height:1.6;
+      transition:.25s;
     }
-    .faq-item.open .faq-answer { max-height: 240px; padding: 0 20px 16px; }
 
-    /* ---------- TOAST ---------- */
+    .faq-item.open .faq-answer {
+      max-height:250px;
+      padding:0 20px 16px;
+    }
+
+    .faq-answer a {color:var(--accent-strong)}
+
+    /* TOAST */
+
     .toast {
-      position: fixed;
-      bottom: 28px;
-      right: 28px;
-      background: var(--bg-sidebar);
-      color: #f0e9df;
-      padding: 14px 22px;
-      border-radius: 14px;
-      font-size: 0.9rem;
-      font-weight: 500;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      box-shadow: var(--shadow-lg);
-      border-left: 4px solid var(--accent);
-      transform: translateY(120%);
-      opacity: 0;
-      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-      z-index: 2000;
-      pointer-events: none;
-      max-width: 340px;
-    }
-    .toast.show { transform: translateY(0); opacity: 1; }
-    .toast i { color: var(--accent); font-size: 1.1rem; flex-shrink: 0; }
-    .toast.error { border-left-color: var(--danger); }
-    .toast.error i { color: var(--danger); }
-
-    /* ---------- RESPONSIVE ---------- */
-    @media (max-width: 1024px) {
-      .support-grid { grid-template-columns: 1fr; }
+      position:fixed;
+      bottom:28px;
+      right:28px;
+      z-index:2000;
+      max-width:340px;
+      display:flex;
+      align-items:center;
+      gap:10px;
+      padding:14px 22px;
+      background:var(--bg-sidebar);
+      color:white;
+      border-left:4px solid var(--accent);
+      border-radius:14px;
+      box-shadow:0 12px 32px rgba(0,0,0,.25);
+      transform:translateY(150%);
+      opacity:0;
+      transition:.3s;
+      pointer-events:none;
     }
 
-    @media (max-width: 900px) {
-      .sidebar { width: 80px; padding: 28px 8px; }
-      .sidebar-brand span, .nav-item span { display: none; }
-      .sidebar-brand i { margin: 0 auto; }
-      .nav-item { justify-content: center; padding: 14px 0; }
-      .nav-item i { font-size: 1.3rem; }
-      .sidebar-footer .nav-item span { display: none; }
-      .main-content { padding: 20px 20px 32px; }
+    .toast.show {transform:translateY(0);opacity:1}
+    .toast i {color:var(--accent)}
+    .toast.error {border-left-color:var(--danger)}
+    .toast.error i {color:var(--danger)}
+
+    /* RESPONSIVE */
+
+    @media(max-width:1024px) {
+      .support-grid {grid-template-columns:1fr}
     }
 
-    @media (max-width: 700px) {
-      .form-grid { grid-template-columns: 1fr; }
-      .form-group.full { grid-column: 1; }
-      .support-hero h1 { font-size: 1.5rem; }
-      .support-hero { padding: 0 8px 24px; }
-      .card-header { padding: 18px 18px 14px 18px; }
-      .card-body { padding: 18px 18px 20px 18px; }
+    @media(max-width:900px) {
+      .sidebar {width:80px;padding:28px 8px}
+      .sidebar-brand span,.nav-item span {display:none}
+      .sidebar-brand {justify-content:center}
+      .nav-item {justify-content:center;padding:14px 0}
+      .main-content {padding:20px}
     }
 
-    @media (max-width: 600px) {
-      .main-content { padding: 16px; }
-      .top-header { flex-direction: column; align-items: stretch; }
-      .header-actions { justify-content: flex-end; }
-      .user-profile span { display: none; }
-      .user-profile { padding: 6px; }
-      .toast { left: 16px; right: 16px; bottom: 16px; max-width: none; }
-      .support-hero h1 { font-size: 1.3rem; }
-      .contact-item { padding: 12px 0; }
+    @media(max-width:700px) {
+      .form-grid {grid-template-columns:1fr}
+      .form-group.full {grid-column:1}
+      .support-hero h1 {font-size:1.5rem}
+      .card-header {padding:18px}
+      .card-body {padding:18px}
+    }
+
+    @media(max-width:600px) {
+      .main-content {padding:16px}
+      .top-header {flex-direction:column;align-items:stretch}
+      .header-actions {justify-content:flex-end}
+      .user-profile span {display:none}
+      .toast {left:16px;right:16px;bottom:16px;max-width:none}
     }
   </style>
 </head>
+
 <body>
+
   <!-- SIDEBAR -->
+
   <aside class="sidebar">
     <a href="home.html" class="sidebar-brand">
       <i class="fas fa-cubes"></i>
@@ -584,26 +529,48 @@
     </a>
 
     <nav class="sidebar-nav">
-      <a href="home.html" class="nav-item"><i class="fas fa-chart-pie"></i><span>Dashboard</span></a>
-      <a href="inventory.html" class="nav-item"><i class="fas fa-boxes"></i><span>Inventory</span></a>
-      <a href="orders.html" class="nav-item"><i class="fas fa-truck"></i><span>Orders</span></a>
-      <a href="analytics.html" class="nav-item"><i class="fas fa-chart-line"></i><span>Analytics</span></a>
-      <a href="settings.html" class="nav-item"><i class="fas fa-cog"></i><span>Settings</span></a>
+      <a href="home.html" class="nav-item">
+        <i class="fas fa-chart-pie"></i><span>Dashboard</span>
+      </a>
+
+      <a href="inventory.html" class="nav-item">
+        <i class="fas fa-boxes"></i><span>Inventory</span>
+      </a>
+
+      <a href="orders.html" class="nav-item">
+        <i class="fas fa-truck"></i><span>Orders</span>
+      </a>
+
+      <a href="analytics.html" class="nav-item">
+        <i class="fas fa-chart-line"></i><span>Analytics</span>
+      </a>
+
+      <a href="settings.html" class="nav-item">
+        <i class="fas fa-cog"></i><span>Settings</span>
+      </a>
     </nav>
 
     <div class="sidebar-footer">
-      <a href="support.html" class="nav-item active"><i class="fas fa-circle-question"></i><span>Support</span></a>
-      <a href="logout.html" class="nav-item"><i class="fas fa-right-from-bracket"></i><span>Logout</span></a>
+      <a href="support.html" class="nav-item active">
+        <i class="fas fa-circle-question"></i><span>Support</span>
+      </a>
+
+      <a href="logout.html" class="nav-item">
+        <i class="fas fa-right-from-bracket"></i><span>Logout</span>
+      </a>
     </div>
   </aside>
 
   <!-- MAIN CONTENT -->
+
   <main class="main-content">
+
     <header class="top-header">
       <div class="page-title">
         <h1>Support</h1>
         <p><i class="fas fa-headset"></i> Maricopa · We're here to help</p>
       </div>
+
       <div class="header-actions">
         <div class="user-profile" id="userProfile">
           <span>Alex Rivera</span>
@@ -618,28 +585,33 @@
     </section>
 
     <div class="support-grid">
-      <!-- SUPPORT FORM CARD -->
+
+      <!-- SUPPORT FORM -->
+
       <section class="card">
         <div class="card-header">
           <h2><i class="fas fa-paper-plane"></i> Send a support request</h2>
-          <p>Fill in the form — clicking “Send” opens your email app with everything pre-filled.</p>
+          <p>Complete the form and Gmail will open with your message ready to send.</p>
         </div>
+
         <div class="card-body">
           <form id="supportForm" novalidate>
+
             <div class="form-grid">
+
               <div class="form-group">
                 <label for="name">Full name <span class="req">*</span></label>
-                <input type="text" id="name" name="name" placeholder="Your name" autocomplete="name" required>
+                <input type="text" id="name" placeholder="Your name" autocomplete="name" required>
               </div>
 
               <div class="form-group">
                 <label for="email">Email address <span class="req">*</span></label>
-                <input type="email" id="email" name="email" placeholder="you@example.com" autocomplete="email" required>
+                <input type="email" id="email" placeholder="you@example.com" autocomplete="email" required>
               </div>
 
               <div class="form-group full">
                 <label for="subject">Subject <span class="req">*</span></label>
-                <select id="subject" name="subject" required>
+                <select id="subject" required>
                   <option value="">Select an issue</option>
                   <option>Technical problem</option>
                   <option>Account assistance</option>
@@ -652,35 +624,46 @@
 
               <div class="form-group full">
                 <label for="message">Your message <span class="req">*</span></label>
-                <textarea id="message" name="message" placeholder="Describe how we can help…" required></textarea>
+                <textarea id="message" placeholder="Describe how we can help..." required></textarea>
               </div>
+
             </div>
 
             <button type="submit" class="btn-send" id="btnSend">
               <i class="fas fa-envelope"></i>
               <span id="btnSendLabel">Send support request</span>
             </button>
+
           </form>
         </div>
       </section>
 
       <!-- CONTACT CARD -->
+
       <section class="card">
         <div class="card-header">
           <h2><i class="fas fa-address-book"></i> Contact our team</h2>
           <p>Prefer to reach us directly? Here's how.</p>
         </div>
+
         <div class="card-body">
+
           <div class="contact-item">
-            <div class="contact-item-icon"><i class="fas fa-envelope"></i></div>
+            <div class="contact-item-icon">
+              <i class="fas fa-envelope"></i>
+            </div>
             <div class="contact-item-info">
               <h3>Email support</h3>
-              <a href="mailto:maricopaconalied@gmail.com">maricopaconalied@gmail.com</a>
+              <a href="https://mail.google.com/mail/?view=cm&fs=1&to=maricopaconalied%40gmail.com" target="_blank" rel="noopener">
+                maricopaconalied@gmail.com
+              </a>
             </div>
           </div>
 
           <div class="contact-item">
-            <div class="contact-item-icon"><i class="fas fa-phone-volume"></i></div>
+            <div class="contact-item-icon">
+              <i class="fas fa-phone-volume"></i>
+            </div>
             <div class="contact-item-info">
               <h3>Phone support</h3>
               <a href="tel:+254700000000">+254 700 000 000</a>
@@ -688,7 +671,9 @@
           </div>
 
           <div class="contact-item">
-            <div class="contact-item-icon"><i class="fas fa-clock"></i></div>
+            <div class="contact-item-icon">
+              <i class="fas fa-clock"></i>
+            </div>
             <div class="contact-item-info">
               <h3>Working hours</h3>
               <p>Monday – Friday · 8:00 AM – 5:00 PM</p>
@@ -696,17 +681,22 @@
           </div>
 
           <div class="contact-item">
-            <div class="contact-item-icon"><i class="fas fa-bolt"></i></div>
+            <div class="contact-item-icon">
+              <i class="fas fa-bolt"></i>
+            </div>
             <div class="contact-item-info">
               <h3>Response time</h3>
               <p>We aim to reply within 24–48 working hours.</p>
             </div>
           </div>
+
         </div>
       </section>
+
     </div>
 
     <!-- FAQ -->
+
     <section class="faq-section">
       <h2><i class="fas fa-circle-question"></i> Frequently asked questions</h2>
 
@@ -716,8 +706,8 @@
           <i class="fas fa-chevron-down"></i>
         </div>
         <div class="faq-answer">
-          Use the form on this page — your email app will open with the details ready to send. You can also write directly to
-          <a href="mailto:maricopaconalied@gmail.com" style="color:var(--accent-strong)">maricopaconalied@gmail.com</a>.
+          Use the support form on this page. Gmail will open with your message ready to send. You can also write directly to
+          <a href="https://mail.google.com/mail/?view=cm&fs=1&to=maricopaconalied%40gmail.com" target="_blank" rel="noopener">maricopaconalied@gmail.com</a>.
         </div>
       </div>
 
@@ -747,60 +737,87 @@
           <i class="fas fa-chevron-down"></i>
         </div>
         <div class="faq-answer">
-          Yes — include the order ID (starts with <em>ord_</em>) and the delivery date in the form. We'll trace it with the courier and update you.
+          Yes. Include the order ID (starts with <em>ord_</em>) and the delivery date in the form. We'll trace it with the courier and update you.
         </div>
       </div>
+
     </section>
+
   </main>
 
-  <!-- TOAST -->
+  <!-- TOAST NOTIFICATION -->
+
   <div class="toast" id="toast">
     <i class="fas fa-check-circle" id="toastIcon"></i>
     <span id="toastMessage">Action completed</span>
   </div>
 
+  <!-- JAVASCRIPT -->
+
   <script>
     (function () {
       'use strict';
 
-      // ============================================================
-      // CONFIG — where the support email goes
-      // ============================================================
+      // =====================================================
+      // CONFIGURATION
+      // =====================================================
+
       const SUPPORT_EMAIL = 'maricopaconalied@gmail.com';
 
-      // ============================================================
-      // TOAST
-      // ============================================================
+      // =====================================================
+      // TOAST NOTIFICATIONS
+      // =====================================================
+
       const toast = document.getElementById('toast');
       const toastMessage = document.getElementById('toastMessage');
       const toastIcon = document.getElementById('toastIcon');
+
       let toastTimeout = null;
 
       function showToast(message, type = 'success', duration = 3400) {
-        if (toastTimeout) clearTimeout(toastTimeout);
+        clearTimeout(toastTimeout);
+
         toastMessage.textContent = message;
         toast.classList.remove('error');
-        toastIcon.className = type === 'error' ? 'fas fa-circle-exclamation' : 'fas fa-check-circle';
-        if (type === 'error') toast.classList.add('error');
+
+        toastIcon.className = type === 'error'
+          ? 'fas fa-circle-exclamation'
+          : 'fas fa-check-circle';
+
+        if (type === 'error') {
+          toast.classList.add('error');
+        }
+
         toast.classList.add('show');
-        toastTimeout = setTimeout(() => toast.classList.remove('show'), duration);
+
+        toastTimeout = setTimeout(() => {
+          toast.classList.remove('show');
+        }, duration);
       }
 
-      // ============================================================
+      // =====================================================
       // FAQ ACCORDION
-      // ============================================================
-      document.querySelectorAll('.faq-question').forEach(q => {
-        q.addEventListener('click', () => {
-          const item = q.parentElement;
+      // =====================================================
+
+      document.querySelectorAll('.faq-question').forEach(question => {
+        question.addEventListener('click', () => {
+          const item = question.parentElement;
           const wasOpen = item.classList.contains('open');
-          document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('open'));
-          if (!wasOpen) item.classList.add('open');
+
+          document.querySelectorAll('.faq-item').forEach(faq => {
+            faq.classList.remove('open');
+          });
+
+          if (!wasOpen) {
+            item.classList.add('open');
+          }
         });
       });
 
-      // ============================================================
-      // FORM → mailto:
-      // ============================================================
+      // =====================================================
+      // SUPPORT FORM → GMAIL WEB
+      // =====================================================
+
       const form = document.getElementById('supportForm');
       const btnSend = document.getElementById('btnSend');
       const btnSendLabel = document.getElementById('btnSendLabel');
@@ -808,100 +825,173 @@
       form.addEventListener('submit', function (e) {
         e.preventDefault();
 
-        const name    = document.getElementById('name').value.trim();
-        const email   = document.getElementById('email').value.trim();
+        // Get form information
+
+        const name = document.getElementById('name').value.trim();
+        const email = document.getElementById('email').value.trim();
         const subject = document.getElementById('subject').value;
         const message = document.getElementById('message').value.trim();
 
-        // ---- Client-side validation ----
-        if (!name)                 { showToast('Please enter your name.', 'error'); return; }
-        if (!email)                { showToast('Please enter your email.', 'error'); return; }
-        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-          showToast('That email address doesn’t look right.', 'error'); return;
-        }
-        if (!subject)              { showToast('Please select a subject.', 'error'); return; }
-        if (message.length < 10)   { showToast('Please describe your issue (at least 10 characters).', 'error'); return; }
+        // Validate name
 
-        // ---- Build mailto: ----
+        if (!name) {
+          showToast('Please enter your name.', 'error');
+          return;
+        }
+
+        // Validate email
+
+        if (!email) {
+          showToast('Please enter your email.', 'error');
+          return;
+        }
+
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+          showToast('That email address doesn’t look right.', 'error');
+          return;
+        }
+
+        // Validate subject
+
+        if (!subject) {
+          showToast('Please select a subject.', 'error');
+          return;
+        }
+
+        // Validate message
+
+        if (message.length < 10) {
+          showToast('Please describe your issue (at least 10 characters).', 'error');
+          return;
+        }
+
+        // Construct email subject
+
         const subjectLine = '[Maricopa Support] ' + subject + ' — ' + name;
 
-        const bodyLines = [
+        // Construct email body
+
+        const body = [
           'Hi Maricopa Support,',
           '',
           message,
           '',
-          '---',
-          'From: ' + name,
+          '--------------------------------',
+          'CUSTOMER INFORMATION',
+          '--------------------------------',
+          'Name: ' + name,
           'Email: ' + email,
-          'Subject: ' + subject,
+          'Issue: ' + subject,
           '',
           'Sent from the Maricopa Support page.'
-        ];
-        const body = bodyLines.join('\r\n');
+        ].join('\n');
 
-        const mailtoUrl = 'mailto:' + encodeURIComponent(SUPPORT_EMAIL) +
-          '?subject=' + encodeURIComponent(subjectLine) +
-          '&body='    + encodeURIComponent(body);
+        // Construct Gmail compose URL
 
-        // Feedback while the mail client is opening
-        btnSend.disabled = true;
-        btnSendLabel.textContent = 'Opening your mail app…';
-        showToast('Opening your email app with the message pre-filled.');
+        const gmailUrl =
+          'https://mail.google.com/mail/?view=cm&fs=1' +
+          '&to=' + encodeURIComponent(SUPPORT_EMAIL) +
+          '&su=' + encodeURIComponent(subjectLine) +
+          '&body=' + encodeURIComponent(body);
 
-        // Small delay so the toast shows before the OS takes over
-        setTimeout(function () {
-          window.location.href = mailtoUrl;
+        // Open Gmail directly in a new browser tab.
+        // This is called synchronously to avoid popup blockers.
 
-          // Restore button after a while (mailto: has no completion event)
-          setTimeout(function () {
+        const gmailWindow = window.open(gmailUrl, '_blank');
+
+        if (gmailWindow) {
+          btnSend.disabled = true;
+          btnSendLabel.textContent = 'Gmail opened';
+
+          showToast('Gmail opened! Review your message and click Send.');
+
+          setTimeout(() => {
             btnSend.disabled = false;
             btnSendLabel.textContent = 'Send support request';
-          }, 1600);
-        }, 250);
+          }, 2500);
+
+        } else {
+          showToast('Gmail could not open. Please allow pop-ups in your browser.', 'error');
+        }
+
       });
 
-      // ============================================================
+      // =====================================================
       // USER PROFILE
-      // ============================================================
+      // =====================================================
+
       document.getElementById('userProfile').addEventListener('click', function () {
         showToast('Signed in as Alex Rivera (Admin)');
       });
 
-      // ============================================================
-      // LIVE THEME SYNC — respond to settings.html changes in other tabs
-      // ============================================================
+      // =====================================================
+      // LIVE THEME SYNCHRONIZATION
+      // =====================================================
+
       window.addEventListener('storage', function (e) {
         const root = document.documentElement;
+
         if (e.key === 'mrc.themeMode') {
           const mode = e.newValue || 'system';
+
           const prefersDark = window.matchMedia &&
             window.matchMedia('(prefers-color-scheme: dark)').matches;
-          const resolved = mode === 'system' ? (prefersDark ? 'dark' : 'light') : mode;
-          if (resolved === 'dark') root.setAttribute('data-theme', 'dark');
-          else root.removeAttribute('data-theme');
+
+          const resolved = mode === 'system'
+            ? (prefersDark ? 'dark' : 'light')
+            : mode;
+
+          if (resolved === 'dark') {
+            root.setAttribute('data-theme', 'dark');
+          } else {
+            root.removeAttribute('data-theme');
+          }
         }
+
         if (e.key === 'mrc.accent') {
           root.setAttribute('data-accent', e.newValue || 'amber');
         }
+
         if (e.key === 'mrc.density') {
-          if (e.newValue === 'compact') root.setAttribute('data-density', 'compact');
-          else root.removeAttribute('data-density');
+          if (e.newValue === 'compact') {
+            root.setAttribute('data-density', 'compact');
+          } else {
+            root.removeAttribute('data-density');
+          }
         }
-        if (e.key === 'mrc.sidebarImage' && e.newValue) {
-          root.style.setProperty('--sidebar-image', 'url("' + e.newValue + '")');
+
+        if (e.key === 'mrc.sidebarImage') {
+          if (e.newValue) {
+            root.style.setProperty('--sidebar-image', `url("${e.newValue}")`);
+          } else {
+            root.style.removeProperty('--sidebar-image');
+          }
         }
       });
 
-      // If OS-level dark mode changes while themeMode === 'system'
+      // =====================================================
+      // SYSTEM DARK MODE SYNCHRONIZATION
+      // =====================================================
+
       if (window.matchMedia) {
-        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function (ev) {
-          const mode = localStorage.getItem('mrc.themeMode') || 'system';
-          if (mode !== 'system') return;
-          if (ev.matches) document.documentElement.setAttribute('data-theme', 'dark');
-          else document.documentElement.removeAttribute('data-theme');
-        });
+        window.matchMedia('(prefers-color-scheme: dark)')
+          .addEventListener('change', function (event) {
+
+            const mode = localStorage.getItem('mrc.themeMode') || 'system';
+
+            if (mode !== 'system') return;
+
+            if (event.matches) {
+              document.documentElement.setAttribute('data-theme', 'dark');
+            } else {
+              document.documentElement.removeAttribute('data-theme');
+            }
+
+          });
       }
+
     })();
   </script>
+
 </body>
 </html>
