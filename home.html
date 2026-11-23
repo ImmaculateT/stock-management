@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
-  <title>Maricopa · Home</title>
+  <title>Maricopa · Concrete Stock Management</title>
   <!-- Font Awesome Icons (v6 free) -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <style>
@@ -24,14 +24,14 @@
     /* ---------- SIDEBAR ---------- */
     .sidebar {
       width: 260px;
-      background: #0b1d2e;
+      background: #1a2b3c;  /* deep slate — industrial */
       color: #e0e9f2;
       display: flex;
       flex-direction: column;
       padding: 28px 16px;
       transition: all 0.2s ease;
       flex-shrink: 0;
-      box-shadow: 2px 0 12px rgba(0, 0, 0, 0.03);
+      box-shadow: 2px 0 12px rgba(0, 0, 0, 0.05);
     }
 
     .sidebar-brand {
@@ -39,15 +39,28 @@
       align-items: center;
       gap: 12px;
       padding: 0 12px 32px 12px;
-      font-weight: 600;
+      font-weight: 700;
       font-size: 1.5rem;
       letter-spacing: -0.02em;
       color: white;
+      cursor: pointer;
+      transition: opacity 0.15s;
+    }
+
+    .sidebar-brand:hover {
+      opacity: 0.85;
     }
 
     .sidebar-brand i {
       font-size: 2rem;
-      color: #4d9fff;
+      color: #f0b34b;  /* warm concrete accent */
+    }
+
+    .sidebar-brand span {
+      background: linear-gradient(135deg, #ffffff, #e8eef5);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
     }
 
     .sidebar-nav {
@@ -68,6 +81,12 @@
       font-weight: 500;
       font-size: 0.95rem;
       transition: all 0.15s ease;
+      cursor: pointer;
+      border: none;
+      background: transparent;
+      width: 100%;
+      text-align: left;
+      font-family: inherit;
     }
 
     .nav-item i {
@@ -77,18 +96,23 @@
     }
 
     .nav-item.active {
-      background: #1c3550;
+      background: #2f4a64;
       color: white;
-      box-shadow: 0 6px 12px -6px rgba(0, 80, 200, 0.3);
+      box-shadow: 0 6px 12px -6px rgba(0, 80, 200, 0.2);
+      border-left: 3px solid #f0b34b;
     }
 
     .nav-item:hover:not(.active) {
-      background: #142a3e;
+      background: #233545;
       color: #e0e9f2;
     }
 
+    .nav-item:active {
+      transform: scale(0.98);
+    }
+
     .sidebar-footer {
-      border-top: 1px solid #1e3a54;
+      border-top: 1px solid #2e4458;
       padding-top: 20px;
       margin-top: 12px;
     }
@@ -127,6 +151,11 @@
       color: #5b6f84;
       font-size: 0.9rem;
       margin-top: 4px;
+    }
+
+    .page-title p i {
+      color: #d6952c;
+      margin-right: 6px;
     }
 
     .header-actions {
@@ -172,6 +201,18 @@
       padding: 6px 12px 6px 16px;
       border-radius: 40px;
       border: 1px solid #dae3ec;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      user-select: none;
+    }
+
+    .user-profile:hover {
+      border-color: #b0c8e0;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+    }
+
+    .user-profile:active {
+      transform: scale(0.98);
     }
 
     .user-profile span {
@@ -181,8 +222,8 @@
     }
 
     .avatar {
-      background: #0b1d2e;
-      color: white;
+      background: #1a2b3c;
+      color: #f0b34b;
       width: 36px;
       height: 36px;
       display: flex;
@@ -191,6 +232,7 @@
       border-radius: 50%;
       font-weight: 600;
       font-size: 0.9rem;
+      border: 1px solid #f0b34b40;
     }
 
     /* ---------- KPI CARDS ---------- */
@@ -210,11 +252,17 @@
       display: flex;
       flex-direction: column;
       transition: all 0.15s ease;
+      cursor: pointer;
     }
 
     .kpi-card:hover {
       border-color: #cbdae9;
       box-shadow: 0 12px 24px -8px rgba(0, 70, 150, 0.08);
+      transform: translateY(-2px);
+    }
+
+    .kpi-card:active {
+      transform: translateY(0);
     }
 
     .kpi-header {
@@ -226,8 +274,8 @@
 
     .kpi-header i {
       font-size: 1.8rem;
-      color: #1e5fa8;
-      background: #e9f0fe;
+      color: #d6952c;
+      background: #fef4e6;
       padding: 8px;
       border-radius: 16px;
       width: 44px;
@@ -304,11 +352,12 @@
       font-size: 0.85rem;
       font-weight: 500;
       color: #2a4b6e;
-      cursor: default;
+      cursor: pointer;
       transition: 0.1s;
       display: flex;
       align-items: center;
       gap: 8px;
+      font-family: inherit;
     }
 
     .btn-outline i {
@@ -318,6 +367,10 @@
     .btn-outline:hover {
       background: #f5f9ff;
       border-color: #b0c8e0;
+    }
+
+    .btn-outline:active {
+      transform: scale(0.96);
     }
 
     .table-wrapper {
@@ -356,6 +409,15 @@
       border-bottom: none;
     }
 
+    tbody tr {
+      transition: background 0.1s;
+      cursor: pointer;
+    }
+
+    tbody tr:hover {
+      background: #fafdff;
+    }
+
     .product-info {
       display: flex;
       align-items: center;
@@ -363,14 +425,14 @@
     }
 
     .product-icon {
-      background: #eef4fc;
+      background: #fef4e6;
       width: 36px;
       height: 36px;
       display: flex;
       align-items: center;
       justify-content: center;
       border-radius: 10px;
-      color: #1d5b9e;
+      color: #d6952c;
       font-size: 1rem;
     }
 
@@ -424,19 +486,58 @@
       justify-content: center;
       font-size: 0.8rem;
       color: #3b5e7e;
-      cursor: default;
+      cursor: pointer;
       transition: 0.1s;
+      font-family: inherit;
     }
 
     .page-btn.active {
-      background: #0b1d2e;
-      border-color: #0b1d2e;
+      background: #1a2b3c;
+      border-color: #1a2b3c;
       color: white;
     }
 
     .page-btn:hover:not(.active) {
       background: #f2f7ff;
       border-color: #b8cee3;
+    }
+
+    .page-btn:active {
+      transform: scale(0.94);
+    }
+
+    /* ---------- TOAST NOTIFICATION ---------- */
+    .toast {
+      position: fixed;
+      bottom: 28px;
+      right: 28px;
+      background: #1a2b3c;
+      color: #f0e9df;
+      padding: 14px 22px;
+      border-radius: 14px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.25);
+      border-left: 4px solid #f0b34b;
+      transform: translateY(120%);
+      opacity: 0;
+      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      z-index: 9999;
+      pointer-events: none;
+      max-width: 340px;
+    }
+
+    .toast.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    .toast i {
+      color: #f0b34b;
+      font-size: 1.1rem;
     }
 
     /* ---------- RESPONSIVE ---------- */
@@ -517,6 +618,13 @@
         flex-direction: column;
         align-items: flex-start;
       }
+
+      .toast {
+        left: 16px;
+        right: 16px;
+        bottom: 16px;
+        max-width: none;
+      }
     }
 
     /* utility */
@@ -528,43 +636,43 @@
 <body>
   <!-- SIDEBAR -->
   <aside class="sidebar">
-    <div class="sidebar-brand">
+    <div class="sidebar-brand" data-action="Home dashboard">
       <i class="fas fa-cubes"></i>
-      <span>StockFlow</span>
+      <span>Maricopa Concrete and Allied</span>
     </div>
 
     <nav class="sidebar-nav">
-      <a href="#" class="nav-item active">
+      <button class="nav-item active" data-action="Dashboard">
         <i class="fas fa-chart-pie"></i>
         <span>Dashboard</span>
-      </a>
-      <a href="#" class="nav-item">
+      </button>
+      <button class="nav-item" data-action="Inventory">
         <i class="fas fa-boxes"></i>
         <span>Inventory</span>
-      </a>
-      <a href="#" class="nav-item">
+      </button>
+      <button class="nav-item" data-action="Orders">
         <i class="fas fa-truck"></i>
         <span>Orders</span>
-      </a>
-      <a href="#" class="nav-item">
+      </button>
+      <button class="nav-item" data-action="Analytics">
         <i class="fas fa-chart-line"></i>
         <span>Analytics</span>
-      </a>
-      <a href="#" class="nav-item">
+      </button>
+      <button class="nav-item" data-action="Settings">
         <i class="fas fa-cog"></i>
         <span>Settings</span>
-      </a>
+      </button>
     </nav>
 
     <div class="sidebar-footer">
-      <a href="#" class="nav-item">
+      <button class="nav-item" data-action="Support">
         <i class="fas fa-circle-question"></i>
         <span>Support</span>
-      </a>
-      <a href="#" class="nav-item">
+      </button>
+      <button class="nav-item" data-action="Logout">
         <i class="fas fa-right-from-bracket"></i>
         <span>Logout</span>
-      </a>
+      </button>
     </div>
   </aside>
 
@@ -573,68 +681,72 @@
     <!-- HEADER -->
     <header class="top-header">
       <div class="page-title">
-        <h1>Overview</h1>
-        <p>Real‑time stock insights &amp; inventory health</p>
+        <h1>Concrete Inventory</h1>
+        <p><i class="fas fa-hard-hat"></i> Maricopa · Stock management &amp; material health</p>
       </div>
 
       <div class="header-actions">
         <div class="search-box">
           <i class="fas fa-search"></i>
-          <input type="text" placeholder="Search products, SKU...">
+          <input type="text" id="searchInput" placeholder="Search mixes, aggregates...">
         </div>
-        <div class="user-profile">
-          <span>Alex Rivera</span>
-          <div class="avatar">AR</div>
+        <div class="user-profile" data-action="User profile">
+          <span>BOSS</span>
+          <div class="avatar">B</div>
         </div>
       </div>
     </header>
 
     <!-- KPI CARDS -->
     <div class="kpi-grid">
-      <div class="kpi-card">
+      <div class="kpi-card" data-action="Total products" data-detail="1,248 products">
         <div class="kpi-header">
           <i class="fas fa-cubes"></i>
           <span class="trend"><i class="fas fa-arrow-up" style="font-size: 0.7rem;"></i> +3.2%</span>
         </div>
         <h3>1,248</h3>
-        <p>Total products</p>
+        <p>Total concrete products</p>
       </div>
 
-      <div class="kpi-card">
+      <div class="kpi-card" data-action="Units in stock" data-detail="8,530 units">
         <div class="kpi-header">
           <i class="fas fa-warehouse"></i>
           <span class="trend"><i class="fas fa-arrow-up" style="font-size: 0.7rem;"></i> +1.8%</span>
         </div>
         <h3>8,530</h3>
-        <p>Units in stock</p>
+        <p>Units in stock (m³ / tons)</p>
       </div>
 
-      <div class="kpi-card">
+      <div class="kpi-card" data-action="Low stock materials" data-detail="23 items need attention">
         <div class="kpi-header">
           <i class="fas fa-exclamation-triangle"></i>
           <span class="trend down"><i class="fas fa-arrow-down" style="font-size: 0.7rem;"></i> -2.1%</span>
         </div>
         <h3>23</h3>
-        <p>Low stock items</p>
+        <p>Low stock materials</p>
       </div>
 
-      <div class="kpi-card">
+      <div class="kpi-card" data-action="Pending shipments" data-detail="7 shipments in transit">
         <div class="kpi-header">
           <i class="fas fa-clock"></i>
           <span class="trend"><i class="fas fa-arrow-up" style="font-size: 0.7rem;"></i> +0.5%</span>
         </div>
         <h3>7</h3>
-        <p>Pending Stocks</p>
+        <p>Pending shipments</p>
       </div>
     </div>
 
     <!-- TABLE SECTION (inventory snapshot) -->
     <div class="table-section">
       <div class="table-header">
-        <h2>Inventory snapshot</h2>
+        <h2>Concrete inventory snapshot</h2>
         <div class="table-actions">
-          <button class="btn-outline"><i class="fas fa-download"></i> Export</button>
-          <button class="btn-outline"><i class="fas fa-filter"></i> Filter</button>
+          <button class="btn-outline" data-action="Export inventory">
+            <i class="fas fa-download"></i> Export
+          </button>
+          <button class="btn-outline" data-action="Filter inventory">
+            <i class="fas fa-filter"></i> Filter
+          </button>
         </div>
       </div>
 
@@ -642,119 +754,202 @@
         <table>
           <thead>
             <tr>
-              <th>Product</th>
+              <th>Product / Mix</th>
               <th>SKU</th>
               <th>Category</th>
-              <th>Stock</th>
+              <th>Stock (m³ / tons)</th>
               <th>Status</th>
-              <th>Price</th>
+              <th>Price / unit</th>
             </tr>
           </thead>
           <tbody>
-            <tr>
+            <tr data-action="Ready-Mix Concrete C30/37" data-detail="SKU MRC-8902 · 147 m³ in stock">
               <td>
                 <div class="product-info">
-                  <div class="product-icon"><i class="fas fa-mobile-alt"></i></div>
-                  <span>Wireless Earbuds Pro</span>
+                  <div class="product-icon"><i class="fas fa-trowel"></i></div>
+                  <span>Ready-Mix Concrete C30/37</span>
                 </div>
               </td>
-              <td><span class="no-wrap">SKU-8902</span></td>
-              <td>Electronics</td>
-              <td>147</td>
+              <td><span class="no-wrap">MRC-8902</span></td>
+              <td>Ready-mix</td>
+              <td>147 m³</td>
               <td><span class="stock-badge">In stock</span></td>
-              <td>$89.99</td>
+              <td>KSH 8,999.00 / m³</td>
             </tr>
-            <tr>
+            <tr data-action="Precast Concrete Blocks 20cm" data-detail="SKU MRC-2341 · 8 pallets in stock">
               <td>
                 <div class="product-info">
-                  <div class="product-icon"><i class="fas fa-laptop"></i></div>
-                  <span>Ultra Slim Laptop 14"</span>
+                  <div class="product-icon"><i class="fas fa-cubes"></i></div>
+                  <span>Precast Concrete Blocks 20cm</span>
                 </div>
               </td>
-              <td><span class="no-wrap">SKU-2341</span></td>
-              <td>Computers</td>
-              <td>8</td>
+              <td><span class="no-wrap">MRC-2341</span></td>
+              <td>Precast</td>
+              <td>8 pallets</td>
               <td><span class="stock-badge low">Low stock</span></td>
-              <td>$1,249.00</td>
+              <td>KSH 125.00 / unit</td>
             </tr>
-            <tr>
+            <tr data-action="Rapid Set Cement – 25kg" data-detail="SKU MRC-5621 · 0 bags — restock needed">
               <td>
                 <div class="product-info">
-                  <div class="product-icon"><i class="fas fa-headphones"></i></div>
-                  <span>Noise‑Cancelling Headphones</span>
+                  <div class="product-icon"><i class="fas fa-truck-loading"></i></div>
+                  <span>Rapid Set Cement – 25kg</span>
                 </div>
               </td>
-              <td><span class="no-wrap">SKU-5621</span></td>
-              <td>Audio</td>
-              <td>0</td>
+              <td><span class="no-wrap">MRC-5621</span></td>
+              <td>Cement</td>
+              <td>0 bags</td>
               <td><span class="stock-badge out">Out of stock</span></td>
-              <td>$199.00</td>
+              <td>KSH 1,290.00 / bag</td>
             </tr>
-            <tr>
+            <tr data-action="Concrete Admixture – Superplasticizer" data-detail="SKU MRC-7712 · 56 drums in stock">
               <td>
                 <div class="product-info">
-                  <div class="product-icon"><i class="fas fa-keyboard"></i></div>
-                  <span>Mechanical Keyboard RGB</span>
+                  <div class="product-icon"><i class="fas fa-water"></i></div>
+                  <span>Concrete Admixture – Superplasticizer</span>
                 </div>
               </td>
-              <td><span class="no-wrap">SKU-7712</span></td>
-              <td>Accessories</td>
-              <td>56</td>
+              <td><span class="no-wrap">MRC-7712</span></td>
+              <td>Chemicals</td>
+              <td>56 drums</td>
               <td><span class="stock-badge">In stock</span></td>
-              <td>$129.50</td>
+              <td>KSH 12,950.00 / drum</td>
             </tr>
-            <tr>
+            <tr data-action="Crushed Limestone Aggregate 20mm" data-detail="SKU MRC-3410 · 12 tons in stock">
               <td>
                 <div class="product-info">
-                  <div class="product-icon"><i class="fas fa-mouse"></i></div>
-                  <span>Ergo Wireless Mouse</span>
+                  <div class="product-icon"><i class="fas fa-mountain"></i></div>
+                  <span>Crushed Limestone Aggregate 20mm</span>
                 </div>
               </td>
-              <td><span class="no-wrap">SKU-3410</span></td>
-              <td>Accessories</td>
-              <td>12</td>
+              <td><span class="no-wrap">MRC-3410</span></td>
+              <td>Aggregates</td>
+              <td>12 tons</td>
               <td><span class="stock-badge low">Low stock</span></td>
-              <td>$59.99</td>
+              <td>KSH 5,999.00 / ton</td>
             </tr>
           </tbody>
         </table>
       </div>
 
       <div class="table-footer">
-        <span>Showing 5 of 128 products</span>
+        <span>Showing 5 of 128 concrete products</span>
         <div class="pagination">
-          <div class="page-btn"><i class="fas fa-chevron-left"></i></div>
-          <div class="page-btn active">1</div>
-          <div class="page-btn">2</div>
-          <div class="page-btn">3</div>
-          <div class="page-btn"><i class="fas fa-chevron-right"></i></div>
+          <button class="page-btn" data-action="Previous page" aria-label="Previous page">
+            <i class="fas fa-chevron-left"></i>
+          </button>
+          <button class="page-btn active" data-action="Page 1">1</button>
+          <button class="page-btn" data-action="Page 2">2</button>
+          <button class="page-btn" data-action="Page 3">3</button>
+          <button class="page-btn" data-action="Next page" aria-label="Next page">
+            <i class="fas fa-chevron-right"></i>
+          </button>
         </div>
       </div>
     </div>
   </main>
 
+  <!-- TOAST NOTIFICATION -->
+  <div class="toast" id="toast">
+    <i class="fas fa-check-circle" id="toastIcon"></i>
+    <span id="toastMessage">Action completed</span>
+  </div>
+
   <script>
-    // minimal JS: highlight active nav (just for demo interaction)
     (function() {
-      const navItems = document.querySelectorAll('.nav-item');
-      navItems.forEach(item => {
-        item.addEventListener('click', function(e) {
-          // only for internal navigation demo: prevent jumping
-          if (this.getAttribute('href') === '#') {
-            e.preventDefault();
-          }
-          // remove active from all nav items (sidebar only, footer too)
+      // ---------- TOAST HELPER ----------
+      const toast = document.getElementById('toast');
+      const toastMessage = document.getElementById('toastMessage');
+      const toastIcon = document.getElementById('toastIcon');
+      let toastTimeout = null;
+
+      function showToast(message, icon = 'fa-check-circle') {
+        if (toastTimeout) clearTimeout(toastTimeout);
+        toastMessage.textContent = message;
+        toastIcon.className = 'fas ' + icon;
+        toast.classList.add('show');
+        toastTimeout = setTimeout(() => {
+          toast.classList.remove('show');
+        }, 2600);
+      }
+
+      // ---------- GENERIC CLICK HANDLER (data-action) ----------
+      document.addEventListener('click', function(e) {
+        const target = e.target.closest('[data-action]');
+        if (!target) return;
+
+        const action = target.getAttribute('data-action');
+        const detail = target.getAttribute('data-detail') || '';
+
+        // --- sidebar nav ---
+        if (target.classList.contains('nav-item')) {
           document.querySelectorAll('.sidebar .nav-item').forEach(nav => nav.classList.remove('active'));
-          // add active to clicked one (if it's in sidebar, not footer - but keep it simple)
-          if (this.closest('.sidebar-nav')) {
-            this.classList.add('active');
+          target.classList.add('active');
+          showToast(action + ' panel loading…', 'fa-compass');
+          return;
+        }
+
+        // --- KPI cards ---
+        if (target.classList.contains('kpi-card')) {
+          showToast(action + ' — ' + detail, 'fa-chart-simple');
+          return;
+        }
+
+        // --- table rows ---
+        if (target.tagName === 'TR' && target.closest('tbody')) {
+          showToast(action + ' — ' + detail, 'fa-box-open');
+          return;
+        }
+
+        // --- pagination ---
+        if (target.classList.contains('page-btn')) {
+          if (!target.classList.contains('active')) {
+            document.querySelectorAll('.page-btn').forEach(btn => btn.classList.remove('active'));
+            target.classList.add('active');
           }
-        });
+          showToast(action + ' loaded', 'fa-file-lines');
+          return;
+        }
+
+        // --- default: buttons, brand, profile, etc. ---
+        showToast(action + (detail ? ' — ' + detail : ''), 'fa-circle-check');
+      });
+
+      // ---------- SEARCH (live feedback, no dummy data) ----------
+      const searchInput = document.getElementById('searchInput');
+      searchInput.addEventListener('input', function(e) {
+        const value = e.target.value.trim();
+        if (value.length > 0) {
+          // highlight matching rows visually
+          const rows = document.querySelectorAll('tbody tr');
+          rows.forEach(row => {
+            const text = row.textContent.toLowerCase();
+            if (text.includes(value.toLowerCase())) {
+              row.style.background = '#fffbea';
+            } else {
+              row.style.background = '';
+            }
+          });
+        } else {
+          document.querySelectorAll('tbody tr').forEach(row => row.style.background = '');
+        }
+      });
+
+      // clear highlight on blur if empty
+      searchInput.addEventListener('blur', function() {
+        if (!this.value.trim()) {
+          document.querySelectorAll('tbody tr').forEach(row => row.style.background = '');
+        }
+      });
+
+      // ---------- KEYBOARD SHORTCUT: press "/" to focus search ----------
+      document.addEventListener('keydown', function(e) {
+        if (e.key === '/' && document.activeElement !== searchInput) {
+          e.preventDefault();
+          searchInput.focus();
+        }
       });
     })();
-
-    // you can add dynamic behavior later (filter, search, etc)
-    // no dummy data – structure is ready for real API integration.
   </script>
 </body>
 </html>
