@@ -24,7 +24,7 @@
     /* ---------- SIDEBAR ---------- */
     .sidebar {
       width: 260px;
-      background: #1a2b3c;  /* deep slate — industrial */
+      background: #1a2b3c;
       color: #e0e9f2;
       display: flex;
       flex-direction: column;
@@ -45,6 +45,7 @@
       color: white;
       cursor: pointer;
       transition: opacity 0.15s;
+      text-decoration: none;
     }
 
     .sidebar-brand:hover {
@@ -53,7 +54,7 @@
 
     .sidebar-brand i {
       font-size: 2rem;
-      color: #f0b34b;  /* warm concrete accent */
+      color: #f0b34b;
     }
 
     .sidebar-brand span {
@@ -358,6 +359,7 @@
       align-items: center;
       gap: 8px;
       font-family: inherit;
+      text-decoration: none;
     }
 
     .btn-outline i {
@@ -434,6 +436,19 @@
       border-radius: 10px;
       color: #d6952c;
       font-size: 1rem;
+      flex-shrink: 0;
+    }
+
+    .product-name {
+      font-weight: 500;
+      color: #0b1d2e;
+    }
+
+    .product-sku {
+      font-size: 0.75rem;
+      color: #8da1b5;
+      margin-top: 2px;
+      display: block;
     }
 
     .stock-badge {
@@ -454,6 +469,23 @@
     .stock-badge.out {
       background: #ffe6e6;
       color: #b13b3b;
+    }
+
+    .qty-cell {
+      font-weight: 600;
+      color: #0b1d2e;
+    }
+
+    .qty-cell .unit {
+      font-weight: 400;
+      color: #8da1b5;
+      font-size: 0.78rem;
+      margin-left: 3px;
+    }
+
+    .price-cell {
+      font-weight: 500;
+      color: #1e3145;
     }
 
     .table-footer {
@@ -497,13 +529,49 @@
       color: white;
     }
 
-    .page-btn:hover:not(.active) {
+    .page-btn:hover:not(.active):not(:disabled) {
       background: #f2f7ff;
       border-color: #b8cee3;
     }
 
-    .page-btn:active {
+    .page-btn:active:not(:disabled) {
       transform: scale(0.94);
+    }
+
+    .page-btn:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    /* empty state */
+    .empty-state {
+      padding: 60px 24px;
+      text-align: center;
+      color: #8da1b5;
+    }
+
+    .empty-state i {
+      font-size: 3rem;
+      color: #d7e3ef;
+      margin-bottom: 16px;
+      display: block;
+    }
+
+    .empty-state h3 {
+      font-size: 1.1rem;
+      color: #5d768e;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+
+    .empty-state p {
+      font-size: 0.88rem;
+      margin-bottom: 16px;
+    }
+
+    .empty-state .btn-outline {
+      display: inline-flex;
+      margin: 0 auto;
     }
 
     /* ---------- TOAST NOTIFICATION ---------- */
@@ -538,6 +606,7 @@
     .toast i {
       color: #f0b34b;
       font-size: 1.1rem;
+      flex-shrink: 0;
     }
 
     /* ---------- RESPONSIVE ---------- */
@@ -636,17 +705,17 @@
 <body>
   <!-- SIDEBAR -->
   <aside class="sidebar">
-    <div class="sidebar-brand" data-action="Home dashboard">
+    <a href="inventory.html" class="sidebar-brand" data-action="Home dashboard">
       <i class="fas fa-cubes"></i>
-      <span>Maricopa Concrete and Allied</span>
-    </div>
+      <span>Maricopa</span>
+    </a>
 
     <nav class="sidebar-nav">
       <button class="nav-item active" data-action="Dashboard">
         <i class="fas fa-chart-pie"></i>
         <span>Dashboard</span>
       </button>
-      <button class="nav-item" data-action="Inventory">
+      <button class="nav-item" data-action="Inventory" data-href="inventory.html">
         <i class="fas fa-boxes"></i>
         <span>Inventory</span>
       </button>
@@ -681,8 +750,8 @@
     <!-- HEADER -->
     <header class="top-header">
       <div class="page-title">
-        <h1>Concrete Inventory</h1>
-        <p><i class="fas fa-hard-hat"></i> Maricopa · Stock management &amp; material health</p>
+        <h1>Dashboard</h1>
+        <p><i class="fas fa-hard-hat"></i> Maricopa · Live stock overview</p>
       </div>
 
       <div class="header-actions">
@@ -697,56 +766,56 @@
       </div>
     </header>
 
-    <!-- KPI CARDS -->
-    <div class="kpi-grid">
-      <div class="kpi-card" data-action="Total products" data-detail="1,248 products">
+    <!-- KPI CARDS (populated by JS from inventory) -->
+    <div class="kpi-grid" id="kpiGrid">
+      <div class="kpi-card" data-action="Total products" data-kpi="total">
         <div class="kpi-header">
           <i class="fas fa-cubes"></i>
-          <span class="trend"><i class="fas fa-arrow-up" style="font-size: 0.7rem;"></i> +3.2%</span>
+          <span class="trend" id="trendTotal"><i class="fas fa-arrow-up" style="font-size: 0.7rem;"></i> +0%</span>
         </div>
-        <h3>1,248</h3>
+        <h3 id="kpiTotal">0</h3>
         <p>Total concrete products</p>
       </div>
 
-      <div class="kpi-card" data-action="Units in stock" data-detail="8,530 units">
+      <div class="kpi-card" data-action="Units in stock" data-kpi="units">
         <div class="kpi-header">
           <i class="fas fa-warehouse"></i>
-          <span class="trend"><i class="fas fa-arrow-up" style="font-size: 0.7rem;"></i> +1.8%</span>
+          <span class="trend" id="trendUnits"><i class="fas fa-arrow-up" style="font-size: 0.7rem;"></i> +0%</span>
         </div>
-        <h3>8,530</h3>
+        <h3 id="kpiUnits">0</h3>
         <p>Units in stock (m³ / tons)</p>
       </div>
 
-      <div class="kpi-card" data-action="Low stock materials" data-detail="23 items need attention">
+      <div class="kpi-card" data-action="Low stock materials" data-kpi="low">
         <div class="kpi-header">
           <i class="fas fa-exclamation-triangle"></i>
-          <span class="trend down"><i class="fas fa-arrow-down" style="font-size: 0.7rem;"></i> -2.1%</span>
+          <span class="trend down" id="trendLow"><i class="fas fa-arrow-down" style="font-size: 0.7rem;"></i> -0%</span>
         </div>
-        <h3>23</h3>
+        <h3 id="kpiLow">0</h3>
         <p>Low stock materials</p>
       </div>
 
-      <div class="kpi-card" data-action="Pending shipments" data-detail="7 shipments in transit">
+      <div class="kpi-card" data-action="Stock value" data-kpi="value">
         <div class="kpi-header">
-          <i class="fas fa-clock"></i>
-          <span class="trend"><i class="fas fa-arrow-up" style="font-size: 0.7rem;"></i> +0.5%</span>
+          <i class="fas fa-coins"></i>
+          <span class="trend" id="trendValue"><i class="fas fa-arrow-up" style="font-size: 0.7rem;"></i> +0%</span>
         </div>
-        <h3>7</h3>
-        <p>Pending shipments</p>
+        <h3 id="kpiValue">KSH 0</h3>
+        <p>Total stock value</p>
       </div>
     </div>
 
-    <!-- TABLE SECTION (inventory snapshot) -->
+    <!-- TABLE SECTION (inventory snapshot — live) -->
     <div class="table-section">
       <div class="table-header">
         <h2>Concrete inventory snapshot</h2>
         <div class="table-actions">
-          <button class="btn-outline" data-action="Export inventory">
+          <button class="btn-outline" id="btnExport">
             <i class="fas fa-download"></i> Export
           </button>
-          <button class="btn-outline" data-action="Filter inventory">
-            <i class="fas fa-filter"></i> Filter
-          </button>
+          <a href="inventory.html" class="btn-outline">
+            <i class="fas fa-boxes"></i> Manage inventory
+          </a>
         </div>
       </div>
 
@@ -757,93 +826,30 @@
               <th>Product / Mix</th>
               <th>SKU</th>
               <th>Category</th>
-              <th>Stock (m³ / tons)</th>
+              <th>Stock</th>
               <th>Status</th>
               <th>Price / unit</th>
             </tr>
           </thead>
-          <tbody>
-            <tr data-action="Ready-Mix Concrete C30/37" data-detail="SKU MRC-8902 · 147 m³ in stock">
-              <td>
-                <div class="product-info">
-                  <div class="product-icon"><i class="fas fa-trowel"></i></div>
-                  <span>Ready-Mix Concrete C30/37</span>
-                </div>
-              </td>
-              <td><span class="no-wrap">MRC-8902</span></td>
-              <td>Ready-mix</td>
-              <td>147 m³</td>
-              <td><span class="stock-badge">In stock</span></td>
-              <td>KSH 8,999.00 / m³</td>
-            </tr>
-            <tr data-action="Precast Concrete Blocks 20cm" data-detail="SKU MRC-2341 · 8 pallets in stock">
-              <td>
-                <div class="product-info">
-                  <div class="product-icon"><i class="fas fa-cubes"></i></div>
-                  <span>Precast Concrete Blocks 20cm</span>
-                </div>
-              </td>
-              <td><span class="no-wrap">MRC-2341</span></td>
-              <td>Precast</td>
-              <td>8 pallets</td>
-              <td><span class="stock-badge low">Low stock</span></td>
-              <td>KSH 125.00 / unit</td>
-            </tr>
-            <tr data-action="Rapid Set Cement – 25kg" data-detail="SKU MRC-5621 · 0 bags — restock needed">
-              <td>
-                <div class="product-info">
-                  <div class="product-icon"><i class="fas fa-truck-loading"></i></div>
-                  <span>Rapid Set Cement – 25kg</span>
-                </div>
-              </td>
-              <td><span class="no-wrap">MRC-5621</span></td>
-              <td>Cement</td>
-              <td>0 bags</td>
-              <td><span class="stock-badge out">Out of stock</span></td>
-              <td>KSH 1,290.00 / bag</td>
-            </tr>
-            <tr data-action="Concrete Admixture – Superplasticizer" data-detail="SKU MRC-7712 · 56 drums in stock">
-              <td>
-                <div class="product-info">
-                  <div class="product-icon"><i class="fas fa-water"></i></div>
-                  <span>Concrete Admixture – Superplasticizer</span>
-                </div>
-              </td>
-              <td><span class="no-wrap">MRC-7712</span></td>
-              <td>Chemicals</td>
-              <td>56 drums</td>
-              <td><span class="stock-badge">In stock</span></td>
-              <td>KSH 12,950.00 / drum</td>
-            </tr>
-            <tr data-action="Crushed Limestone Aggregate 20mm" data-detail="SKU MRC-3410 · 12 tons in stock">
-              <td>
-                <div class="product-info">
-                  <div class="product-icon"><i class="fas fa-mountain"></i></div>
-                  <span>Crushed Limestone Aggregate 20mm</span>
-                </div>
-              </td>
-              <td><span class="no-wrap">MRC-3410</span></td>
-              <td>Aggregates</td>
-              <td>12 tons</td>
-              <td><span class="stock-badge low">Low stock</span></td>
-              <td>KSH 5,999.00 / ton</td>
-            </tr>
+          <tbody id="inventoryBody">
+            <!-- populated by JS -->
           </tbody>
         </table>
+
+        <div class="empty-state" id="emptyState" style="display:none;">
+          <i class="fas fa-box-open"></i>
+          <h3>No inventory items yet</h3>
+          <p>Add items to your inventory to see them here.</p>
+          <a href="inventory.html" class="btn-outline">
+            <i class="fas fa-plus"></i> Add stock items
+          </a>
+        </div>
       </div>
 
       <div class="table-footer">
-        <span>Showing 5 of 128 concrete products</span>
-        <div class="pagination">
-          <button class="page-btn" data-action="Previous page" aria-label="Previous page">
-            <i class="fas fa-chevron-left"></i>
-          </button>
-          <button class="page-btn active" data-action="Page 1">1</button>
-          <button class="page-btn" data-action="Page 2">2</button>
-          <button class="page-btn" data-action="Page 3">3</button>
-          <button class="page-btn" data-action="Next page" aria-label="Next page">
-            <i class="fas fa-chevron-right"></i>
-          </button>
+        <span id="footerInfo">Showing 0 of 0 products</span>
+        <div class="pagination" id="pagination">
+          <!-- pagination buttons injected -->
         </div>
       </div>
     </div>
@@ -857,7 +863,37 @@
 
   <script>
     (function() {
-      // ---------- TOAST HELPER ----------
+      'use strict';
+
+      // ============================================================
+      // SHARED CONSTANTS (must match inventory page)
+      // ============================================================
+      const STORAGE_KEY = 'maricopa_inventory_v1';
+      const PAGE_SIZE = 5;
+
+      // ============================================================
+      // STATE
+      // ============================================================
+      let inventory = [];
+      let currentPage = 1;
+      let searchTerm = '';
+
+      // ============================================================
+      // DOM REFS
+      // ============================================================
+      const tbody = document.getElementById('inventoryBody');
+      const emptyState = document.getElementById('emptyState');
+      const footerInfo = document.getElementById('footerInfo');
+      const pagination = document.getElementById('pagination');
+      const searchInput = document.getElementById('searchInput');
+      const kpiTotal = document.getElementById('kpiTotal');
+      const kpiUnits = document.getElementById('kpiUnits');
+      const kpiLow = document.getElementById('kpiLow');
+      const kpiValue = document.getElementById('kpiValue');
+
+      // ============================================================
+      // TOAST
+      // ============================================================
       const toast = document.getElementById('toast');
       const toastMessage = document.getElementById('toastMessage');
       const toastIcon = document.getElementById('toastIcon');
@@ -868,87 +904,366 @@
         toastMessage.textContent = message;
         toastIcon.className = 'fas ' + icon;
         toast.classList.add('show');
-        toastTimeout = setTimeout(() => {
-          toast.classList.remove('show');
-        }, 2600);
+        toastTimeout = setTimeout(() => toast.classList.remove('show'), 2600);
       }
 
-      // ---------- GENERIC CLICK HANDLER (data-action) ----------
+      // ============================================================
+      // HELPERS
+      // ============================================================
+      function formatKSH(n) {
+        const num = Number(n) || 0;
+        return 'KSH ' + num.toLocaleString('en-KE', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      }
+
+      function formatNumber(n) {
+        return Number(n || 0).toLocaleString('en-KE');
+      }
+
+      function getStatus(item) {
+        const qty = Number(item.quantity) || 0;
+        const threshold = Number(item.threshold) || 10;
+        if (qty <= 0) return 'out';
+        if (qty <= threshold) return 'low';
+        return 'in';
+      }
+
+      function statusLabel(status) {
+        return status === 'out' ? 'Out of stock' : status === 'low' ? 'Low stock' : 'In stock';
+      }
+
+      function statusClass(status) {
+        return status === 'out' ? 'stock-badge out' : status === 'low' ? 'stock-badge low' : 'stock-badge';
+      }
+
+      function categoryIcon(category) {
+        const map = {
+          'Ready-mix': 'fa-trowel',
+          'Precast': 'fa-cubes',
+          'Cement': 'fa-truck-loading',
+          'Chemicals': 'fa-water',
+          'Aggregates': 'fa-mountain',
+          'Steel': 'fa-bars',
+          'Other': 'fa-box'
+        };
+        return map[category] || 'fa-box';
+      }
+
+      function escapeHtml(str) {
+        if (str === null || str === undefined) return '';
+        return String(str)
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;')
+          .replace(/'/g, '&#039;');
+      }
+
+      // ============================================================
+      // LOAD INVENTORY FROM SHARED STORAGE
+      // ============================================================
+      function loadInventory() {
+        try {
+          const raw = localStorage.getItem(STORAGE_KEY);
+          inventory = raw ? JSON.parse(raw) : [];
+          if (!Array.isArray(inventory)) inventory = [];
+        } catch (e) {
+          inventory = [];
+        }
+      }
+
+      // ============================================================
+      // KPI CALCULATIONS (live from inventory)
+      // ============================================================
+      function updateKPIs() {
+        const total = inventory.length;
+        let units = 0, low = 0, value = 0;
+
+        inventory.forEach(item => {
+          const qty = Number(item.quantity) || 0;
+          const price = Number(item.price) || 0;
+          units += qty;
+          value += qty * price;
+          if (getStatus(item) === 'low') low++;
+        });
+
+        kpiTotal.textContent = formatNumber(total);
+        kpiUnits.textContent = formatNumber(units);
+        kpiLow.textContent = formatNumber(low);
+        kpiValue.textContent = formatKSH(value);
+
+        // Dynamic trend indicators (based on current vs previous snapshot)
+        // We store a lightweight snapshot in localStorage to compute change.
+        const snapshotKey = STORAGE_KEY + '_dash_snapshot';
+        let prev = null;
+        try {
+          const rawPrev = localStorage.getItem(snapshotKey);
+          prev = rawPrev ? JSON.parse(rawPrev) : null;
+        } catch (e) { prev = null; }
+
+        function setTrend(el, current, previous, invertGood) {
+          const trendEl = document.getElementById(el);
+          if (!trendEl) return;
+          if (previous === null || previous === undefined || previous === 0) {
+            trendEl.innerHTML = '<i class="fas fa-minus" style="font-size: 0.7rem;"></i> 0%';
+            trendEl.classList.remove('down');
+            return;
+          }
+          const pct = ((current - previous) / previous) * 100;
+          const isUp = pct >= 0;
+          const good = invertGood ? !isUp : isUp;
+          trendEl.classList.toggle('down', !good);
+          trendEl.innerHTML = '<i class="fas fa-arrow-' + (isUp ? 'up' : 'down') + '" style="font-size: 0.7rem;"></i> ' +
+            (isUp ? '+' : '') + pct.toFixed(1) + '%';
+        }
+
+        if (prev) {
+          setTrend('trendTotal', total, prev.total, false);
+          setTrend('trendUnits', units, prev.units, false);
+          setTrend('trendLow', low, prev.low, true);   // fewer low-stock is good
+          setTrend('trendValue', value, prev.value, false);
+        } else {
+          // first run: show neutral
+          ['trendTotal', 'trendUnits', 'trendLow', 'trendValue'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) {
+              el.innerHTML = '<i class="fas fa-minus" style="font-size: 0.7rem;"></i> 0%';
+              el.classList.remove('down');
+            }
+          });
+        }
+
+        // Save snapshot for next comparison
+        try {
+          localStorage.setItem(snapshotKey, JSON.stringify({ total, units, low, value }));
+        } catch (e) { /* storage full — silent */ }
+      }
+
+      // ============================================================
+      // FILTER + RENDER TABLE
+      // ============================================================
+      function getFilteredItems() {
+        const q = searchTerm.trim().toLowerCase();
+        if (!q) return inventory;
+        return inventory.filter(item => {
+          const hay = (
+            (item.name || '') + ' ' +
+            (item.sku || '') + ' ' +
+            (item.category || '') + ' ' +
+            (item.supplier || '')
+          ).toLowerCase();
+          return hay.includes(q);
+        });
+      }
+
+      function renderTable() {
+        const filtered = getFilteredItems();
+        const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+        if (currentPage > totalPages) currentPage = totalPages;
+        if (currentPage < 1) currentPage = 1;
+
+        const start = (currentPage - 1) * PAGE_SIZE;
+        const pageItems = filtered.slice(start, start + PAGE_SIZE);
+
+        tbody.innerHTML = '';
+
+        if (pageItems.length === 0) {
+          emptyState.style.display = 'block';
+          tbody.style.display = 'none';
+        } else {
+          emptyState.style.display = 'none';
+          tbody.style.display = '';
+          pageItems.forEach(item => {
+            const status = getStatus(item);
+            const tr = document.createElement('tr');
+            tr.setAttribute('data-action', item.name);
+            tr.setAttribute('data-detail', 'SKU ' + item.sku + ' · ' + formatNumber(item.quantity) + ' ' + (item.unit || 'units') + ' in stock');
+            tr.innerHTML = `
+              <td>
+                <div class="product-info">
+                  <div class="product-icon"><i class="fas ${categoryIcon(item.category)}"></i></div>
+                  <div>
+                    <div class="product-name">${escapeHtml(item.name)}</div>
+                    <span class="product-sku">${escapeHtml(item.supplier || '')}</span>
+                  </div>
+                </div>
+              </td>
+              <td><span class="no-wrap">${escapeHtml(item.sku)}</span></td>
+              <td>${escapeHtml(item.category)}</td>
+              <td class="qty-cell">${formatNumber(item.quantity)}<span class="unit">${escapeHtml(item.unit || '')}</span></td>
+              <td><span class="${statusClass(status)}">${statusLabel(status)}</span></td>
+              <td class="price-cell">${formatKSH(item.price)}</td>
+            `;
+            tbody.appendChild(tr);
+          });
+        }
+
+        // footer
+        footerInfo.textContent = filtered.length === 0
+          ? 'Showing 0 of 0 products'
+          : `Showing ${start + 1}–${start + pageItems.length} of ${filtered.length} product${filtered.length !== 1 ? 's' : ''}`;
+
+        renderPagination(totalPages);
+      }
+
+      function renderPagination(totalPages) {
+        pagination.innerHTML = '';
+        if (totalPages <= 1) return;
+
+        const prev = document.createElement('button');
+        prev.className = 'page-btn';
+        prev.innerHTML = '<i class="fas fa-chevron-left"></i>';
+        prev.disabled = currentPage === 1;
+        prev.addEventListener('click', () => {
+          if (currentPage > 1) { currentPage--; renderTable(); }
+        });
+        pagination.appendChild(prev);
+
+        let startPage = Math.max(1, currentPage - 1);
+        let endPage = Math.min(totalPages, startPage + 2);
+        if (endPage - startPage < 2) startPage = Math.max(1, endPage - 2);
+
+        for (let i = startPage; i <= endPage; i++) {
+          const btn = document.createElement('button');
+          btn.className = 'page-btn' + (i === currentPage ? ' active' : '');
+          btn.textContent = i;
+          btn.addEventListener('click', () => { currentPage = i; renderTable(); });
+          pagination.appendChild(btn);
+        }
+
+        const next = document.createElement('button');
+        next.className = 'page-btn';
+        next.innerHTML = '<i class="fas fa-chevron-right"></i>';
+        next.disabled = currentPage === totalPages;
+        next.addEventListener('click', () => {
+          if (currentPage < totalPages) { currentPage++; renderTable(); }
+        });
+        pagination.appendChild(next);
+      }
+
+      // ============================================================
+      // SEARCH
+      // ============================================================
+      searchInput.addEventListener('input', function() {
+        searchTerm = this.value;
+        currentPage = 1;
+        renderTable();
+      });
+
+      // ============================================================
+      // EXPORT (shares the same CSV logic as inventory)
+      // ============================================================
+      document.getElementById('btnExport').addEventListener('click', function() {
+        if (inventory.length === 0) {
+          showToast('Nothing to export — inventory is empty.', 'fa-circle-exclamation');
+          return;
+        }
+        const headers = ['Name', 'SKU', 'Category', 'Quantity', 'Unit', 'Unit Price (KSH)', 'Threshold', 'Status', 'Supplier'];
+        const rows = inventory.map(item => [
+          item.name,
+          item.sku,
+          item.category,
+          item.quantity,
+          item.unit,
+          item.price,
+          item.threshold,
+          statusLabel(getStatus(item)),
+          item.supplier || ''
+        ]);
+        const csv = [headers, ...rows]
+          .map(r => r.map(cell => '"' + String(cell).replace(/"/g, '""') + '"').join(','))
+          .join('\r\n');
+
+        const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'maricopa-inventory-' + new Date().toISOString().slice(0, 10) + '.csv';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        showToast('Inventory exported as CSV.', 'fa-download');
+      });
+
+      // ============================================================
+      // GENERIC CLICK HANDLER (toast feedback for dashboard elements)
+      // ============================================================
       document.addEventListener('click', function(e) {
         const target = e.target.closest('[data-action]');
         if (!target) return;
 
+        // Skip links that navigate away
+        if (target.tagName === 'A' && target.getAttribute('href')) return;
+
         const action = target.getAttribute('data-action');
         const detail = target.getAttribute('data-detail') || '';
 
-        // --- sidebar nav ---
+        // sidebar nav
         if (target.classList.contains('nav-item')) {
-          document.querySelectorAll('.sidebar .nav-item').forEach(nav => nav.classList.remove('active'));
+          const href = target.getAttribute('data-href');
+          if (href) { window.location.href = href; return; }
+          document.querySelectorAll('.sidebar .nav-item').forEach(n => n.classList.remove('active'));
           target.classList.add('active');
           showToast(action + ' panel loading…', 'fa-compass');
           return;
         }
 
-        // --- KPI cards ---
+        // KPI cards
         if (target.classList.contains('kpi-card')) {
-          showToast(action + ' — ' + detail, 'fa-chart-simple');
+          showToast(action + (detail ? ' — ' + detail : ''), 'fa-chart-simple');
           return;
         }
 
-        // --- table rows ---
+        // table rows
         if (target.tagName === 'TR' && target.closest('tbody')) {
           showToast(action + ' — ' + detail, 'fa-box-open');
           return;
         }
 
-        // --- pagination ---
-        if (target.classList.contains('page-btn')) {
-          if (!target.classList.contains('active')) {
-            document.querySelectorAll('.page-btn').forEach(btn => btn.classList.remove('active'));
-            target.classList.add('active');
-          }
-          showToast(action + ' loaded', 'fa-file-lines');
-          return;
-        }
-
-        // --- default: buttons, brand, profile, etc. ---
+        // default
         showToast(action + (detail ? ' — ' + detail : ''), 'fa-circle-check');
       });
 
-      // ---------- SEARCH (live feedback, no dummy data) ----------
-      const searchInput = document.getElementById('searchInput');
-      searchInput.addEventListener('input', function(e) {
-        const value = e.target.value.trim();
-        if (value.length > 0) {
-          // highlight matching rows visually
-          const rows = document.querySelectorAll('tbody tr');
-          rows.forEach(row => {
-            const text = row.textContent.toLowerCase();
-            if (text.includes(value.toLowerCase())) {
-              row.style.background = '#fffbea';
-            } else {
-              row.style.background = '';
-            }
-          });
-        } else {
-          document.querySelectorAll('tbody tr').forEach(row => row.style.background = '');
-        }
-      });
-
-      // clear highlight on blur if empty
-      searchInput.addEventListener('blur', function() {
-        if (!this.value.trim()) {
-          document.querySelectorAll('tbody tr').forEach(row => row.style.background = '');
-        }
-      });
-
-      // ---------- KEYBOARD SHORTCUT: press "/" to focus search ----------
+      // ============================================================
+      // KEYBOARD: "/" focuses search
+      // ============================================================
       document.addEventListener('keydown', function(e) {
         if (e.key === '/' && document.activeElement !== searchInput) {
-          e.preventDefault();
-          searchInput.focus();
+          const tag = (document.activeElement.tagName || '').toLowerCase();
+          if (tag !== 'input' && tag !== 'textarea' && tag !== 'select') {
+            e.preventDefault();
+            searchInput.focus();
+          }
         }
       });
+
+      // ============================================================
+      // LIVE SYNC: refresh when inventory page saves in another tab
+      // ============================================================
+      window.addEventListener('storage', function(e) {
+        if (e.key === STORAGE_KEY) {
+          loadInventory();
+          updateKPIs();
+          renderTable();
+          showToast('Inventory updated — dashboard synced.', 'fa-rotate');
+        }
+      });
+
+      // Also refresh whenever the page becomes visible again
+      document.addEventListener('visibilitychange', function() {
+        if (!document.hidden) {
+          loadInventory();
+          updateKPIs();
+          renderTable();
+        }
+      });
+
+      // ============================================================
+      // INIT
+      // ============================================================
+      loadInventory();
+      updateKPIs();
+      renderTable();
     })();
   </script>
 </body>
