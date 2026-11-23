@@ -1,5 +1,5 @@
 # stock-management
-# stock-management-user
+
 #  Maricopa Stock Management System
 
 **A Smart, Reliable and Efficient Inventory Management Solution**
