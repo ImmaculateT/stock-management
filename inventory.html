@@ -21,7 +21,7 @@
       min-height: 100vh;
     }
 
-    /* ---------- SIDEBAR ---------- */
+    /* ---------- SIDEBAR (with background image) ---------- */
     .sidebar {
       width: 260px;
       background: #1a2b3c;
@@ -32,6 +32,38 @@
       transition: all 0.2s ease;
       flex-shrink: 0;
       box-shadow: 2px 0 12px rgba(0, 0, 0, 0.05);
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Background image layer */
+    .sidebar::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      /* ▼▼▼ REPLACE THIS URL WITH YOUR SIDEBAR BACKGROUND IMAGE ▼▼▼ */
+      background-image: url('https://images.unsplash.com/photo-1517581177682-a085bb7ffb15?auto=format&fit=crop&w=800&q=80');
+      background-size: cover;
+      background-position: center;
+      opacity: 0.18;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* Dark overlay for readability */
+    .sidebar::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(26, 43, 60, 0.92) 0%, rgba(26, 43, 60, 0.75) 100%);
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    /* All sidebar content sits above the image layers */
+    .sidebar > * {
+      position: relative;
+      z-index: 2;
     }
 
     .sidebar-brand {
@@ -71,6 +103,7 @@
       flex: 1;
     }
 
+    /* Navigation items are now <a> tags with real hrefs */
     .nav-item {
       display: flex;
       align-items: center;
@@ -587,6 +620,25 @@
       background: #fff5f5;
     }
 
+    /* loading state */
+    .loading-state {
+      padding: 60px 24px;
+      text-align: center;
+      color: #8da1b5;
+    }
+
+    .loading-state i {
+      font-size: 2.4rem;
+      color: #d7e3ef;
+      margin-bottom: 16px;
+      display: block;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
     /* empty state */
     .empty-state {
       padding: 60px 24px;
@@ -1010,43 +1062,45 @@
 <body>
   <!-- SIDEBAR -->
   <aside class="sidebar">
-    <a href="#" class="sidebar-brand" data-action="Home dashboard">
+    <!-- Brand links to dashboard — REPLACE href with your dashboard URL -->
+    <a href="dashboard.html" class="sidebar-brand">
       <i class="fas fa-cubes"></i>
       <span>Maricopa</span>
     </a>
 
     <nav class="sidebar-nav">
-      <button class="nav-item" data-action="Dashboard">
+      <!-- ▼▼▼ REPLACE THE href VALUES BELOW WITH YOUR EXACT PAGE LOCATIONS ▼▼▼ -->
+      <a href="home.html" class="nav-item">
         <i class="fas fa-chart-pie"></i>
         <span>Dashboard</span>
-      </button>
-      <button class="nav-item active" data-action="Inventory">
+      </a>
+      <a href="inventory.html" class="nav-item active">
         <i class="fas fa-boxes"></i>
         <span>Inventory</span>
-      </button>
-      <button class="nav-item" data-action="Orders">
+      </a>
+      <a href="orders.html" class="nav-item">
         <i class="fas fa-truck"></i>
         <span>Orders</span>
-      </button>
-      <button class="nav-item" data-action="Analytics">
+      </a>
+      <a href="analytics.html" class="nav-item">
         <i class="fas fa-chart-line"></i>
         <span>Analytics</span>
-      </button>
-      <button class="nav-item" data-action="Settings">
+      </a>
+      <a href="settings.html" class="nav-item">
         <i class="fas fa-cog"></i>
         <span>Settings</span>
-      </button>
+      </a>
     </nav>
 
     <div class="sidebar-footer">
-      <button class="nav-item" data-action="Support">
+      <a href="support.html" class="nav-item">
         <i class="fas fa-circle-question"></i>
         <span>Support</span>
-      </button>
-      <button class="nav-item" data-action="Logout">
+      </a>
+      <a href="logout.html" class="nav-item">
         <i class="fas fa-right-from-bracket"></i>
         <span>Logout</span>
-      </button>
+      </a>
     </div>
   </aside>
 
@@ -1064,7 +1118,7 @@
           <i class="fas fa-search"></i>
           <input type="text" id="searchInput" placeholder="Search name, SKU, category...">
         </div>
-        <div class="user-profile" data-action="User profile">
+        <div class="user-profile" id="userProfile">
           <span>Alex Rivera</span>
           <div class="avatar">AR</div>
         </div>
@@ -1162,6 +1216,12 @@
             <!-- rows injected by JS -->
           </tbody>
         </table>
+
+        <div class="loading-state" id="loadingState" style="display:none;">
+          <i class="fas fa-spinner"></i>
+          <p>Loading inventory…</p>
+        </div>
+
         <div class="empty-state" id="emptyState" style="display:none;">
           <i class="fas fa-box-open"></i>
           <h3>No inventory items yet</h3>
@@ -1271,9 +1331,97 @@
       'use strict';
 
       // ============================================================
+      // BACKEND CONFIGURATION
+      // ============================================================
+      // Replace these with your actual backend endpoints.
+      // The DataService object below is the single place where all
+      // network calls live — wire these to your real API.
+      const API = {
+        BASE_URL: 'https://your-backend.example.com/api',
+        ENDPOINTS: {
+          list:   '/inventory',
+          create: '/inventory',
+          update: '/inventory/:id',   // :id replaced at runtime
+          delete: '/inventory/:id',
+          clear:  '/inventory'        // DELETE on collection
+        },
+        // Helper to build URLs
+        url(key, params) {
+          let path = this.ENDPOINTS[key] || '';
+          if (params && params.id) path = path.replace(':id', encodeURIComponent(params.id));
+          return this.BASE_URL + path;
+        }
+      };
+
+      // ============================================================
+      // DATA SERVICE — swap the internals for real fetch() calls.
+      // Currently returns an empty list so the page runs standalone.
+      // ============================================================
+      const DataService = {
+        async fetchInventory() {
+          // ▼▼▼ UNCOMMENT AND USE YOUR REAL API ▼▼▼
+          // const res = await fetch(API.url('list'), {
+          //   headers: { 'Accept': 'application/json' }
+          // });
+          // if (!res.ok) throw new Error('Failed to load inventory');
+          // return await res.json();
+
+          // Temporary: return empty array until backend is connected
+          return [];
+        },
+
+        async createItem(item) {
+          // ▼▼▼ UNCOMMENT AND USE YOUR REAL API ▼▼▼
+          // const res = await fetch(API.url('create'), {
+          //   method: 'POST',
+          //   headers: { 'Content-Type': 'application/json' },
+          //   body: JSON.stringify(item)
+          // });
+          // if (!res.ok) throw new Error('Failed to create item');
+          // return await res.json();
+
+          // Temporary: simulate success
+          return { ...item, id: 'temp_' + Date.now() };
+        },
+
+        async updateItem(id, item) {
+          // ▼▼▼ UNCOMMENT AND USE YOUR REAL API ▼▼▼
+          // const res = await fetch(API.url('update', { id }), {
+          //   method: 'PUT',
+          //   headers: { 'Content-Type': 'application/json' },
+          //   body: JSON.stringify(item)
+          // });
+          // if (!res.ok) throw new Error('Failed to update item');
+          // return await res.json();
+
+          // Temporary: simulate success
+          return { ...item, id };
+        },
+
+        async deleteItem(id) {
+          // ▼▼▼ UNCOMMENT AND USE YOUR REAL API ▼▼▼
+          // const res = await fetch(API.url('delete', { id }), {
+          //   method: 'DELETE'
+          // });
+          // if (!res.ok) throw new Error('Failed to delete item');
+
+          // Temporary: simulate success
+          return true;
+        },
+
+        async clearAll() {
+          // ▼▼▼ UNCOMMENT AND USE YOUR REAL API ▼▼▼
+          // const res = await fetch(API.url('clear'), { method: 'DELETE' });
+          // if (!res.ok) throw new Error('Failed to clear inventory');
+
+          // Temporary: simulate success
+          return true;
+        }
+      };
+
+      // ============================================================
       // STATE
       // ============================================================
-      const STORAGE_KEY = 'maricopa_inventory_v1';
       const PAGE_SIZE = 8;
 
       let inventory = [];
@@ -1282,12 +1430,14 @@
       let sortKey = 'name';
       let sortDir = 'asc';
       let filters = { search: '', category: '', status: '' };
+      let isLoading = false;
 
       // ============================================================
       // DOM REFS
       // ============================================================
       const tbody = document.getElementById('inventoryBody');
       const emptyState = document.getElementById('emptyState');
+      const loadingState = document.getElementById('loadingState');
       const footerInfo = document.getElementById('footerInfo');
       const pagination = document.getElementById('pagination');
       const searchInput = document.getElementById('searchInput');
@@ -1319,27 +1469,6 @@
         toast.classList.toggle('error', type === 'error');
         toast.classList.add('show');
         toastTimeout = setTimeout(() => toast.classList.remove('show'), 2800);
-      }
-
-      // ============================================================
-      // PERSISTENCE
-      // ============================================================
-      function loadInventory() {
-        try {
-          const raw = localStorage.getItem(STORAGE_KEY);
-          inventory = raw ? JSON.parse(raw) : [];
-          if (!Array.isArray(inventory)) inventory = [];
-        } catch (e) {
-          inventory = [];
-        }
-      }
-
-      function saveInventory() {
-        try {
-          localStorage.setItem(STORAGE_KEY, JSON.stringify(inventory));
-        } catch (e) {
-          showToast('Could not save to storage.', 'error');
-        }
       }
 
       // ============================================================
@@ -1403,7 +1532,6 @@
       function getFilteredItems() {
         const q = filters.search.trim().toLowerCase();
         return inventory.filter(item => {
-          // search
           if (q) {
             const hay = (
               (item.name || '') + ' ' +
@@ -1413,12 +1541,8 @@
             ).toLowerCase();
             if (!hay.includes(q)) return false;
           }
-          // category
           if (filters.category && item.category !== filters.category) return false;
-          // status
-          if (filters.status) {
-            if (getStatus(item) !== filters.status) return false;
-          }
+          if (filters.status && getStatus(item) !== filters.status) return false;
           return true;
         });
       }
@@ -1474,10 +1598,21 @@
       // RENDER TABLE
       // ============================================================
       function renderTable() {
+        // show loading
+        if (isLoading) {
+          tbody.style.display = 'none';
+          emptyState.style.display = 'none';
+          loadingState.style.display = 'block';
+          footerInfo.textContent = 'Loading…';
+          pagination.innerHTML = '';
+          return;
+        }
+
+        loadingState.style.display = 'none';
+
         const filtered = getFilteredItems();
         const sorted = getSortedItems(filtered);
 
-        // pagination bounds
         const totalPages = Math.max(1, Math.ceil(sorted.length / PAGE_SIZE));
         if (currentPage > totalPages) currentPage = totalPages;
         if (currentPage < 1) currentPage = 1;
@@ -1485,7 +1620,6 @@
         const start = (currentPage - 1) * PAGE_SIZE;
         const pageItems = sorted.slice(start, start + PAGE_SIZE);
 
-        // rows
         tbody.innerHTML = '';
         if (pageItems.length === 0) {
           emptyState.style.display = 'block';
@@ -1527,16 +1661,13 @@
           });
         }
 
-        // footer info
         const showing = pageItems.length;
         footerInfo.textContent = sorted.length === 0
           ? 'Showing 0 items'
           : `Showing ${start + 1}–${start + showing} of ${sorted.length} item${sorted.length !== 1 ? 's' : ''}`;
 
-        // pagination controls
         renderPagination(totalPages);
 
-        // sort icons
         document.querySelectorAll('th.sortable').forEach(th => {
           const icon = th.querySelector('.sort-icon i');
           if (th.dataset.sort === sortKey) {
@@ -1564,7 +1695,6 @@
         });
         pagination.appendChild(prev);
 
-        // page numbers (max 5 visible)
         let startPage = Math.max(1, currentPage - 2);
         let endPage = Math.min(totalPages, startPage + 4);
         if (endPage - startPage < 4) startPage = Math.max(1, endPage - 4);
@@ -1585,6 +1715,25 @@
           if (currentPage < totalPages) { currentPage++; renderTable(); }
         });
         pagination.appendChild(next);
+      }
+
+      // ============================================================
+      // LOAD DATA FROM BACKEND
+      // ============================================================
+      async function loadInventory() {
+        isLoading = true;
+        renderTable();
+        try {
+          inventory = await DataService.fetchInventory();
+          if (!Array.isArray(inventory)) inventory = [];
+        } catch (err) {
+          console.error('Load error:', err);
+          showToast('Could not load inventory. Check your connection.', 'error');
+          inventory = [];
+        } finally {
+          isLoading = false;
+          renderTable();
+        }
       }
 
       // ============================================================
@@ -1625,9 +1774,9 @@
       }
 
       // ============================================================
-      // FORM SUBMIT
+      // FORM SUBMIT (async → backend)
       // ============================================================
-      itemForm.addEventListener('submit', function(e) {
+      itemForm.addEventListener('submit', async function(e) {
         e.preventDefault();
 
         const name = document.getElementById('itemName').value.trim();
@@ -1647,7 +1796,7 @@
         if (quantityRaw === '' || Number(quantityRaw) < 0) { showToast('Enter a valid quantity.', 'error'); return; }
         if (priceRaw === '' || Number(priceRaw) < 0) { showToast('Enter a valid price.', 'error'); return; }
 
-        // duplicate SKU check (excluding current edit)
+        // duplicate SKU check (local — backend should also enforce)
         const dup = inventory.find(i =>
           i.sku.toLowerCase() === sku.toLowerCase() && i.id !== editingId
         );
@@ -1665,27 +1814,39 @@
           notes
         };
 
-        if (editingId) {
-          const idx = inventory.findIndex(i => i.id === editingId);
-          if (idx !== -1) {
-            inventory[idx] = { ...inventory[idx], ...payload };
-            showToast('Item updated successfully.');
-          }
-        } else {
-          inventory.push({ id: uid(), ...payload, createdAt: Date.now() });
-          showToast('Item added to inventory.');
-        }
+        // disable save button while talking to backend
+        modalSave.disabled = true;
+        modalSave.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving…';
 
-        saveInventory();
-        closeModal();
-        currentPage = 1;
-        renderTable();
+        try {
+          if (editingId) {
+            const updated = await DataService.updateItem(editingId, payload);
+            const idx = inventory.findIndex(i => i.id === editingId);
+            if (idx !== -1) inventory[idx] = { ...inventory[idx], ...updated, ...payload };
+            showToast('Item updated successfully.');
+          } else {
+            const created = await DataService.createItem(payload);
+            inventory.push({ id: created.id || uid(), ...payload, createdAt: Date.now() });
+            showToast('Item added to inventory.');
+          }
+          closeModal();
+          currentPage = 1;
+          renderTable();
+        } catch (err) {
+          console.error('Save error:', err);
+          showToast('Could not save item. Please try again.', 'error');
+        } finally {
+          modalSave.disabled = false;
+          modalSave.innerHTML = editingId
+            ? '<i class="fas fa-check"></i> Update item'
+            : '<i class="fas fa-check"></i> Save item';
+        }
       });
 
       // ============================================================
       // ROW ACTIONS (event delegation)
       // ============================================================
-      tbody.addEventListener('click', function(e) {
+      tbody.addEventListener('click', async function(e) {
         const editBtn = e.target.closest('[data-edit]');
         const delBtn = e.target.closest('[data-delete]');
 
@@ -1700,11 +1861,16 @@
           const id = delBtn.getAttribute('data-delete');
           const item = inventory.find(i => i.id === id);
           if (!item) return;
-          if (confirm('Delete "' + item.name + '"? This cannot be undone.')) {
+          if (!confirm('Delete "' + item.name + '"? This cannot be undone.')) return;
+
+          try {
+            await DataService.deleteItem(id);
             inventory = inventory.filter(i => i.id !== id);
-            saveInventory();
             showToast('Item deleted.');
             renderTable();
+          } catch (err) {
+            console.error('Delete error:', err);
+            showToast('Could not delete item. Please try again.', 'error');
           }
         }
       });
@@ -1713,18 +1879,25 @@
       // TOOLBAR ACTIONS
       // ============================================================
       document.getElementById('btnAddItem').addEventListener('click', () => openModal());
+
       document.getElementById('btnExport').addEventListener('click', exportCSV);
-      document.getElementById('btnClearAll').addEventListener('click', function() {
+
+      document.getElementById('btnClearAll').addEventListener('click', async function() {
         if (inventory.length === 0) {
           showToast('Inventory is already empty.', 'error');
           return;
         }
-        if (confirm('Delete ALL ' + inventory.length + ' inventory items? This cannot be undone.')) {
+        if (!confirm('Delete ALL ' + inventory.length + ' inventory items? This cannot be undone.')) return;
+
+        try {
+          await DataService.clearAll();
           inventory = [];
-          saveInventory();
           currentPage = 1;
           renderTable();
           showToast('All inventory cleared.');
+        } catch (err) {
+          console.error('Clear error:', err);
+          showToast('Could not clear inventory. Please try again.', 'error');
         }
       });
 
@@ -1784,7 +1957,7 @@
       });
 
       // ============================================================
-      // SORTING (click on headers)
+      // SORTING
       // ============================================================
       document.querySelectorAll('th.sortable').forEach(th => {
         th.addEventListener('click', function() {
@@ -1813,7 +1986,6 @@
         if (e.key === 'Escape' && modalOverlay.classList.contains('open')) {
           closeModal();
         }
-        // "/" focuses search when not typing in a field
         if (e.key === '/' && !modalOverlay.classList.contains('open')) {
           const tag = (document.activeElement.tagName || '').toLowerCase();
           if (tag !== 'input' && tag !== 'textarea' && tag !== 'select') {
@@ -1824,52 +1996,16 @@
       });
 
       // ============================================================
-      // SIDEBAR NAV (visual only, keeps theme consistent)
+      // USER PROFILE
       // ============================================================
-      document.querySelectorAll('.nav-item[data-action]').forEach(btn => {
-        btn.addEventListener('click', function() {
-          if (this.classList.contains('active')) return;
-          document.querySelectorAll('.sidebar .nav-item').forEach(n => n.classList.remove('active'));
-          this.classList.add('active');
-          if (this.dataset.action !== 'Inventory') {
-            showToast(this.dataset.action + ' panel — coming soon', 'success');
-          }
-        });
-      });
-
-      document.querySelector('.sidebar-brand').addEventListener('click', function(e) {
-        e.preventDefault();
-        showToast('Maricopa · Concrete stock management', 'success');
-      });
-
-      document.querySelector('.user-profile').addEventListener('click', function() {
+      document.getElementById('userProfile').addEventListener('click', function() {
         showToast('Signed in as Alex Rivera (Admin)', 'success');
       });
 
       // ============================================================
-      // SEED DATA (only if storage is completely empty — first run)
-      // ============================================================
-      function seedIfEmpty() {
-        if (inventory.length > 0) return;
-        const seeds = [
-          { name: 'Ready-Mix Concrete C30/37', sku: 'MRC-8902', category: 'Ready-mix', quantity: 147, unit: 'm³', price: 8999, threshold: 20, supplier: 'Maricopa Batch Plant', notes: 'High-strength structural mix.' },
-          { name: 'Precast Concrete Blocks 20cm', sku: 'MRC-2341', category: 'Precast', quantity: 8, unit: 'pallets', price: 125, threshold: 10, supplier: 'Maricopa Precast Yard', notes: '' },
-          { name: 'Rapid Set Cement – 25kg', sku: 'MRC-5621', category: 'Cement', quantity: 0, unit: 'bags', price: 1290, threshold: 15, supplier: 'Bamburi Cement Ltd.', notes: 'Urgent restock required.' },
-          { name: 'Concrete Admixture – Superplasticizer', sku: 'MRC-7712', category: 'Chemicals', quantity: 56, unit: 'drums', price: 12950, threshold: 10, supplier: 'Sika Kenya', notes: '' },
-          { name: 'Crushed Limestone Aggregate 20mm', sku: 'MRC-3410', category: 'Aggregates', quantity: 12, unit: 'tons', price: 5999, threshold: 15, supplier: 'Maricopa Quarry', notes: '' },
-          { name: 'Steel Reinforcement Bar 12mm', sku: 'MRC-1150', category: 'Steel', quantity: 240, unit: 'bars', price: 850, threshold: 50, supplier: 'Devki Steel Mills', notes: 'Grade 500.' },
-          { name: 'Concrete Curing Compound 20L', sku: 'MRC-6603', category: 'Chemicals', quantity: 18, unit: 'drums', price: 7400, threshold: 8, supplier: 'Fosroc Kenya', notes: '' }
-        ];
-        inventory = seeds.map(s => ({ id: uid(), ...s, createdAt: Date.now() }));
-        saveInventory();
-      }
-
-      // ============================================================
-      // INIT
+      // INIT — load from backend
       // ============================================================
       loadInventory();
-      seedIfEmpty();
-      renderTable();
     })();
   </script>
 </body>
