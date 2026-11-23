@@ -1266,6 +1266,13 @@
         </div>
       </div>
       <div class="stat-pill">
+        <i class="fas fa-circle-check"></i>
+        <div class="stat-info">
+          <span class="stat-value" id="statIn">0</span>
+          <span class="stat-label">In stock</span>
+        </div>
+      </div>
+      <div class="stat-pill">
         <i class="fas fa-exclamation-triangle"></i>
         <div class="stat-info">
           <span class="stat-value" id="statLow">0</span>
@@ -1489,6 +1496,48 @@
     </div>
   </div>
 
+  <!-- STOCK MOVEMENT MODAL -->
+  <div class="modal-overlay" id="movementOverlay">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="movementTitle">
+      <div class="modal-header">
+        <h2 id="movementTitle"><i class="fas fa-arrows-rotate"></i> Record stock movement</h2>
+        <button class="modal-close" id="movementClose" aria-label="Close"><i class="fas fa-xmark"></i></button>
+      </div>
+      <form id="movementForm">
+        <div class="modal-body">
+          <div class="form-grid">
+            <div class="form-group full">
+              <label>Selected item</label>
+              <div id="movementItemName" style="font-weight:700;padding:12px 14px;border:1px solid var(--border-color);border-radius:10px;background:var(--surface-2);">—</div>
+            </div>
+            <div class="form-group">
+              <label for="movementType">Movement type</label>
+              <select id="movementType" required>
+                <option value="in">Receive stock (Stock in)</option>
+                <option value="out">Issue stock (Stock out)</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="movementQuantity">Quantity</label>
+              <input type="number" id="movementQuantity" min="1" step="any" placeholder="Enter quantity" required>
+            </div>
+            <div class="form-group full">
+              <label for="movementNote">Reason / reference (optional)</label>
+              <input type="text" id="movementNote" placeholder="e.g. Supplier delivery, project dispatch, requisition number">
+            </div>
+            <div class="form-group full">
+              <div id="movementPreview" style="padding:12px 14px;border-radius:10px;background:var(--surface-2);font-size:.9rem;">Current stock: —</div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline" id="movementCancel">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="movementSave"><i class="fas fa-check"></i> Save movement</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <div class="toast" id="toast">
     <i class="fas fa-check-circle" id="toastIcon"></i>
     <span id="toastMessage">Action completed</span>
@@ -1588,6 +1637,7 @@
       const filterStatus = document.getElementById('filterStatus');
       const statTotal = document.getElementById('statTotal');
       const statUnits = document.getElementById('statUnits');
+      const statIn = document.getElementById('statIn');
       const statLow = document.getElementById('statLow');
       const statOut = document.getElementById('statOut');
       const statValue = document.getElementById('statValue');
@@ -1602,6 +1652,14 @@
       const toastMessage = document.getElementById('toastMessage');
       const toastIcon = document.getElementById('toastIcon');
       let toastTimeout = null;
+      const movementOverlay = document.getElementById('movementOverlay');
+      const movementForm = document.getElementById('movementForm');
+      const movementType = document.getElementById('movementType');
+      const movementQuantity = document.getElementById('movementQuantity');
+      const movementItemName = document.getElementById('movementItemName');
+      const movementPreview = document.getElementById('movementPreview');
+      const movementSave = document.getElementById('movementSave');
+      let movementItemId = null;
 
       // Report DOM
       const reportOverlay = document.getElementById('reportOverlay');
@@ -1674,7 +1732,7 @@
       function formatNumber(n) { return Number(n || 0).toLocaleString('en-KE'); }
       function getStatus(item) {
         const qty = Number(item.quantity) || 0;
-        const threshold = Number(item.threshold) || 10;
+        const threshold = item.threshold === null || item.threshold === undefined || item.threshold === '' ? 10 : Number(item.threshold);
         if (qty <= 0) return 'out';
         if (qty <= threshold) return 'low';
         return 'in';
@@ -1732,17 +1790,19 @@
       }
 
       function updateStats() {
-        let units = 0, low = 0, out = 0, value = 0;
+        let units = 0, inStock = 0, low = 0, out = 0, value = 0;
         inventory.forEach(item => {
           const qty = Number(item.quantity) || 0;
           const price = Number(item.price) || 0;
           units += qty; value += qty * price;
           const s = getStatus(item);
+          if (s === 'in') inStock++;
           if (s === 'low') low++;
           if (s === 'out') out++;
         });
         statTotal.textContent = formatNumber(inventory.length);
         statUnits.textContent = formatNumber(units);
+        statIn.textContent = formatNumber(inStock);
         statLow.textContent = formatNumber(low);
         statOut.textContent = formatNumber(out);
         statValue.textContent = formatKSH(value);
@@ -1796,6 +1856,7 @@
               <td><span class="${statusClass(status)}">${statusLabel(status)}</span></td>
               <td>
                 <div class="row-actions">
+                  <button class="icon-btn" data-move="${item.id}" title="Receive or issue stock" aria-label="Record stock movement"><i class="fas fa-arrows-rotate"></i></button>
                   <button class="icon-btn edit" data-edit="${item.id}" title="Edit item" aria-label="Edit item"><i class="fas fa-pen"></i></button>
                   <button class="icon-btn delete" data-delete="${item.id}" title="Delete item" aria-label="Delete item"><i class="fas fa-trash"></i></button>
                 </div>
@@ -1956,9 +2017,85 @@
         }
       });
 
+      function openMovement(item) {
+        if (!serverReachable) { showToast('Cannot record movement while the server is offline.', 'warning'); return; }
+        movementItemId = item.id;
+        movementItemName.textContent = item.name + ' · ' + item.sku;
+        movementType.value = 'in';
+        movementQuantity.value = '';
+        document.getElementById('movementNote').value = '';
+        updateMovementPreview();
+        movementOverlay.classList.add('open');
+        setTimeout(() => movementQuantity.focus(), 100);
+      }
+
+      function closeMovement() {
+        movementOverlay.classList.remove('open');
+        movementItemId = null;
+        movementForm.reset();
+      }
+
+      function updateMovementPreview() {
+        const item = inventory.find(row => row.id === movementItemId);
+        if (!item) return;
+        const current = Number(item.quantity) || 0;
+        const amount = Number(movementQuantity.value) || 0;
+        const next = movementType.value === 'out' ? current - amount : current + amount;
+        movementPreview.textContent = 'Current stock: ' + formatNumber(current) + ' ' + (item.unit || 'units') +
+          (amount > 0 ? '  →  New balance: ' + formatNumber(next) + ' ' + (item.unit || 'units') : '');
+        movementPreview.style.color = next < 0 ? 'var(--danger)' : '';
+      }
+
+      movementType.addEventListener('change', updateMovementPreview);
+      movementQuantity.addEventListener('input', updateMovementPreview);
+      document.getElementById('movementClose').addEventListener('click', closeMovement);
+      document.getElementById('movementCancel').addEventListener('click', closeMovement);
+      movementOverlay.addEventListener('click', e => { if (e.target === movementOverlay) closeMovement(); });
+
+      movementForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const item = inventory.find(row => row.id === movementItemId);
+        const amount = Number(movementQuantity.value);
+        if (!item || !Number.isFinite(amount) || amount <= 0) {
+          showToast('Enter a quantity greater than zero.', 'error'); return;
+        }
+        const current = Number(item.quantity) || 0;
+        const movementKind = movementType.value;
+        const next = movementKind === 'out' ? current - amount : current + amount;
+        if (next < 0) { showToast('Insufficient stock. You cannot issue more than the available balance.', 'error'); return; }
+        const payload = {
+          name: item.name, sku: item.sku, category: item.category,
+          quantity: next, unit: item.unit || 'units', price: Number(item.price) || 0,
+          threshold: item.threshold === undefined ? 10 : Number(item.threshold),
+          supplier: item.supplier || '', notes: item.notes || ''
+        };
+        movementSave.disabled = true;
+        movementSave.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving…';
+        try {
+          const updated = await DataService.updateItem(item.id, payload);
+          const index = inventory.findIndex(row => row.id === item.id);
+          if (index !== -1) inventory[index] = { ...item, ...(updated || {}), ...payload };
+          setServerReachable(true);
+          closeMovement();
+          renderTable();
+          showToast((movementKind === 'out' ? 'Stock issued.' : 'Stock received.') + ' New balance: ' + formatNumber(next) + ' ' + (item.unit || 'units'));
+        } catch (err) {
+          handleServiceError(err, 'Recording stock movement');
+        } finally {
+          movementSave.disabled = false;
+          movementSave.innerHTML = '<i class="fas fa-check"></i> Save movement';
+        }
+      });
+
       tbody.addEventListener('click', async function(e) {
         const editBtn = e.target.closest('[data-edit]');
         const delBtn = e.target.closest('[data-delete]');
+        const moveBtn = e.target.closest('[data-move]');
+        if (moveBtn) {
+          const item = inventory.find(i => i.id === moveBtn.getAttribute('data-move'));
+          if (item) openMovement(item);
+          return;
+        }
         if (editBtn) {
           const id = editBtn.getAttribute('data-edit');
           const item = inventory.find(i => i.id === id);
@@ -2125,6 +2262,7 @@
         if (e.key === 'Escape') {
           if (modalOverlay.classList.contains('open')) closeModal();
           if (reportOverlay.classList.contains('open')) closeReport();
+          if (movementOverlay.classList.contains('open')) closeMovement();
         }
         if (e.key === '/' && !modalOverlay.classList.contains('open') && !reportOverlay.classList.contains('open')) {
           const tag = (document.activeElement.tagName || '').toLowerCase();
