@@ -2,48 +2,36 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes, viewport-fit=cover">
   <title>Maricopa · Inventory Management</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 
   <!-- ============================================================
        THEME BOOTSTRAP — runs before body paints (no flash)
-       Reads preferences saved by settings.html and applies them.
        ============================================================ -->
   <script>
     (function () {
       try {
         var root = document.documentElement;
-
-        // Theme mode: light | dark | system
         var themeMode = localStorage.getItem('mrc.themeMode') || 'system';
         var resolved = themeMode;
         if (themeMode === 'system') {
-          var prefersDark = window.matchMedia &&
-            window.matchMedia('(prefers-color-scheme: dark)').matches;
+          var prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
           resolved = prefersDark ? 'dark' : 'light';
         }
         if (resolved === 'dark') root.setAttribute('data-theme', 'dark');
-
-        // Accent colour
         var accent = localStorage.getItem('mrc.accent') || 'amber';
         root.setAttribute('data-accent', accent);
-
-        // Density
         var density = localStorage.getItem('mrc.density') || 'comfortable';
         if (density === 'compact') root.setAttribute('data-density', 'compact');
-
-        // Sidebar background image
         var sidebarImg = localStorage.getItem('mrc.sidebarImage');
-        if (sidebarImg) {
-          root.style.setProperty('--sidebar-image', 'url("' + sidebarImg + '")');
-        }
-      } catch (e) { /* localStorage unavailable — fall back to defaults */ }
+        if (sidebarImg) root.style.setProperty('--sidebar-image', 'url("' + sidebarImg + '")');
+      } catch (e) { /* fallback */ }
     })();
   </script>
 
   <style>
-    /* ---------- THEME VARIABLES (mirrors settings.html) ---------- */
+    /* ---------- THEME VARIABLES ---------- */
     :root {
       --bg-body: #f4f7fc;
       --bg-surface: #ffffff;
@@ -75,6 +63,9 @@
       --table-head-bg: #f9fcff;
       --row-padding: 14px 18px;
       --sidebar-image: url('https://lh3.googleusercontent.com/gps-cs-s/ANWiy9RlL5m_9yx9qFp1KsgIQMk4nifrcAOL4MRZ1LG83j6MOM1CwpJ1qW8CbQ9QxwMhRiR8FYh6ocg9kUnJtf636i7edyX06zBTL-13zvEx945Od7fmU11Al7jDJFrFDojlmjsllaq8qQ=s680-w680-h510-rw');
+      --report-bg: var(--bg-surface);
+      --report-border: var(--border-color);
+      --report-header-bg: var(--bg-surface-alt);
     }
 
     html[data-theme="dark"] {
@@ -106,6 +97,9 @@
       --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.6);
       --table-row-hover: #1c2b38;
       --table-head-bg: #12202b;
+      --report-bg: #16222e;
+      --report-border: #22323f;
+      --report-header-bg: #1b2a38;
     }
 
     html[data-density="compact"] { --row-padding: 8px 12px; }
@@ -136,6 +130,8 @@
       display: flex;
       min-height: 100vh;
       transition: background 0.25s ease, color 0.25s ease;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
     }
 
     /* ---------- SIDEBAR ---------- */
@@ -246,6 +242,7 @@
       flex-direction: column;
       padding: 24px 32px;
       overflow-x: auto;
+      min-width: 0;
     }
 
     .top-header {
@@ -266,7 +263,7 @@
     .page-title p { color: var(--text-secondary); font-size: 0.9rem; margin-top: 4px; }
     .page-title p i { color: var(--accent-strong); margin-right: 6px; }
 
-    .header-actions { display: flex; align-items: center; gap: 16px; }
+    .header-actions { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
 
     .search-box {
       display: flex;
@@ -605,13 +602,14 @@
       gap: 12px;
     }
 
-    .pagination { display: flex; gap: 6px; align-items: center; }
+    .pagination { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
 
     .page-btn {
       background: var(--bg-surface);
       border: 1px solid var(--border-color-strong);
-      width: 32px;
+      min-width: 32px;
       height: 32px;
+      padding: 0 6px;
       border-radius: 10px;
       display: flex;
       align-items: center;
@@ -634,7 +632,183 @@
     .page-btn:active:not(:disabled) { transform: scale(0.94); }
     .page-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 
-    /* ---------- MODAL ---------- */
+    /* ---------- REPORT MODAL ---------- */
+    .report-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(11, 29, 46, 0.65);
+      backdrop-filter: blur(4px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      z-index: 1100;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s ease;
+    }
+    .report-overlay.open { opacity: 1; visibility: visible; }
+
+    .report-panel {
+      background: var(--report-bg);
+      border-radius: 28px;
+      width: 100%;
+      max-width: 1000px;
+      max-height: 92vh;
+      overflow-y: auto;
+      box-shadow: var(--shadow-lg);
+      transform: translateY(24px) scale(0.97);
+      transition: all 0.3s cubic-bezier(0.34, 1.4, 0.64, 1);
+      border: 1px solid var(--report-border);
+    }
+    .report-overlay.open .report-panel { transform: translateY(0) scale(1); }
+
+    .report-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 24px 28px 18px 28px;
+      border-bottom: 1px solid var(--border-color);
+      position: sticky;
+      top: 0;
+      background: var(--report-bg);
+      z-index: 2;
+      border-radius: 28px 28px 0 0;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .report-header h2 {
+      font-size: 1.3rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .report-header h2 i { color: var(--accent-strong); }
+    .report-header .report-meta {
+      font-size: 0.82rem;
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    .report-header .report-meta span {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .report-header .report-meta i { color: var(--accent-strong); font-size: 0.8rem; }
+
+    .report-close {
+      width: 38px;
+      height: 38px;
+      border-radius: 12px;
+      border: 1px solid var(--border-color);
+      background: var(--bg-surface);
+      color: var(--text-secondary);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1rem;
+      transition: all 0.12s ease;
+      font-family: inherit;
+    }
+    .report-close:hover { background: var(--danger-bg); border-color: var(--danger-border); color: var(--danger); }
+    .report-close:active { transform: scale(0.92); }
+
+    .report-body { padding: 24px 28px 32px 28px; }
+
+    .report-summary {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 14px;
+      margin-bottom: 24px;
+    }
+    .report-summary-item {
+      background: var(--bg-surface-alt);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 14px 16px;
+      text-align: center;
+    }
+    .report-summary-item .rs-value {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      line-height: 1.2;
+    }
+    .report-summary-item .rs-label {
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      font-weight: 500;
+      margin-top: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+
+    .report-table-wrap {
+      overflow-x: auto;
+      border-radius: 16px;
+      border: 1px solid var(--border-color);
+      background: var(--bg-surface);
+    }
+
+    .report-table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 700px;
+    }
+    .report-table th {
+      text-align: left;
+      padding: 12px 16px;
+      font-size: 0.72rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      color: var(--text-secondary);
+      background: var(--report-header-bg);
+      border-bottom: 1px solid var(--border-color);
+      white-space: nowrap;
+    }
+    .report-table td {
+      padding: 11px 16px;
+      font-size: 0.86rem;
+      color: var(--text-primary);
+      border-bottom: 1px solid var(--border-color);
+      white-space: nowrap;
+    }
+    .report-table tr:last-child td { border-bottom: none; }
+    .report-table tbody tr:hover { background: var(--table-row-hover); }
+
+    .report-table .r-total-row td {
+      font-weight: 700;
+      background: var(--report-header-bg);
+      border-top: 2px solid var(--border-color-strong);
+      font-size: 0.9rem;
+    }
+
+    .report-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 28px 24px 28px;
+      border-top: 1px solid var(--border-color);
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .report-footer .report-note {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .report-footer .report-note i { color: var(--accent-strong); }
+
+    /* ---------- MODAL (ADD/EDIT) ---------- */
     .modal-overlay {
       position: fixed;
       inset: 0;
@@ -802,13 +976,14 @@
     @media (max-width: 700px) {
       .form-grid { grid-template-columns: 1fr; }
       .form-group.full { grid-column: 1; }
+      .report-summary { grid-template-columns: repeat(2, 1fr); }
     }
 
     @media (max-width: 600px) {
       .main-content { padding: 16px; }
       .top-header { flex-direction: column; align-items: stretch; }
       .header-actions { justify-content: space-between; flex-wrap: wrap; }
-      .search-box { flex: 1; }
+      .search-box { flex: 1; min-width: 0; }
       .search-box input { width: 100%; }
       .user-profile span { display: none; }
       .user-profile { padding: 6px; }
@@ -823,9 +998,23 @@
       .modal-footer { padding: 16px 20px 22px 20px; }
       .connection-banner { flex-wrap: wrap; }
       .connection-banner button { margin-left: 0; width: 100%; }
+      .report-header { padding: 18px 18px 14px 18px; }
+      .report-body { padding: 18px 18px 24px 18px; }
+      .report-footer { padding: 16px 18px 20px 18px; flex-direction: column; align-items: flex-start; }
+      .report-summary { grid-template-columns: 1fr 1fr; }
+    }
+
+    @media (max-width: 400px) {
+      .report-summary { grid-template-columns: 1fr; }
+      .stats-strip { grid-template-columns: 1fr; }
     }
 
     .no-wrap { white-space: nowrap; }
+
+    /* smooth scrollbars for report */
+    .report-panel::-webkit-scrollbar { width: 6px; }
+    .report-panel::-webkit-scrollbar-track { background: transparent; }
+    .report-panel::-webkit-scrollbar-thumb { background: var(--border-color-strong); border-radius: 8px; }
   </style>
 </head>
 <body>
@@ -917,7 +1106,7 @@
     <div class="toolbar">
       <div class="toolbar-left">
         <button class="btn btn-primary" id="btnAddItem"><i class="fas fa-plus"></i> Add stock item</button>
-        <button class="btn btn-outline" id="btnExport"><i class="fas fa-download"></i> Export CSV</button>
+        <button class="btn btn-outline" id="btnExport"><i class="fas fa-chart-pie"></i> View report</button>
         <button class="btn btn-danger" id="btnClearAll"><i class="fas fa-trash-can"></i> Clear all</button>
       </div>
       <div class="filter-group">
@@ -975,6 +1164,72 @@
       </div>
     </div>
   </main>
+
+  <!-- ============================================================
+       REPORT MODAL (replaces CSV export)
+       ============================================================ -->
+  <div class="report-overlay" id="reportOverlay">
+    <div class="report-panel" role="dialog" aria-modal="true" aria-labelledby="reportTitle">
+      <div class="report-header">
+        <h2 id="reportTitle"><i class="fas fa-chart-pie"></i> Inventory report</h2>
+        <div class="report-meta">
+          <span><i class="fas fa-calendar-alt"></i> <span id="reportDate">—</span></span>
+          <span><i class="fas fa-cubes"></i> <span id="reportItemCount">0 items</span></span>
+        </div>
+        <button class="report-close" id="reportClose" aria-label="Close report"><i class="fas fa-xmark"></i></button>
+      </div>
+
+      <div class="report-body">
+        <div class="report-summary" id="reportSummary">
+          <div class="report-summary-item">
+            <div class="rs-value" id="reportStatTotal">0</div>
+            <div class="rs-label">Total items</div>
+          </div>
+          <div class="report-summary-item">
+            <div class="rs-value" id="reportStatUnits">0</div>
+            <div class="rs-label">Total units</div>
+          </div>
+          <div class="report-summary-item">
+            <div class="rs-value" id="reportStatLow">0</div>
+            <div class="rs-label">Low stock</div>
+          </div>
+          <div class="report-summary-item">
+            <div class="rs-value" id="reportStatOut">0</div>
+            <div class="rs-label">Out of stock</div>
+          </div>
+          <div class="report-summary-item">
+            <div class="rs-value" id="reportStatValue">KSH 0</div>
+            <div class="rs-label">Stock value</div>
+          </div>
+        </div>
+
+        <div class="report-table-wrap">
+          <table class="report-table">
+            <thead>
+              <tr>
+                <th>Item</th>
+                <th>SKU</th>
+                <th>Category</th>
+                <th>Qty</th>
+                <th>Unit price</th>
+                <th>Line total</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="reportTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="report-footer">
+        <div class="report-note">
+          <i class="fas fa-info-circle"></i>
+          <span>Report generated from current inventory data.</span>
+        </div>
+        <button class="btn btn-outline" id="reportCloseFooter"><i class="fas fa-check"></i> Done</button>
+      </div>
+    </div>
+  </div>
 
   <!-- ADD / EDIT MODAL -->
   <div class="modal-overlay" id="modalOverlay">
@@ -1159,6 +1414,19 @@
       const toastMessage = document.getElementById('toastMessage');
       const toastIcon = document.getElementById('toastIcon');
       let toastTimeout = null;
+
+      // Report DOM
+      const reportOverlay = document.getElementById('reportOverlay');
+      const reportClose = document.getElementById('reportClose');
+      const reportCloseFooter = document.getElementById('reportCloseFooter');
+      const reportDate = document.getElementById('reportDate');
+      const reportItemCount = document.getElementById('reportItemCount');
+      const reportStatTotal = document.getElementById('reportStatTotal');
+      const reportStatUnits = document.getElementById('reportStatUnits');
+      const reportStatLow = document.getElementById('reportStatLow');
+      const reportStatOut = document.getElementById('reportStatOut');
+      const reportStatValue = document.getElementById('reportStatValue');
+      const reportTableBody = document.getElementById('reportTableBody');
 
       function showToast(message, type = 'success', duration = 3200) {
         if (toastTimeout) clearTimeout(toastTimeout);
@@ -1527,7 +1795,7 @@
       });
 
       document.getElementById('btnAddItem').addEventListener('click', () => openModal());
-      document.getElementById('btnExport').addEventListener('click', exportCSV);
+      document.getElementById('btnExport').addEventListener('click', openReport);
 
       document.getElementById('btnClearAll').addEventListener('click', async function() {
         if (inventory.length === 0) { showToast('Inventory is already empty.', 'warning'); return; }
@@ -1551,28 +1819,86 @@
         }
       });
 
-      function exportCSV() {
-        if (inventory.length === 0) { showToast('Nothing to export — inventory is empty.', 'warning'); return; }
-        const headers = ['Name', 'SKU', 'Category', 'Quantity', 'Unit', 'Unit Price (KSH)', 'Threshold', 'Status', 'Supplier', 'Notes'];
-        const rows = inventory.map(item => [
-          item.name, item.sku, item.category, item.quantity, item.unit, item.price,
-          item.threshold, statusLabel(getStatus(item)), item.supplier || '', item.notes || ''
-        ]);
-        const csv = [headers, ...rows]
-          .map(r => r.map(c => '"' + String(c).replace(/"/g, '""') + '"').join(','))
-          .join('\r\n');
-        const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = 'maricopa-inventory-' + new Date().toISOString().slice(0, 10) + '.csv';
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-        showToast('Inventory exported as CSV.');
+      // ============================================================
+      // REPORT GENERATION (replaces CSV export)
+      // ============================================================
+      function openReport() {
+        if (inventory.length === 0) {
+          showToast('Nothing to report — inventory is empty.', 'warning');
+          return;
+        }
+
+        const now = new Date();
+        reportDate.textContent = now.toLocaleDateString('en-KE', {
+          year: 'numeric', month: 'short', day: 'numeric'
+        }) + ' · ' + now.toLocaleTimeString('en-KE', { hour: '2-digit', minute: '2-digit' });
+
+        const items = getSortedItems(getFilteredItems());
+        reportItemCount.textContent = items.length + ' item' + (items.length !== 1 ? 's' : '');
+
+        let totalUnits = 0, low = 0, out = 0, totalValue = 0;
+        items.forEach(item => {
+          const qty = Number(item.quantity) || 0;
+          const price = Number(item.price) || 0;
+          totalUnits += qty;
+          totalValue += qty * price;
+          const s = getStatus(item);
+          if (s === 'low') low++;
+          if (s === 'out') out++;
+        });
+
+        reportStatTotal.textContent = formatNumber(items.length);
+        reportStatUnits.textContent = formatNumber(totalUnits);
+        reportStatLow.textContent = formatNumber(low);
+        reportStatOut.textContent = formatNumber(out);
+        reportStatValue.textContent = formatKSH(totalValue);
+
+        reportTableBody.innerHTML = '';
+        items.forEach(item => {
+          const qty = Number(item.quantity) || 0;
+          const price = Number(item.price) || 0;
+          const lineTotal = qty * price;
+          const status = getStatus(item);
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td><span class="no-wrap">${escapeHtml(item.name)}</span></td>
+            <td><span class="no-wrap">${escapeHtml(item.sku)}</span></td>
+            <td>${escapeHtml(item.category)}</td>
+            <td>${formatNumber(qty)} <span style="color:var(--text-muted);font-size:0.78rem;">${escapeHtml(item.unit || '')}</span></td>
+            <td>${formatKSH(price)}</td>
+            <td>${formatKSH(lineTotal)}</td>
+            <td><span class="${statusClass(status)}">${statusLabel(status)}</span></td>`;
+          reportTableBody.appendChild(tr);
+        });
+
+        const totalRow = document.createElement('tr');
+        totalRow.className = 'r-total-row';
+        totalRow.innerHTML = `
+          <td colspan="3">Total</td>
+          <td>${formatNumber(totalUnits)}</td>
+          <td>—</td>
+          <td>${formatKSH(totalValue)}</td>
+          <td>—</td>`;
+        reportTableBody.appendChild(totalRow);
+
+        reportOverlay.classList.add('open');
+        document.body.style.overflow = 'hidden';
       }
 
+      function closeReport() {
+        reportOverlay.classList.remove('open');
+        document.body.style.overflow = '';
+      }
+
+      reportClose.addEventListener('click', closeReport);
+      reportCloseFooter.addEventListener('click', closeReport);
+      reportOverlay.addEventListener('click', function(e) {
+        if (e.target === reportOverlay) closeReport();
+      });
+
+      // ============================================================
+      // EVENT LISTENERS
+      // ============================================================
       btnRetryConnection.addEventListener('click', async function() {
         const btn = this;
         btn.disabled = true;
@@ -1602,8 +1928,11 @@
       modalOverlay.addEventListener('click', function(e) { if (e.target === modalOverlay) closeModal(); });
 
       document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape' && modalOverlay.classList.contains('open')) closeModal();
-        if (e.key === '/' && !modalOverlay.classList.contains('open')) {
+        if (e.key === 'Escape') {
+          if (modalOverlay.classList.contains('open')) closeModal();
+          if (reportOverlay.classList.contains('open')) closeReport();
+        }
+        if (e.key === '/' && !modalOverlay.classList.contains('open') && !reportOverlay.classList.contains('open')) {
           const tag = (document.activeElement.tagName || '').toLowerCase();
           if (tag !== 'input' && tag !== 'textarea' && tag !== 'select') {
             e.preventDefault();
@@ -1617,8 +1946,7 @@
       });
 
       // ============================================================
-      // LIVE THEME SYNC — respond to changes from settings.html
-      // (fires when another tab updates localStorage)
+      // LIVE THEME SYNC
       // ============================================================
       window.addEventListener('storage', function(e) {
         const root = document.documentElement;
@@ -1641,7 +1969,6 @@
         }
       });
 
-      // If user picks "system" theme, respond to OS changes live
       if (window.matchMedia) {
         window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function(ev) {
           const mode = localStorage.getItem('mrc.themeMode') || 'system';
