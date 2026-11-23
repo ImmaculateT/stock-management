@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Maricopa Concrete · Loading</title>
+  <style>
+    /* ----- RESET & BASE ----- */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: #1e1e1e;
+      font-family: 'Segoe UI', 'Roboto', system-ui, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      /* subtle concrete texture via gradient */
+      background-image: 
+        radial-gradient(circle at 20% 30%, rgba(120, 120, 120, 0.08) 0%, transparent 25%),
+        radial-gradient(circle at 90% 70%, rgba(160, 160, 160, 0.06) 0%, transparent 35%),
+        repeating-linear-gradient(45deg, rgba(80, 80, 80, 0.02) 0px, rgba(80, 80, 80, 0.02) 2px, 
+                                  rgba(40, 40, 40, 0.02) 2px, rgba(40, 40, 40, 0.02) 6px);
+    }
+
+    /* ----- MAIN LOADER CARD (cement block style) ----- */
+    .loader-container {
+      background: #2a2a2a;
+      padding: 2.5rem 3rem 3rem 3rem;
+      border-radius: 2rem;
+      box-shadow: 
+        0 25px 40px -10px rgba(0, 0, 0, 0.8),
+        inset 0 2px 4px rgba(255, 255, 255, 0.05),
+        inset 0 -4px 8px rgba(0, 0, 0, 0.6);
+      border: 1px solid rgba(200, 200, 200, 0.15);
+      max-width: 650px;
+      width: 90vw;
+      transition: box-shadow 0.2s;
+      /* concrete-like texture */
+      background-image: 
+        linear-gradient(145deg, #2e2e2e, #232323),
+        repeating-linear-gradient(45deg, #3a3a3a 0px, #3a3a3a 1px, #2c2c2c 1px, #2c2c2c 5px);
+      background-blend-mode: overlay;
+    }
+
+    /* ----- HEADER / COMPANY NAME (like stamped concrete) ----- */
+    .company-header {
+      text-align: center;
+      margin-bottom: 2.5rem;
+    }
+
+    .company-name {
+      font-size: 1.9rem;
+      font-weight: 800;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: #d6d6d6;
+      text-shadow: 
+        0 2px 0 #0a0a0a,
+        0 4px 6px rgba(0, 0, 0, 0.8),
+        0 0 10px rgba(180, 180, 180, 0.3);
+      font-family: 'Impact', 'Arial Black', 'Segoe UI Black', sans-serif;
+      line-height: 1.2;
+    }
+
+    .company-sub {
+      font-size: 1rem;
+      letter-spacing: 6px;
+      color: #9b9b9b;
+      text-transform: uppercase;
+      font-weight: 400;
+      margin-top: 0.4rem;
+      text-shadow: 0 1px 2px black;
+      border-top: 1px solid #555;
+      padding-top: 0.75rem;
+      display: inline-block;
+      padding-left: 1rem;
+      padding-right: 1rem;
+    }
+
+    /* ----- CEMENT / CONCRETE FEATURE: rotating drum with aggregate ----- */
+    .cement-mixer {
+      position: relative;
+      width: 160px;
+      height: 160px;
+      margin: 0 auto 2.5rem;
+      filter: drop-shadow(0 12px 12px rgba(0, 0, 0, 0.7));
+    }
+
+    /* outer concrete ring (like a cement truck drum) */
+    .drum-ring {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      background: conic-gradient(
+        #7a7a7a 0deg 60deg,
+        #5e5e5e 60deg 120deg,
+        #4a4a4a 120deg 180deg,
+        #5e5e5e 180deg 240deg,
+        #6e6e6e 240deg 300deg,
+        #7a7a7a 300deg 360deg
+      );
+      box-shadow: 
+        inset 0 0 20px #000000cc,
+        inset 0 0 40px #1e1e1e,
+        0 0 0 4px #353535,
+        0 0 0 8px #222222;
+      animation: rotateDrum 4s linear infinite;
+      transform-origin: center;
+      border: 2px solid #4a4a4a;
+    }
+
+    /* inner concrete texture (aggregate/pebbles) */
+    .drum-inner {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      width: calc(100% - 40px);
+      height: calc(100% - 40px);
+      border-radius: 50%;
+      background: radial-gradient(circle at 30% 30%, #9b9b9b, #4d4d4d 80%);
+      box-shadow: 
+        inset 0 0 20px #000000,
+        inset 0 0 5px #ffffff30;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      z-index: 2;
+    }
+
+    /* aggregate (small stone/cement particles) */
+    .aggregate {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      animation: rotateDrum 4s linear infinite reverse;
+    }
+
+    .aggregate span {
+      position: absolute;
+      background: #b9b9b9;
+      border-radius: 50%;
+      box-shadow: inset -2px -2px 5px #2e2e2e, inset 2px 2px 5px #f0f0f0;
+      opacity: 0.9;
+    }
+
+    /* individual pebble positions (randomized) */
+    .aggregate span:nth-child(1) { width: 14px; height: 14px; top: 20%; left: 15%; background: #a8a8a8; }
+    .aggregate span:nth-child(2) { width: 10px; height: 10px; top: 70%; left: 25%; background: #888; }
+    .aggregate span:nth-child(3) { width: 18px; height: 18px; top: 40%; left: 70%; background: #b0b0b0; }
+    .aggregate span:nth-child(4) { width: 8px; height: 8px; top: 80%; left: 60%; background: #6e6e6e; }
+    .aggregate span:nth-child(5) { width: 12px; height: 12px; top: 15%; left: 80%; background: #9e9e9e; }
+    .aggregate span:nth-child(6) { width: 16px; height: 16px; top: 55%; left: 10%; background: #7e7e7e; }
+    .aggregate span:nth-child(7) { width: 9px; height: 9px; top: 35%; left: 45%; background: #c0c0c0; }
+    .aggregate span:nth-child(8) { width: 20px; height: 20px; top: 65%; left: 75%; background: #6a6a6a; }
+    .aggregate span:nth-child(9) { width: 11px; height: 11px; top: 50%; left: 55%; background: #aaaaaa; }
+    .aggregate span:nth-child(10) { width: 13px; height: 13px; top: 10%; left: 45%; background: #8f8f8f; }
+
+    /* static center ring (like a cement bag opening) */
+    .center-badge {
+      position: absolute;
+      width: 50px;
+      height: 50px;
+      background: #2d2d2d;
+      border-radius: 50%;
+      z-index: 5;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 
+        0 0 0 6px #4a4a4a,
+        0 0 0 10px #1e1e1e,
+        inset 0 0 8px black;
+      color: #cccccc;
+      font-size: 22px;
+      font-weight: bold;
+      font-family: 'Courier New', monospace;
+    }
+
+    /* ----- LOADING TEXT & PROGRESS ----- */
+    .loading-label {
+      display: flex;
+      justify-content: space-between;
+      color: #bcbcbc;
+      font-weight: 500;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      font-size: 0.9rem;
+      text-shadow: 0 2px 3px black;
+      margin-bottom: 0.75rem;
+    }
+
+    .loading-label span:first-child {
+      color: #e0e0e0;
+    }
+
+    .loading-label span:last-child {
+      color: #d4af37; /* subtle gold hint */
+      font-weight: 700;
+    }
+
+    .progress-bar-bg {
+      width: 100%;
+      height: 18px;
+      background: #1a1a1a;
+      border-radius: 30px;
+      box-shadow: 
+        inset 0 4px 8px #000000,
+        0 1px 0 #4a4a4a;
+      padding: 2px;
+      border: 1px solid #3b3b3b;
+      margin-bottom: 2rem;
+    }
+
+    .progress-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #7e7e7e, #c0c0c0, #e0e0e0);
+      border-radius: 30px;
+      box-shadow: 
+        0 0 12px #cccccc90,
+        inset 0 1px 4px white;
+      transition: width 0.1s ease;
+      /* concrete texture effect */
+      background-image: repeating-linear-gradient(45deg, #bfbfbf 0px, #bfbfbf 2px, #a0a0a0 2px, #a0a0a0 6px);
+      background-blend-mode: overlay;
+    }
+
+    /* small note */
+    .cement-note {
+      text-align: center;
+      font-size: 0.75rem;
+      color: #6e6e6e;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-top: 1rem;
+      border-top: 1px solid #3a3a3a;
+      padding-top: 1.2rem;
+      font-weight: 300;
+    }
+
+    /* ----- animations ----- */
+    @keyframes rotateDrum {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    /* small responsive */
+    @media (max-width: 500px) {
+      .loader-container {
+        padding: 2rem 1.5rem;
+      }
+      .company-name {
+        font-size: 1.4rem;
+      }
+      .company-sub {
+        font-size: 0.7rem;
+        letter-spacing: 3px;
+      }
+      .cement-mixer {
+        width: 130px;
+        height: 130px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="loader-container">
+    <!-- Company name with stamped concrete style -->
+    <div class="company-header">
+      <div class="company-name">MARICOPA</div>
+      <div class="company-sub">CONCRETE & ALLIED CO.</div>
+    </div>
+
+    <!-- Concrete/Cement feature: rotating drum with aggregates -->
+    <div class="cement-mixer">
+      <div class="drum-ring"></div>
+      <div class="drum-inner">
+        <div class="aggregate">
+          <span></span><span></span><span></span><span></span><span></span>
+          <span></span><span></span><span></span><span></span><span></span>
+        </div>
+      </div>
+      <div class="center-badge">C</div>
+    </div>
+
+    <!-- Loading progress (cement pouring style) -->
+    <div class="loading-label">
+      <span>⚙️ POURING CEMENT</span>
+      <span id="percentageDisplay">0%</span>
+    </div>
+    <div class="progress-bar-bg">
+      <div class="progress-fill" id="progressFill"></div>
+    </div>
+
+    <div class="cement-note">
+      ⚡ AGGREGATE · WATER · CEMENT · STRENGTH ⚡
+    </div>
+  </div>
+
+  <script>
+    (function() {
+      // Configuration
+      const REDIRECT_URL = 'home.html';
+      const LOAD_DURATION = 3500; // 3.5 seconds for full progress
+
+      // Elements
+      const progressFill = document.getElementById('progressFill');
+      const percentageDisplay = document.getElementById('percentageDisplay');
+
+      // Variables
+      let startTime = null;
+      let animationFrame = null;
+
+      // Update progress based on elapsed time
+      function updateProgress(timestamp) {
+        if (!startTime) {
+          startTime = timestamp;
+        }
+
+        const elapsed = timestamp - startTime;
+        // Clamp between 0 and LOAD_DURATION
+        const progress = Math.min(elapsed / LOAD_DURATION, 1);
+        const percent = Math.floor(progress * 100);
+
+        // Update UI
+        progressFill.style.width = percent + '%';
+        percentageDisplay.textContent = percent + '%';
+
+        // Continue until 100%
+        if (progress < 1) {
+          animationFrame = requestAnimationFrame(updateProgress);
+        } else {
+          // Ensure exactly 100% (floating point safe)
+          progressFill.style.width = '100%';
+          percentageDisplay.textContent = '100%';
+          
+          // Small delay to show 100% before redirect (makes it feel complete)
+          setTimeout(() => {
+            // Redirect to home.html
+            window.location.href = REDIRECT_URL;
+          }, 200);
+        }
+      }
+
+      // Start the loading animation once the page is fully loaded
+      window.addEventListener('load', function() {
+        // Small extra delay to ensure everything is rendered (optional)
+        setTimeout(() => {
+          animationFrame = requestAnimationFrame(updateProgress);
+        }, 100);
+      });
+
+      // Fallback: if load event somehow doesn't fire, start after 300ms anyway
+      // but protect against multiple starts.
+      let fallbackTimer = setTimeout(() => {
+        if (!animationFrame) {
+          animationFrame = requestAnimationFrame(updateProgress);
+        }
+      }, 500);
+
+      // Clean up fallback if load event fires
+      window.addEventListener('load', function() {
+        clearTimeout(fallbackTimer);
+      });
+
+      // Optional: handle if user tries to leave? Not needed.
+      // For extra robustness, if redirect fails due to missing home.html, we still redirect.
+      // No additional code needed.
+
+    })();
+  </script>
+</body>
+</html>
