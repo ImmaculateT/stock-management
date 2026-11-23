@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
-  <title>Maricopa · Concrete Stock Management</title>
+  <title>Maricopa · Dashboard</title>
   <!-- Font Awesome Icons (v6 free) -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <style>
@@ -32,6 +32,35 @@
       transition: all 0.2s ease;
       flex-shrink: 0;
       box-shadow: 2px 0 12px rgba(0, 0, 0, 0.05);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .sidebar::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      /* ▼▼▼ REPLACE THIS URL WITH YOUR SIDEBAR BACKGROUND IMAGE ▼▼▼ */
+      background-image: url('https://images.unsplash.com/photo-1517581177682-a085bb7ffb15?auto=format&fit=crop&w=800&q=80');
+      background-size: cover;
+      background-position: center;
+      opacity: 0.18;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .sidebar::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(26, 43, 60, 0.92) 0%, rgba(26, 43, 60, 0.75) 100%);
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .sidebar > * {
+      position: relative;
+      z-index: 2;
     }
 
     .sidebar-brand {
@@ -48,9 +77,7 @@
       text-decoration: none;
     }
 
-    .sidebar-brand:hover {
-      opacity: 0.85;
-    }
+    .sidebar-brand:hover { opacity: 0.85; }
 
     .sidebar-brand i {
       font-size: 2rem;
@@ -108,9 +135,7 @@
       color: #e0e9f2;
     }
 
-    .nav-item:active {
-      transform: scale(0.98);
-    }
+    .nav-item:active { transform: scale(0.98); }
 
     .sidebar-footer {
       border-top: 1px solid #2e4458;
@@ -118,9 +143,7 @@
       margin-top: 12px;
     }
 
-    .sidebar-footer .nav-item {
-      color: #8faec9;
-    }
+    .sidebar-footer .nav-item { color: #8faec9; }
 
     /* ---------- MAIN CONTENT ---------- */
     .main-content {
@@ -131,12 +154,11 @@
       overflow-x: auto;
     }
 
-    /* header */
     .top-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 32px;
+      margin-bottom: 24px;
       flex-wrap: wrap;
       gap: 16px;
     }
@@ -190,9 +212,7 @@
       color: #1f3449;
     }
 
-    .search-box input::placeholder {
-      color: #9bb0c5;
-    }
+    .search-box input::placeholder { color: #9bb0c5; }
 
     .user-profile {
       display: flex;
@@ -212,9 +232,7 @@
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
     }
 
-    .user-profile:active {
-      transform: scale(0.98);
-    }
+    .user-profile:active { transform: scale(0.98); }
 
     .user-profile span {
       font-weight: 500;
@@ -236,12 +254,59 @@
       border: 1px solid #f0b34b40;
     }
 
+    /* ---------- CONNECTION BANNER ---------- */
+    .connection-banner {
+      display: none;
+      align-items: center;
+      gap: 12px;
+      background: #fff5f5;
+      border: 1px solid #f3cdcd;
+      color: #b13b3b;
+      padding: 12px 18px;
+      border-radius: 16px;
+      margin-bottom: 18px;
+      font-size: 0.88rem;
+      font-weight: 500;
+      animation: fadeSlideDown 0.3s ease;
+    }
+
+    .connection-banner.show { display: flex; }
+
+    .connection-banner i {
+      font-size: 1.1rem;
+      color: #e05c5c;
+      flex-shrink: 0;
+    }
+
+    .connection-banner button {
+      margin-left: auto;
+      background: #b13b3b;
+      color: white;
+      border: none;
+      padding: 7px 16px;
+      border-radius: 40px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+      transition: all 0.15s;
+      white-space: nowrap;
+    }
+
+    .connection-banner button:hover { background: #8f2e2e; }
+    .connection-banner button:active { transform: scale(0.96); }
+
+    @keyframes fadeSlideDown {
+      from { opacity: 0; transform: translateY(-8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
     /* ---------- KPI CARDS ---------- */
     .kpi-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
       gap: 20px;
-      margin-bottom: 32px;
+      margin-bottom: 28px;
     }
 
     .kpi-card {
@@ -262,9 +327,7 @@
       transform: translateY(-2px);
     }
 
-    .kpi-card:active {
-      transform: translateY(0);
-    }
+    .kpi-card:active { transform: translateY(0); }
 
     .kpi-header {
       display: flex;
@@ -287,17 +350,23 @@
     }
 
     .kpi-header .trend {
-      font-size: 0.8rem;
+      font-size: 0.78rem;
       font-weight: 600;
       padding: 4px 10px;
       border-radius: 40px;
       background: #e3f5e9;
       color: #1b7b3f;
+      white-space: nowrap;
     }
 
     .trend.down {
       background: #ffe9e9;
       color: #b33b3b;
+    }
+
+    .trend.neutral {
+      background: #eef2f7;
+      color: #5d768e;
     }
 
     .kpi-card h3 {
@@ -312,6 +381,23 @@
       color: #687e94;
       font-size: 0.9rem;
       font-weight: 500;
+    }
+
+    /* skeleton for loading */
+    .kpi-card.loading h3,
+    .kpi-card.loading .trend {
+      color: transparent;
+      background: linear-gradient(90deg, #eef2f7 25%, #f8fbff 50%, #eef2f7 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.4s infinite;
+      border-radius: 6px;
+    }
+
+    .kpi-card.loading h3 { width: 60%; }
+    .kpi-card.loading .trend { width: 46px; }
+
+    @keyframes shimmer {
+      to { background-position: -200% 0; }
     }
 
     /* ---------- TABLE SECTION ---------- */
@@ -343,6 +429,7 @@
     .table-actions {
       display: flex;
       gap: 12px;
+      flex-wrap: wrap;
     }
 
     .btn-outline {
@@ -360,20 +447,18 @@
       gap: 8px;
       font-family: inherit;
       text-decoration: none;
+      white-space: nowrap;
     }
 
-    .btn-outline i {
-      font-size: 0.8rem;
-    }
+    .btn-outline i { font-size: 0.8rem; }
 
-    .btn-outline:hover {
+    .btn-outline:hover:not(:disabled) {
       background: #f5f9ff;
       border-color: #b0c8e0;
     }
 
-    .btn-outline:active {
-      transform: scale(0.96);
-    }
+    .btn-outline:active:not(:disabled) { transform: scale(0.96); }
+    .btn-outline:disabled { opacity: 0.5; cursor: not-allowed; }
 
     .table-wrapper {
       overflow-x: auto;
@@ -407,18 +492,14 @@
       white-space: nowrap;
     }
 
-    tr:last-child td {
-      border-bottom: none;
-    }
+    tr:last-child td { border-bottom: none; }
 
     tbody tr {
       transition: background 0.1s;
       cursor: pointer;
     }
 
-    tbody tr:hover {
-      background: #fafdff;
-    }
+    tbody tr:hover { background: #fafdff; }
 
     .product-info {
       display: flex;
@@ -461,20 +542,10 @@
       display: inline-block;
     }
 
-    .stock-badge.low {
-      background: #fff0e0;
-      color: #b1590e;
-    }
+    .stock-badge.low { background: #fff0e0; color: #b1590e; }
+    .stock-badge.out { background: #ffe6e6; color: #b13b3b; }
 
-    .stock-badge.out {
-      background: #ffe6e6;
-      color: #b13b3b;
-    }
-
-    .qty-cell {
-      font-weight: 600;
-      color: #0b1d2e;
-    }
+    .qty-cell { font-weight: 600; color: #0b1d2e; }
 
     .qty-cell .unit {
       font-weight: 400;
@@ -483,11 +554,51 @@
       margin-left: 3px;
     }
 
-    .price-cell {
-      font-weight: 500;
-      color: #1e3145;
+    .price-cell { font-weight: 500; color: #1e3145; }
+
+    /* loading / empty states */
+    .loading-state,
+    .empty-state {
+      padding: 60px 24px;
+      text-align: center;
+      color: #8da1b5;
     }
 
+    .loading-state i {
+      font-size: 2.4rem;
+      color: #d7e3ef;
+      margin-bottom: 16px;
+      display: block;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .empty-state i {
+      font-size: 3rem;
+      color: #d7e3ef;
+      margin-bottom: 16px;
+      display: block;
+    }
+
+    .empty-state h3 {
+      font-size: 1.1rem;
+      color: #5d768e;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+
+    .empty-state p {
+      font-size: 0.88rem;
+      margin-bottom: 16px;
+    }
+
+    .empty-state .btn-outline {
+      display: inline-flex;
+      margin: 0 auto;
+    }
+
+    /* table footer */
     .table-footer {
       display: flex;
       justify-content: space-between;
@@ -501,11 +612,7 @@
       gap: 12px;
     }
 
-    .pagination {
-      display: flex;
-      gap: 6px;
-      align-items: center;
-    }
+    .pagination { display: flex; gap: 6px; align-items: center; }
 
     .page-btn {
       background: white;
@@ -534,47 +641,10 @@
       border-color: #b8cee3;
     }
 
-    .page-btn:active:not(:disabled) {
-      transform: scale(0.94);
-    }
+    .page-btn:active:not(:disabled) { transform: scale(0.94); }
+    .page-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 
-    .page-btn:disabled {
-      opacity: 0.4;
-      cursor: not-allowed;
-    }
-
-    /* empty state */
-    .empty-state {
-      padding: 60px 24px;
-      text-align: center;
-      color: #8da1b5;
-    }
-
-    .empty-state i {
-      font-size: 3rem;
-      color: #d7e3ef;
-      margin-bottom: 16px;
-      display: block;
-    }
-
-    .empty-state h3 {
-      font-size: 1.1rem;
-      color: #5d768e;
-      font-weight: 600;
-      margin-bottom: 6px;
-    }
-
-    .empty-state p {
-      font-size: 0.88rem;
-      margin-bottom: 16px;
-    }
-
-    .empty-state .btn-outline {
-      display: inline-flex;
-      margin: 0 auto;
-    }
-
-    /* ---------- TOAST NOTIFICATION ---------- */
+    /* ---------- TOAST ---------- */
     .toast {
       position: fixed;
       bottom: 28px;
@@ -598,10 +668,7 @@
       max-width: 340px;
     }
 
-    .toast.show {
-      transform: translateY(0);
-      opacity: 1;
-    }
+    .toast.show { transform: translateY(0); opacity: 1; }
 
     .toast i {
       color: #f0b34b;
@@ -609,84 +676,46 @@
       flex-shrink: 0;
     }
 
+    .toast.error { border-left-color: #e05c5c; }
+    .toast.error i { color: #e05c5c; }
+
+    .toast.warning { border-left-color: #f0b34b; }
+
     /* ---------- RESPONSIVE ---------- */
     @media (max-width: 900px) {
-      .sidebar {
-        width: 80px;
-        padding: 28px 8px;
-      }
+      .sidebar { width: 80px; padding: 28px 8px; }
 
       .sidebar-brand span,
-      .nav-item span {
-        display: none;
-      }
+      .nav-item span { display: none; }
 
-      .sidebar-brand i {
-        margin: 0 auto;
-      }
+      .sidebar-brand i { margin: 0 auto; }
 
-      .nav-item {
-        justify-content: center;
-        padding: 14px 0;
-      }
+      .nav-item { justify-content: center; padding: 14px 0; }
+      .nav-item i { font-size: 1.3rem; }
 
-      .nav-item i {
-        font-size: 1.3rem;
-      }
+      .sidebar-footer .nav-item span { display: none; }
 
-      .sidebar-footer .nav-item span {
-        display: none;
-      }
-
-      .main-content {
-        padding: 20px;
-      }
+      .main-content { padding: 20px; }
     }
 
     @media (max-width: 600px) {
-      .main-content {
-        padding: 16px;
-      }
+      .main-content { padding: 16px; }
 
-      .top-header {
-        flex-direction: column;
-        align-items: stretch;
-      }
+      .top-header { flex-direction: column; align-items: stretch; }
 
-      .header-actions {
-        justify-content: space-between;
-        flex-wrap: wrap;
-      }
+      .header-actions { justify-content: space-between; flex-wrap: wrap; }
 
-      .search-box {
-        flex: 1;
-      }
+      .search-box { flex: 1; }
+      .search-box input { width: 100%; }
 
-      .search-box input {
-        width: 100%;
-      }
+      .kpi-grid { grid-template-columns: 1fr; }
 
-      .kpi-grid {
-        grid-template-columns: 1fr;
-      }
+      .table-header { flex-direction: column; align-items: flex-start; }
 
-      .table-header {
-        flex-direction: column;
-        align-items: flex-start;
-      }
+      .user-profile span { display: none; }
+      .user-profile { padding: 6px; }
 
-      .user-profile span {
-        display: none;
-      }
-
-      .user-profile {
-        padding: 6px;
-      }
-
-      .table-footer {
-        flex-direction: column;
-        align-items: flex-start;
-      }
+      .table-footer { flex-direction: column; align-items: flex-start; }
 
       .toast {
         left: 16px;
@@ -694,54 +723,54 @@
         bottom: 16px;
         max-width: none;
       }
+
+      .connection-banner { flex-wrap: wrap; }
+      .connection-banner button { margin-left: 0; width: 100%; }
     }
 
-    /* utility */
-    .no-wrap {
-      white-space: nowrap;
-    }
+    .no-wrap { white-space: nowrap; }
   </style>
 </head>
 <body>
   <!-- SIDEBAR -->
   <aside class="sidebar">
-    <a href="inventory.html" class="sidebar-brand" data-action="Home dashboard">
+    <a href="dashboard.html" class="sidebar-brand">
       <i class="fas fa-cubes"></i>
       <span>Maricopa</span>
     </a>
 
     <nav class="sidebar-nav">
-      <button class="nav-item active" data-action="Dashboard">
+      <a href="dashboard.html" class="nav-item active">
         <i class="fas fa-chart-pie"></i>
         <span>Dashboard</span>
-      </button>
-      <button class="nav-item" data-action="Inventory" data-href="inventory.html">
+      </a>
+      <a href="inventory.html" class="nav-item">
         <i class="fas fa-boxes"></i>
         <span>Inventory</span>
-      </button>
-      <button class="nav-item" data-action="Orders">
+      </a>
+      <a href="orders.html" class="nav-item">
         <i class="fas fa-truck"></i>
         <span>Orders</span>
-      </button>
-      <button class="nav-item" data-action="Analytics">
+      </a>
+      <a href="analytics.html" class="nav-item">
         <i class="fas fa-chart-line"></i>
         <span>Analytics</span>
-      </button>
-      <button class="nav-item" data-action="Settings">
+      </a>
+      <a href="settings.html" class="nav-item">
         <i class="fas fa-cog"></i>
         <span>Settings</span>
-      </button>
+      </a>
     </nav>
 
     <div class="sidebar-footer">
-      <button class="nav-item" data-action="Support">
+      <a href="support.html" class="nav-item">
         <i class="fas fa-circle-question"></i>
         <span>Support</span>
-      </button>
-      <button class="nav-item" data-action="Logout">
+      </a>
+      <a href="logout.html" class="nav-item">
         <i class="fas fa-right-from-bracket"></i>
         <span>Logout</span>
-      </button>
+      </a>
     </div>
   </aside>
 
@@ -759,53 +788,62 @@
           <i class="fas fa-search"></i>
           <input type="text" id="searchInput" placeholder="Search mixes, aggregates...">
         </div>
-        <div class="user-profile" data-action="User profile">
+        <div class="user-profile" id="userProfile">
           <span>BOSS</span>
           <div class="avatar">B</div>
         </div>
       </div>
     </header>
 
-    <!-- KPI CARDS (populated by JS from inventory) -->
+    <!-- CONNECTION BANNER -->
+    <div class="connection-banner" id="connectionBanner">
+      <i class="fas fa-plug-circle-exclamation"></i>
+      <span id="connectionMessage">Cannot reach the server. Check your connection and try again.</span>
+      <button id="btnRetryConnection">
+        <i class="fas fa-rotate"></i> Retry
+      </button>
+    </div>
+
+    <!-- KPI CARDS -->
     <div class="kpi-grid" id="kpiGrid">
-      <div class="kpi-card" data-action="Total products" data-kpi="total">
+      <div class="kpi-card loading" data-action="Total products" data-kpi="total">
         <div class="kpi-header">
           <i class="fas fa-cubes"></i>
-          <span class="trend" id="trendTotal"><i class="fas fa-arrow-up" style="font-size: 0.7rem;"></i> +0%</span>
+          <span class="trend neutral" id="trendTotal"><i class="fas fa-minus" style="font-size: 0.7rem;"></i> 0%</span>
         </div>
         <h3 id="kpiTotal">0</h3>
         <p>Total concrete products</p>
       </div>
 
-      <div class="kpi-card" data-action="Units in stock" data-kpi="units">
+      <div class="kpi-card loading" data-action="Units in stock" data-kpi="units">
         <div class="kpi-header">
           <i class="fas fa-warehouse"></i>
-          <span class="trend" id="trendUnits"><i class="fas fa-arrow-up" style="font-size: 0.7rem;"></i> +0%</span>
+          <span class="trend neutral" id="trendUnits"><i class="fas fa-minus" style="font-size: 0.7rem;"></i> 0%</span>
         </div>
         <h3 id="kpiUnits">0</h3>
         <p>Units in stock (m³ / tons)</p>
       </div>
 
-      <div class="kpi-card" data-action="Low stock materials" data-kpi="low">
+      <div class="kpi-card loading" data-action="Low stock materials" data-kpi="low">
         <div class="kpi-header">
           <i class="fas fa-exclamation-triangle"></i>
-          <span class="trend down" id="trendLow"><i class="fas fa-arrow-down" style="font-size: 0.7rem;"></i> -0%</span>
+          <span class="trend neutral" id="trendLow"><i class="fas fa-minus" style="font-size: 0.7rem;"></i> 0%</span>
         </div>
         <h3 id="kpiLow">0</h3>
         <p>Low stock materials</p>
       </div>
 
-      <div class="kpi-card" data-action="Stock value" data-kpi="value">
+      <div class="kpi-card loading" data-action="Stock value" data-kpi="value">
         <div class="kpi-header">
           <i class="fas fa-coins"></i>
-          <span class="trend" id="trendValue"><i class="fas fa-arrow-up" style="font-size: 0.7rem;"></i> +0%</span>
+          <span class="trend neutral" id="trendValue"><i class="fas fa-minus" style="font-size: 0.7rem;"></i> 0%</span>
         </div>
         <h3 id="kpiValue">KSH 0</h3>
         <p>Total stock value</p>
       </div>
     </div>
 
-    <!-- TABLE SECTION (inventory snapshot — live) -->
+    <!-- TABLE SECTION -->
     <div class="table-section">
       <div class="table-header">
         <h2>Concrete inventory snapshot</h2>
@@ -831,10 +869,13 @@
               <th>Price / unit</th>
             </tr>
           </thead>
-          <tbody id="inventoryBody">
-            <!-- populated by JS -->
-          </tbody>
+          <tbody id="inventoryBody"></tbody>
         </table>
+
+        <div class="loading-state" id="loadingState">
+          <i class="fas fa-spinner"></i>
+          <p>Loading inventory…</p>
+        </div>
 
         <div class="empty-state" id="emptyState" style="display:none;">
           <i class="fas fa-box-open"></i>
@@ -848,14 +889,12 @@
 
       <div class="table-footer">
         <span id="footerInfo">Showing 0 of 0 products</span>
-        <div class="pagination" id="pagination">
-          <!-- pagination buttons injected -->
-        </div>
+        <div class="pagination" id="pagination"></div>
       </div>
     </div>
   </main>
 
-  <!-- TOAST NOTIFICATION -->
+  <!-- TOAST -->
   <div class="toast" id="toast">
     <i class="fas fa-check-circle" id="toastIcon"></i>
     <span id="toastMessage">Action completed</span>
@@ -866,10 +905,21 @@
       'use strict';
 
       // ============================================================
-      // SHARED CONSTANTS (must match inventory page)
+      // BACKEND CONFIG — must match inventory.html exactly
       // ============================================================
-      const STORAGE_KEY = 'maricopa_inventory_v1';
+      const API = {
+        BASE_URL: 'http://localhost:3000/api',
+        ENDPOINTS: {
+          list: '/inventory',
+          health: '/health'
+        },
+        url(key) {
+          return this.BASE_URL + (this.ENDPOINTS[key] || '');
+        }
+      };
+
       const PAGE_SIZE = 5;
+      const SNAPSHOT_KEY = 'maricopa_dashboard_snapshot_v1';
 
       // ============================================================
       // STATE
@@ -877,12 +927,16 @@
       let inventory = [];
       let currentPage = 1;
       let searchTerm = '';
+      let isLoading = false;
+      let serverReachable = true;
+      let refreshTimer = null;
 
       // ============================================================
       // DOM REFS
       // ============================================================
       const tbody = document.getElementById('inventoryBody');
       const emptyState = document.getElementById('emptyState');
+      const loadingState = document.getElementById('loadingState');
       const footerInfo = document.getElementById('footerInfo');
       const pagination = document.getElementById('pagination');
       const searchInput = document.getElementById('searchInput');
@@ -890,6 +944,15 @@
       const kpiUnits = document.getElementById('kpiUnits');
       const kpiLow = document.getElementById('kpiLow');
       const kpiValue = document.getElementById('kpiValue');
+      const trendTotal = document.getElementById('trendTotal');
+      const trendUnits = document.getElementById('trendUnits');
+      const trendLow = document.getElementById('trendLow');
+      const trendValue = document.getElementById('trendValue');
+
+      const connectionBanner = document.getElementById('connectionBanner');
+      const connectionMessage = document.getElementById('connectionMessage');
+      const btnRetryConnection = document.getElementById('btnRetryConnection');
+      const btnExport = document.getElementById('btnExport');
 
       // ============================================================
       // TOAST
@@ -899,12 +962,23 @@
       const toastIcon = document.getElementById('toastIcon');
       let toastTimeout = null;
 
-      function showToast(message, icon = 'fa-check-circle') {
+      function showToast(message, type = 'success', duration = 3000) {
         if (toastTimeout) clearTimeout(toastTimeout);
         toastMessage.textContent = message;
-        toastIcon.className = 'fas ' + icon;
+        toast.classList.remove('error', 'warning');
+
+        if (type === 'error') {
+          toastIcon.className = 'fas fa-circle-exclamation';
+          toast.classList.add('error');
+        } else if (type === 'warning') {
+          toastIcon.className = 'fas fa-triangle-exclamation';
+          toast.classList.add('warning');
+        } else {
+          toastIcon.className = 'fas fa-check-circle';
+        }
+
         toast.classList.add('show');
-        toastTimeout = setTimeout(() => toast.classList.remove('show'), 2600);
+        toastTimeout = setTimeout(() => toast.classList.remove('show'), duration);
       }
 
       // ============================================================
@@ -959,22 +1033,51 @@
       }
 
       // ============================================================
-      // LOAD INVENTORY FROM SHARED STORAGE
+      // CONNECTION STATUS
       // ============================================================
-      function loadInventory() {
-        try {
-          const raw = localStorage.getItem(STORAGE_KEY);
-          inventory = raw ? JSON.parse(raw) : [];
-          if (!Array.isArray(inventory)) inventory = [];
-        } catch (e) {
-          inventory = [];
+      function setServerReachable(reachable, reason = '') {
+        const wasDown = !serverReachable;
+        serverReachable = reachable;
+
+        if (!reachable) {
+          connectionBanner.classList.add('show');
+          connectionMessage.textContent = reason || 'Cannot reach the server. Check your connection and try again.';
+          btnExport.disabled = true;
+        } else {
+          connectionBanner.classList.remove('show');
+          btnExport.disabled = false;
+          if (wasDown) showToast('Reconnected to server.', 'success');
         }
       }
 
       // ============================================================
-      // KPI CALCULATIONS (live from inventory)
+      // API CALL
       // ============================================================
-      function updateKPIs() {
+      async function fetchInventory() {
+        let res;
+        try {
+          res = await fetch(API.url('list'), {
+            headers: { 'Accept': 'application/json' }
+          });
+        } catch (networkErr) {
+          const err = new Error('NETWORK');
+          err.isNetwork = true;
+          throw err;
+        }
+
+        if (!res.ok) {
+          const err = new Error('Request failed (' + res.status + ')');
+          err.status = res.status;
+          throw err;
+        }
+
+        return await res.json();
+      }
+
+      // ============================================================
+      // KPI CALCULATIONS
+      // ============================================================
+      function computeKPIs() {
         const total = inventory.length;
         let units = 0, low = 0, value = 0;
 
@@ -986,56 +1089,55 @@
           if (getStatus(item) === 'low') low++;
         });
 
-        kpiTotal.textContent = formatNumber(total);
-        kpiUnits.textContent = formatNumber(units);
-        kpiLow.textContent = formatNumber(low);
-        kpiValue.textContent = formatKSH(value);
+        return { total, units, low, value };
+      }
 
-        // Dynamic trend indicators (based on current vs previous snapshot)
-        // We store a lightweight snapshot in localStorage to compute change.
-        const snapshotKey = STORAGE_KEY + '_dash_snapshot';
-        let prev = null;
+      function readSnapshot() {
         try {
-          const rawPrev = localStorage.getItem(snapshotKey);
-          prev = rawPrev ? JSON.parse(rawPrev) : null;
-        } catch (e) { prev = null; }
+          const raw = localStorage.getItem(SNAPSHOT_KEY);
+          return raw ? JSON.parse(raw) : null;
+        } catch { return null; }
+      }
 
-        function setTrend(el, current, previous, invertGood) {
-          const trendEl = document.getElementById(el);
-          if (!trendEl) return;
-          if (previous === null || previous === undefined || previous === 0) {
-            trendEl.innerHTML = '<i class="fas fa-minus" style="font-size: 0.7rem;"></i> 0%';
-            trendEl.classList.remove('down');
-            return;
-          }
-          const pct = ((current - previous) / previous) * 100;
-          const isUp = pct >= 0;
-          const good = invertGood ? !isUp : isUp;
-          trendEl.classList.toggle('down', !good);
-          trendEl.innerHTML = '<i class="fas fa-arrow-' + (isUp ? 'up' : 'down') + '" style="font-size: 0.7rem;"></i> ' +
-            (isUp ? '+' : '') + pct.toFixed(1) + '%';
-        }
-
-        if (prev) {
-          setTrend('trendTotal', total, prev.total, false);
-          setTrend('trendUnits', units, prev.units, false);
-          setTrend('trendLow', low, prev.low, true);   // fewer low-stock is good
-          setTrend('trendValue', value, prev.value, false);
-        } else {
-          // first run: show neutral
-          ['trendTotal', 'trendUnits', 'trendLow', 'trendValue'].forEach(id => {
-            const el = document.getElementById(id);
-            if (el) {
-              el.innerHTML = '<i class="fas fa-minus" style="font-size: 0.7rem;"></i> 0%';
-              el.classList.remove('down');
-            }
-          });
-        }
-
-        // Save snapshot for next comparison
+      function writeSnapshot(kpis) {
         try {
-          localStorage.setItem(snapshotKey, JSON.stringify({ total, units, low, value }));
-        } catch (e) { /* storage full — silent */ }
+          localStorage.setItem(SNAPSHOT_KEY, JSON.stringify(kpis));
+        } catch { /* ignore */ }
+      }
+
+      function setTrend(el, current, previous, invertGood = false) {
+        if (!el) return;
+        if (previous === null || previous === undefined || previous === 0) {
+          el.className = 'trend neutral';
+          el.innerHTML = '<i class="fas fa-minus" style="font-size: 0.7rem;"></i> 0%';
+          return;
+        }
+        const pct = ((current - previous) / previous) * 100;
+        const isUp = pct >= 0;
+        const good = invertGood ? !isUp : isUp;
+        el.className = 'trend' + (good ? '' : ' down');
+        el.innerHTML = '<i class="fas fa-arrow-' + (isUp ? 'up' : 'down') + '" style="font-size: 0.7rem;"></i> ' +
+          (isUp ? '+' : '') + pct.toFixed(1) + '%';
+      }
+
+      function updateKPIs() {
+        const kpis = computeKPIs();
+        const prev = readSnapshot();
+
+        kpiTotal.textContent = formatNumber(kpis.total);
+        kpiUnits.textContent = formatNumber(kpis.units);
+        kpiLow.textContent = formatNumber(kpis.low);
+        kpiValue.textContent = formatKSH(kpis.value);
+
+        setTrend(trendTotal, kpis.total, prev && prev.total, false);
+        setTrend(trendUnits, kpis.units, prev && prev.units, false);
+        setTrend(trendLow, kpis.low, prev && prev.low, true);
+        setTrend(trendValue, kpis.value, prev && prev.value, false);
+
+        writeSnapshot(kpis);
+
+        // remove skeleton loading state
+        document.querySelectorAll('.kpi-card').forEach(c => c.classList.remove('loading'));
       }
 
       // ============================================================
@@ -1056,6 +1158,17 @@
       }
 
       function renderTable() {
+        if (isLoading) {
+          tbody.style.display = 'none';
+          emptyState.style.display = 'none';
+          loadingState.style.display = 'block';
+          footerInfo.textContent = 'Loading…';
+          pagination.innerHTML = '';
+          return;
+        }
+
+        loadingState.style.display = 'none';
+
         const filtered = getFilteredItems();
         const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
         if (currentPage > totalPages) currentPage = totalPages;
@@ -1097,7 +1210,6 @@
           });
         }
 
-        // footer
         footerInfo.textContent = filtered.length === 0
           ? 'Showing 0 of 0 products'
           : `Showing ${start + 1}–${start + pageItems.length} of ${filtered.length} product${filtered.length !== 1 ? 's' : ''}`;
@@ -1141,6 +1253,35 @@
       }
 
       // ============================================================
+      // LOAD DATA
+      // ============================================================
+      async function loadInventory(showSpinner = true) {
+        if (showSpinner) {
+          isLoading = true;
+          renderTable();
+          document.querySelectorAll('.kpi-card').forEach(c => c.classList.add('loading'));
+        }
+
+        try {
+          const data = await fetchInventory();
+          inventory = Array.isArray(data) ? data : [];
+          setServerReachable(true);
+        } catch (err) {
+          if (err.isNetwork) {
+            setServerReachable(false, 'Server unreachable. Is the backend running on ' + API.BASE_URL + '?');
+            showToast('Server not connected — dashboard may be stale.', 'error', 4200);
+          } else {
+            showToast('Failed to load inventory (' + (err.status || 'error') + ').', 'error');
+          }
+          inventory = [];
+        } finally {
+          isLoading = false;
+          renderTable();
+          updateKPIs();
+        }
+      }
+
+      // ============================================================
       // SEARCH
       // ============================================================
       searchInput.addEventListener('input', function() {
@@ -1150,11 +1291,11 @@
       });
 
       // ============================================================
-      // EXPORT (shares the same CSV logic as inventory)
+      // EXPORT CSV
       // ============================================================
-      document.getElementById('btnExport').addEventListener('click', function() {
+      btnExport.addEventListener('click', function() {
         if (inventory.length === 0) {
-          showToast('Nothing to export — inventory is empty.', 'fa-circle-exclamation');
+          showToast('Nothing to export — inventory is empty.', 'warning');
           return;
         }
         const headers = ['Name', 'SKU', 'Category', 'Quantity', 'Unit', 'Unit Price (KSH)', 'Threshold', 'Status', 'Supplier'];
@@ -1182,50 +1323,50 @@
         a.click();
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
-        showToast('Inventory exported as CSV.', 'fa-download');
+        showToast('Inventory exported as CSV.');
       });
 
       // ============================================================
-      // GENERIC CLICK HANDLER (toast feedback for dashboard elements)
+      // RETRY CONNECTION
+      // ============================================================
+      btnRetryConnection.addEventListener('click', async function() {
+        const btn = this;
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Connecting…';
+        try {
+          await loadInventory();
+        } finally {
+          btn.disabled = false;
+          btn.innerHTML = '<i class="fas fa-rotate"></i> Retry';
+        }
+      });
+
+      // ============================================================
+      // GENERIC CLICK FEEDBACK (KPI cards, rows)
       // ============================================================
       document.addEventListener('click', function(e) {
         const target = e.target.closest('[data-action]');
         if (!target) return;
 
-        // Skip links that navigate away
-        if (target.tagName === 'A' && target.getAttribute('href')) return;
+        // skip links
+        if (target.tagName === 'A') return;
 
         const action = target.getAttribute('data-action');
         const detail = target.getAttribute('data-detail') || '';
 
-        // sidebar nav
-        if (target.classList.contains('nav-item')) {
-          const href = target.getAttribute('data-href');
-          if (href) { window.location.href = href; return; }
-          document.querySelectorAll('.sidebar .nav-item').forEach(n => n.classList.remove('active'));
-          target.classList.add('active');
-          showToast(action + ' panel loading…', 'fa-compass');
-          return;
-        }
-
-        // KPI cards
         if (target.classList.contains('kpi-card')) {
-          showToast(action + (detail ? ' — ' + detail : ''), 'fa-chart-simple');
+          showToast(action + (detail ? ' — ' + detail : ''), 'success');
           return;
         }
 
-        // table rows
         if (target.tagName === 'TR' && target.closest('tbody')) {
-          showToast(action + ' — ' + detail, 'fa-box-open');
+          showToast(action + ' — ' + detail, 'success');
           return;
         }
-
-        // default
-        showToast(action + (detail ? ' — ' + detail : ''), 'fa-circle-check');
       });
 
       // ============================================================
-      // KEYBOARD: "/" focuses search
+      // KEYBOARD "/" FOCUSES SEARCH
       // ============================================================
       document.addEventListener('keydown', function(e) {
         if (e.key === '/' && document.activeElement !== searchInput) {
@@ -1238,32 +1379,31 @@
       });
 
       // ============================================================
-      // LIVE SYNC: refresh when inventory page saves in another tab
+      // USER PROFILE
       // ============================================================
-      window.addEventListener('storage', function(e) {
-        if (e.key === STORAGE_KEY) {
-          loadInventory();
-          updateKPIs();
-          renderTable();
-          showToast('Inventory updated — dashboard synced.', 'fa-rotate');
-        }
+      document.getElementById('userProfile').addEventListener('click', function() {
+        showToast('Signed in as BOSS (Admin)', 'success');
       });
 
-      // Also refresh whenever the page becomes visible again
+      // ============================================================
+      // AUTO-REFRESH: poll every 20s, plus refresh when tab regains focus
+      // ============================================================
+      function startAutoRefresh() {
+        if (refreshTimer) clearInterval(refreshTimer);
+        refreshTimer = setInterval(() => {
+          if (!document.hidden) loadInventory(false); // silent refresh
+        }, 20000);
+      }
+
       document.addEventListener('visibilitychange', function() {
-        if (!document.hidden) {
-          loadInventory();
-          updateKPIs();
-          renderTable();
-        }
+        if (!document.hidden) loadInventory(false);
       });
 
       // ============================================================
       // INIT
       // ============================================================
       loadInventory();
-      updateKPIs();
-      renderTable();
+      startAutoRefresh();
     })();
   </script>
 </body>
