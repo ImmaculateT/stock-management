@@ -1,0 +1,1166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+  <title>Maricopa · Settings · Theme</title>
+  <!-- Font Awesome Icons (v6 free) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    /* ---------- THEME VARIABLES ---------- */
+    :root {
+      /* Light theme (default) */
+      --bg-body: #f4f7fc;
+      --bg-surface: #ffffff;
+      --bg-surface-alt: #f9fcff;
+      --bg-sidebar: #1a2b3c;
+      --bg-sidebar-hover: #233545;
+      --bg-sidebar-active: #2f4a64;
+      --text-primary: #0b1d2e;
+      --text-secondary: #5b6f84;
+      --text-muted: #8da1b5;
+      --text-sidebar: #b8c9db;
+      --text-sidebar-muted: #8faec9;
+      --border-color: #e9eff6;
+      --border-color-strong: #dae3ec;
+      --accent: #f0b34b;
+      --accent-strong: #d6952c;
+      --accent-bg: #fef4e6;
+      --danger: #b13b3b;
+      --danger-bg: #fff5f5;
+      --danger-border: #f3cdcd;
+      --success: #1e6d3a;
+      --success-bg: #e6f3e6;
+      --warning: #b1590e;
+      --warning-bg: #fff0e0;
+      --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.02);
+      --shadow-md: 0 6px 18px rgba(0, 0, 0, 0.02);
+      --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.25);
+      --table-row-hover: #fafdff;
+      --table-head-bg: #f9fcff;
+      --row-padding: 16px 20px;
+      --sidebar-image: url('https://images.unsplash.com/photo-1517581177682-a085bb7ffb15?auto=format&fit=crop&w=800&q=80');
+    }
+
+    /* Dark theme */
+    html[data-theme="dark"] {
+      --bg-body: #0e1720;
+      --bg-surface: #16222e;
+      --bg-surface-alt: #1b2a38;
+      --bg-sidebar: #0b141c;
+      --bg-sidebar-hover: #16222e;
+      --bg-sidebar-active: #1f3444;
+      --text-primary: #e6eef7;
+      --text-secondary: #9fb2c7;
+      --text-muted: #6e8499;
+      --text-sidebar: #b8c9db;
+      --text-sidebar-muted: #7c93a8;
+      --border-color: #22323f;
+      --border-color-strong: #2c4152;
+      --accent: #f0b34b;
+      --accent-strong: #f0b34b;
+      --accent-bg: #2a2113;
+      --danger: #f08a8a;
+      --danger-bg: #2a1717;
+      --danger-border: #4a2424;
+      --success: #6fd48f;
+      --success-bg: #12261a;
+      --warning: #f0b34b;
+      --warning-bg: #2a2113;
+      --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
+      --shadow-md: 0 6px 18px rgba(0, 0, 0, 0.35);
+      --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.6);
+      --table-row-hover: #1c2b38;
+      --table-head-bg: #12202b;
+    }
+
+    /* Compact density */
+    html[data-density="compact"] {
+      --row-padding: 10px 14px;
+    }
+
+    /* Accent overrides (applied as CSS variable via JS) */
+    html[data-accent="amber"]  { --accent: #f0b34b; --accent-strong: #d6952c; --accent-bg: #fef4e6; }
+    html[data-accent="blue"]   { --accent: #4d9fff; --accent-strong: #2f6cb0; --accent-bg: #e6f0fb; }
+    html[data-accent="green"]  { --accent: #4caf7d; --accent-strong: #1e6d3a; --accent-bg: #e6f3e6; }
+    html[data-accent="red"]    { --accent: #e05c5c; --accent-strong: #b13b3b; --accent-bg: #ffe6e6; }
+    html[data-accent="purple"] { --accent: #8e5bbf; --accent-strong: #6b3f99; --accent-bg: #f0e6fa; }
+
+    html[data-theme="dark"][data-accent="amber"]  { --accent-bg: #2a2113; }
+    html[data-theme="dark"][data-accent="blue"]   { --accent-bg: #142438; }
+    html[data-theme="dark"][data-accent="green"]  { --accent-bg: #12261a; }
+    html[data-theme="dark"][data-accent="red"]    { --accent-bg: #2a1717; }
+    html[data-theme="dark"][data-accent="purple"] { --accent-bg: #221630; }
+
+    /* ---------- RESET & GLOBAL ---------- */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+    }
+
+    body {
+      background: var(--bg-body);
+      color: var(--text-primary);
+      display: flex;
+      min-height: 100vh;
+      transition: background 0.25s ease, color 0.25s ease;
+    }
+
+    /* ---------- SIDEBAR ---------- */
+    .sidebar {
+      width: 260px;
+      background: var(--bg-sidebar);
+      color: var(--text-sidebar);
+      display: flex;
+      flex-direction: column;
+      padding: 28px 16px;
+      transition: all 0.2s ease;
+      flex-shrink: 0;
+      box-shadow: 2px 0 12px rgba(0, 0, 0, 0.05);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .sidebar::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image: var(--sidebar-image);
+      background-size: cover;
+      background-position: center;
+      opacity: 0.18;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .sidebar::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(26, 43, 60, 0.92) 0%, rgba(26, 43, 60, 0.75) 100%);
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    html[data-theme="dark"] .sidebar::after {
+      background: linear-gradient(180deg, rgba(11, 20, 28, 0.94) 0%, rgba(11, 20, 28, 0.82) 100%);
+    }
+
+    .sidebar > * { position: relative; z-index: 2; }
+
+    .sidebar-brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 0 12px 32px 12px;
+      font-weight: 700;
+      font-size: 1.5rem;
+      letter-spacing: -0.02em;
+      color: white;
+      cursor: pointer;
+      transition: opacity 0.15s;
+      text-decoration: none;
+    }
+
+    .sidebar-brand:hover { opacity: 0.85; }
+    .sidebar-brand i { font-size: 2rem; color: var(--accent); }
+
+    .sidebar-brand span {
+      background: linear-gradient(135deg, #ffffff, #e8eef5);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .sidebar-nav { display: flex; flex-direction: column; gap: 6px; flex: 1; }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 12px 16px;
+      border-radius: 12px;
+      color: var(--text-sidebar);
+      text-decoration: none;
+      font-weight: 500;
+      font-size: 0.95rem;
+      transition: all 0.15s ease;
+      cursor: pointer;
+      border: none;
+      background: transparent;
+      width: 100%;
+      text-align: left;
+      font-family: inherit;
+    }
+
+    .nav-item i { width: 20px; font-size: 1.1rem; text-align: center; }
+
+    .nav-item.active {
+      background: var(--bg-sidebar-active);
+      color: white;
+      box-shadow: 0 6px 12px -6px rgba(0, 80, 200, 0.2);
+      border-left: 3px solid var(--accent);
+    }
+
+    .nav-item:hover:not(.active) { background: var(--bg-sidebar-hover); color: #e0e9f2; }
+    .nav-item:active { transform: scale(0.98); }
+
+    .sidebar-footer {
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      padding-top: 20px;
+      margin-top: 12px;
+    }
+
+    .sidebar-footer .nav-item { color: var(--text-sidebar-muted); }
+
+    /* ---------- MAIN CONTENT ---------- */
+    .main-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      padding: 24px 32px;
+      overflow-x: auto;
+    }
+
+    .top-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 28px;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .page-title h1 {
+      font-size: 1.8rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      letter-spacing: -0.02em;
+    }
+
+    .page-title p {
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+      margin-top: 4px;
+    }
+
+    .page-title p i { color: var(--accent-strong); margin-right: 6px; }
+
+    .header-actions { display: flex; align-items: center; gap: 16px; }
+
+    .user-profile {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: var(--bg-surface);
+      padding: 6px 12px 6px 16px;
+      border-radius: 40px;
+      border: 1px solid var(--border-color-strong);
+      cursor: pointer;
+      transition: all 0.15s ease;
+      user-select: none;
+    }
+
+    .user-profile:hover { border-color: var(--accent); box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04); }
+    .user-profile:active { transform: scale(0.98); }
+
+    .user-profile span { font-weight: 500; font-size: 0.9rem; color: var(--text-primary); }
+
+    .avatar {
+      background: var(--bg-sidebar);
+      color: var(--accent);
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      font-weight: 600;
+      font-size: 0.9rem;
+      border: 1px solid rgba(240, 179, 75, 0.25);
+    }
+
+    /* ---------- SETTINGS LAYOUT ---------- */
+    .settings-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 340px;
+      gap: 24px;
+      align-items: start;
+    }
+
+    /* ---------- CARD ---------- */
+    .card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: 24px;
+      box-shadow: var(--shadow-md);
+      overflow: hidden;
+      transition: background 0.25s ease, border-color 0.25s ease;
+    }
+
+    .card + .card { margin-top: 20px; }
+
+    .card-header {
+      padding: 22px 24px 16px 24px;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .card-header h2 {
+      font-size: 1.05rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      letter-spacing: -0.01em;
+    }
+
+    .card-header h2 i { color: var(--accent-strong); font-size: 0.95rem; }
+
+    .card-header p {
+      font-size: 0.82rem;
+      color: var(--text-secondary);
+      margin-top: 4px;
+      line-height: 1.4;
+    }
+
+    .card-body { padding: 22px 24px 24px 24px; }
+
+    /* ---------- SETTING ROW ---------- */
+    .setting-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      padding: 16px 0;
+      border-bottom: 1px solid var(--border-color);
+      flex-wrap: wrap;
+    }
+
+    .setting-row:last-child { border-bottom: none; padding-bottom: 0; }
+    .setting-row:first-child { padding-top: 0; }
+
+    .setting-info { flex: 1; min-width: 200px; }
+
+    .setting-info label {
+      display: block;
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 3px;
+    }
+
+    .setting-info p {
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+      line-height: 1.45;
+      margin-top: 2px;
+    }
+
+    .setting-control { flex-shrink: 0; }
+
+    /* ---------- THEME MODE SELECTOR ---------- */
+    .theme-modes {
+      display: flex;
+      gap: 8px;
+      background: var(--bg-surface-alt);
+      padding: 4px;
+      border-radius: 40px;
+      border: 1px solid var(--border-color);
+    }
+
+    .theme-mode-btn {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+      border-radius: 40px;
+      border: 1px solid transparent;
+      background: transparent;
+      color: var(--text-secondary);
+      font-family: inherit;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      white-space: nowrap;
+    }
+
+    .theme-mode-btn:hover:not(.active) {
+      color: var(--text-primary);
+      background: var(--bg-surface);
+    }
+
+    .theme-mode-btn.active {
+      background: var(--bg-surface);
+      color: var(--text-primary);
+      border-color: var(--border-color-strong);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .theme-mode-btn i { font-size: 0.9rem; }
+    .theme-mode-btn.active i { color: var(--accent-strong); }
+
+    /* ---------- ACCENT SWATCHES ---------- */
+    .swatch-row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .swatch {
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      border: 3px solid transparent;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      position: relative;
+      padding: 0;
+      font-family: inherit;
+      box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.06);
+    }
+
+    .swatch:hover { transform: translateY(-2px); }
+    .swatch:active { transform: translateY(0); }
+
+    .swatch.active {
+      border-color: var(--text-primary);
+      box-shadow: inset 0 0 0 2px var(--bg-surface), 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .swatch.active::after {
+      content: '\f00c';
+      font-family: 'Font Awesome 6 Free';
+      font-weight: 900;
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 0.85rem;
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+    }
+
+    .swatch[data-accent="amber"]  { background: #f0b34b; }
+    .swatch[data-accent="blue"]   { background: #4d9fff; }
+    .swatch[data-accent="green"]  { background: #4caf7d; }
+    .swatch[data-accent="red"]    { background: #e05c5c; }
+    .swatch[data-accent="purple"] { background: #8e5bbf; }
+
+    /* ---------- SIDEBAR IMAGE PICKER ---------- */
+    .sidebar-images {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+      gap: 10px;
+    }
+
+    .sidebar-img-option {
+      aspect-ratio: 1;
+      border-radius: 14px;
+      border: 3px solid transparent;
+      background-size: cover;
+      background-position: center;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      position: relative;
+      padding: 0;
+      font-family: inherit;
+      overflow: hidden;
+    }
+
+    .sidebar-img-option::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: rgba(26, 43, 60, 0.2);
+      transition: opacity 0.15s;
+    }
+
+    .sidebar-img-option:hover { transform: translateY(-2px); }
+    .sidebar-img-option:hover::after { opacity: 0.3; }
+    .sidebar-img-option:active { transform: translateY(0); }
+
+    .sidebar-img-option.active {
+      border-color: var(--accent);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+
+    .sidebar-img-option.active::before {
+      content: '\f00c';
+      font-family: 'Font Awesome 6 Free';
+      font-weight: 900;
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 1.1rem;
+      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
+      z-index: 2;
+    }
+
+    .sidebar-img-option.active::after { opacity: 0.55; background: rgba(26, 43, 60, 0.5); }
+
+    /* ---------- DENSITY CONTROL ---------- */
+    .density-toggle {
+      display: flex;
+      gap: 8px;
+      background: var(--bg-surface-alt);
+      padding: 4px;
+      border-radius: 40px;
+      border: 1px solid var(--border-color);
+    }
+
+    .density-btn {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+      border-radius: 40px;
+      border: 1px solid transparent;
+      background: transparent;
+      color: var(--text-secondary);
+      font-family: inherit;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      white-space: nowrap;
+    }
+
+    .density-btn:hover:not(.active) {
+      color: var(--text-primary);
+      background: var(--bg-surface);
+    }
+
+    .density-btn.active {
+      background: var(--bg-surface);
+      color: var(--text-primary);
+      border-color: var(--border-color-strong);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .density-btn.active i { color: var(--accent-strong); }
+
+    /* ---------- PREVIEW CARD ---------- */
+    .preview-card {
+      position: sticky;
+      top: 24px;
+    }
+
+    .preview-body {
+      padding: 22px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .preview-mini {
+      background: var(--bg-surface-alt);
+      border: 1px solid var(--border-color);
+      border-radius: 14px;
+      padding: 14px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .preview-mini-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: var(--accent-bg);
+      color: var(--accent-strong);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.95rem;
+      flex-shrink: 0;
+    }
+
+    .preview-mini-info { min-width: 0; }
+
+    .preview-mini-title {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .preview-mini-sub {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    .preview-swatches {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .preview-swatch {
+      width: 100%;
+      height: 24px;
+      border-radius: 6px;
+      border: 1px solid var(--border-color);
+    }
+
+    .preview-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 10px 18px;
+      border-radius: 40px;
+      background: var(--bg-sidebar);
+      color: #f0e9df;
+      border: none;
+      font-family: inherit;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .preview-btn i { color: var(--accent); }
+
+    .preview-label {
+      font-size: 0.72rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--text-muted);
+      margin-bottom: 2px;
+    }
+
+    .preview-divider {
+      height: 1px;
+      background: var(--border-color);
+      margin: 4px 0;
+    }
+
+    .preview-hint {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+    }
+
+    .preview-hint i {
+      color: var(--accent-strong);
+      font-size: 0.8rem;
+      margin-top: 2px;
+      flex-shrink: 0;
+    }
+
+    /* ---------- TOAST ---------- */
+    .toast {
+      position: fixed;
+      bottom: 28px;
+      right: 28px;
+      background: var(--bg-sidebar);
+      color: #f0e9df;
+      padding: 14px 22px;
+      border-radius: 14px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      box-shadow: var(--shadow-lg);
+      border-left: 4px solid var(--accent);
+      transform: translateY(120%);
+      opacity: 0;
+      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      z-index: 9999;
+      pointer-events: none;
+      max-width: 340px;
+    }
+
+    .toast.show { transform: translateY(0); opacity: 1; }
+    .toast i { color: var(--accent); font-size: 1.1rem; flex-shrink: 0; }
+
+    /* ---------- RESPONSIVE ---------- */
+    @media (max-width: 1024px) {
+      .settings-layout { grid-template-columns: 1fr; }
+      .preview-card { position: static; }
+    }
+
+    @media (max-width: 900px) {
+      .sidebar { width: 80px; padding: 28px 8px; }
+      .sidebar-brand span, .nav-item span { display: none; }
+      .sidebar-brand i { margin: 0 auto; }
+      .nav-item { justify-content: center; padding: 14px 0; }
+      .nav-item i { font-size: 1.3rem; }
+      .sidebar-footer .nav-item span { display: none; }
+      .main-content { padding: 20px; }
+    }
+
+    @media (max-width: 700px) {
+      .setting-row { flex-direction: column; align-items: stretch; }
+      .setting-control { width: 100%; }
+      .theme-modes, .density-toggle { width: 100%; }
+      .theme-mode-btn, .density-btn { flex: 1; justify-content: center; padding: 8px 10px; }
+      .theme-mode-btn span, .density-btn span { display: inline; font-size: 0.8rem; }
+    }
+
+    @media (max-width: 600px) {
+      .main-content { padding: 16px; }
+      .top-header { flex-direction: column; align-items: stretch; }
+      .header-actions { justify-content: flex-end; }
+      .user-profile span { display: none; }
+      .user-profile { padding: 6px; }
+      .card-header { padding: 18px 18px 14px 18px; }
+      .card-body { padding: 18px 18px 20px 18px; }
+      .toast { left: 16px; right: 16px; bottom: 16px; max-width: none; }
+      .sidebar-images { grid-template-columns: repeat(auto-fill, minmax(70px, 1fr)); }
+    }
+
+    .no-wrap { white-space: nowrap; }
+  </style>
+</head>
+<body>
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <a href="dashboard.html" class="sidebar-brand">
+      <i class="fas fa-cubes"></i>
+      <span>Maricopa</span>
+    </a>
+
+    <nav class="sidebar-nav">
+      <a href="dashboard.html" class="nav-item">
+        <i class="fas fa-chart-pie"></i>
+        <span>Dashboard</span>
+      </a>
+      <a href="inventory.html" class="nav-item">
+        <i class="fas fa-boxes"></i>
+        <span>Inventory</span>
+      </a>
+      <a href="orders.html" class="nav-item">
+        <i class="fas fa-truck"></i>
+        <span>Orders</span>
+      </a>
+      <a href="analytics.html" class="nav-item">
+        <i class="fas fa-chart-line"></i>
+        <span>Analytics</span>
+      </a>
+      <a href="settings.html" class="nav-item active">
+        <i class="fas fa-cog"></i>
+        <span>Settings</span>
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <a href="support.html" class="nav-item">
+        <i class="fas fa-circle-question"></i>
+        <span>Support</span>
+      </a>
+      <a href="logout.html" class="nav-item">
+        <i class="fas fa-right-from-bracket"></i>
+        <span>Logout</span>
+      </a>
+    </div>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <main class="main-content">
+    <header class="top-header">
+      <div class="page-title">
+        <h1>Settings</h1>
+        <p><i class="fas fa-palette"></i> Maricopa · Personalise how the app looks</p>
+      </div>
+
+      <div class="header-actions">
+        <div class="user-profile" id="userProfile">
+          <span>BOSS</span>
+          <div class="avatar">B</div>
+        </div>
+      </div>
+    </header>
+
+    <div class="settings-layout">
+      <!-- LEFT COLUMN -->
+      <div class="settings-column">
+        <!-- THEME MODE -->
+        <section class="card">
+          <div class="card-header">
+            <div>
+              <h2><i class="fas fa-circle-half-stroke"></i> Theme mode</h2>
+              <p>Choose how the interface looks. "System" follows your device's preference automatically.</p>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="setting-row">
+              <div class="setting-info">
+                <label>Appearance</label>
+                <p>Switch between light, dark, or match your operating system.</p>
+              </div>
+              <div class="setting-control">
+                <div class="theme-modes" id="themeModes">
+                  <button class="theme-mode-btn" data-theme-mode="light">
+                    <i class="fas fa-sun"></i><span>Light</span>
+                  </button>
+                  <button class="theme-mode-btn" data-theme-mode="dark">
+                    <i class="fas fa-moon"></i><span>Dark</span>
+                  </button>
+                  <button class="theme-mode-btn" data-theme-mode="system">
+                    <i class="fas fa-desktop"></i><span>System</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ACCENT COLOUR -->
+        <section class="card">
+          <div class="card-header">
+            <div>
+              <h2><i class="fas fa-droplet"></i> Accent colour</h2>
+              <p>The highlight colour used for icons, active states, and key buttons across the app.</p>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="setting-row">
+              <div class="setting-info">
+                <label>Primary accent</label>
+                <p>Pick a colour that matches your brand. Applies instantly across all pages.</p>
+              </div>
+              <div class="setting-control">
+                <div class="swatch-row" id="accentSwatches">
+                  <button class="swatch" data-accent="amber"  title="Amber (default)"></button>
+                  <button class="swatch" data-accent="blue"   title="Blue"></button>
+                  <button class="swatch" data-accent="green"  title="Green"></button>
+                  <button class="swatch" data-accent="red"    title="Red"></button>
+                  <button class="swatch" data-accent="purple" title="Purple"></button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- SIDEBAR BACKGROUND -->
+        <section class="card">
+          <div class="card-header">
+            <div>
+              <h2><i class="fas fa-image"></i> Sidebar background</h2>
+              <p>Choose the image shown behind the sidebar navigation. Low opacity keeps text readable.</p>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="setting-row" style="border-bottom: none; padding-bottom: 0;">
+              <div class="setting-info">
+                <label>Background image</label>
+                <p>Click a thumbnail to apply it. The change is instant and saved automatically.</p>
+              </div>
+            </div>
+            <div class="sidebar-images" id="sidebarImages" style="margin-top: 14px;">
+              <button class="sidebar-img-option" data-sidebar-img="concrete" title="Concrete texture"
+                style="background-image:url('https://images.unsplash.com/photo-1517581177682-a085bb7ffb15?auto=format&fit=crop&w=800&q=80');"></button>
+              <button class="sidebar-img-option" data-sidebar-img="construction" title="Construction site"
+                style="background-image:url('https://images.unsplash.com/photo-1541888946425-d81bb19240f5?auto=format&fit=crop&w=800&q=80');"></button>
+              <button class="sidebar-img-option" data-sidebar-img="blueprint" title="Blueprint"
+                style="background-image:url('https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&w=800&q=80');"></button>
+              <button class="sidebar-img-option" data-sidebar-img="cement" title="Cement texture"
+                style="background-image:url('https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=800&q=80');"></button>
+              <button class="sidebar-img-option" data-sidebar-img="architecture" title="Architecture"
+                style="background-image:url('https://images.unsplash.com/photo-1487958449943-2429e8be8625?auto=format&fit=crop&w=800&q=80');"></button>
+              <button class="sidebar-img-option" data-sidebar-img="none" title="No image"
+                style="background: linear-gradient(135deg, #1a2b3c, #2f4a64);">
+                <i class="fas fa-ban" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#8da1b5;font-size:1.2rem;"></i>
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <!-- DENSITY -->
+        <section class="card">
+          <div class="card-header">
+            <div>
+              <h2><i class="fas fa-bars-staggered"></i> Density</h2>
+              <p>Control how much breathing room tables and lists get. Compact fits more rows on screen.</p>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="setting-row">
+              <div class="setting-info">
+                <label>Layout density</label>
+                <p>Comfortable is the default; Compact reduces padding to show more data.</p>
+              </div>
+              <div class="setting-control">
+                <div class="density-toggle" id="densityToggle">
+                  <button class="density-btn" data-density-mode="comfortable">
+                    <i class="fas fa-expand"></i><span>Comfortable</span>
+                  </button>
+                  <button class="density-btn" data-density-mode="compact">
+                    <i class="fas fa-compress"></i><span>Compact</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <!-- RIGHT COLUMN: PREVIEW -->
+      <aside class="preview-card card">
+        <div class="card-header">
+          <div>
+            <h2><i class="fas fa-eye"></i> Live preview</h2>
+            <p>How your theme looks on key UI elements.</p>
+          </div>
+        </div>
+        <div class="preview-body">
+          <div>
+            <div class="preview-label">Sample card</div>
+            <div class="preview-mini">
+              <div class="preview-mini-icon"><i class="fas fa-cubes"></i></div>
+              <div class="preview-mini-info">
+                <div class="preview-mini-title">Ready-Mix Concrete C30/37</div>
+                <div class="preview-mini-sub">147 m³ · In stock</div>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <div class="preview-label">Accent palette</div>
+            <div class="preview-swatches">
+              <div class="preview-swatch" style="background: var(--accent);"></div>
+              <div class="preview-swatch" style="background: var(--accent-strong);"></div>
+              <div class="preview-swatch" style="background: var(--accent-bg);"></div>
+            </div>
+          </div>
+
+          <div class="preview-divider"></div>
+
+          <div>
+            <div class="preview-label">Primary button</div>
+            <button class="preview-btn" type="button">
+              <i class="fas fa-plus"></i> Add stock item
+            </button>
+          </div>
+
+          <div class="preview-divider"></div>
+
+          <div class="preview-hint">
+            <i class="fas fa-circle-info"></i>
+            <span>Theme preferences are saved automatically in this browser and apply to every Maricopa page.</span>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </main>
+
+  <!-- TOAST -->
+  <div class="toast" id="toast">
+    <i class="fas fa-check-circle" id="toastIcon"></i>
+    <span id="toastMessage">Theme updated</span>
+  </div>
+
+  <script>
+    (function() {
+      'use strict';
+
+      // ============================================================
+      // STORAGE KEYS — shared with other Maricopa pages
+      // ============================================================
+      const STORAGE = {
+        THEME_MODE: 'maricopa_theme_mode',
+        ACCENT: 'maricopa_theme_accent',
+        SIDEBAR_IMAGE: 'maricopa_sidebar_image',
+        DENSITY: 'maricopa_theme_density'
+      };
+
+      // Sidebar image presets
+      const SIDEBAR_IMAGES = {
+        concrete:      "url('https://images.unsplash.com/photo-1517581177682-a085bb7ffb15?auto=format&fit=crop&w=800&q=80')",
+        construction:  "url('https://images.unsplash.com/photo-1541888946425-d81bb19240f5?auto=format&fit=crop&w=800&q=80')",
+        blueprint:     "url('https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&w=800&q=80')",
+        cement:        "url('https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=800&q=80')",
+        architecture:  "url('https://images.unsplash.com/photo-1487958449943-2429e8be8625?auto=format&fit=crop&w=800&q=80')",
+        none:          'none'
+      };
+
+      // ============================================================
+      // DOM REFS
+      // ============================================================
+      const html = document.documentElement;
+      const themeModeBtns = document.querySelectorAll('[data-theme-mode]');
+      const accentSwatches = document.querySelectorAll('[data-accent]');
+      const sidebarImgBtns = document.querySelectorAll('[data-sidebar-img]');
+      const densityBtns = document.querySelectorAll('[data-density-mode]');
+
+      // ============================================================
+      // TOAST
+      // ============================================================
+      const toast = document.getElementById('toast');
+      const toastMessage = document.getElementById('toastMessage');
+      const toastIcon = document.getElementById('toastIcon');
+      let toastTimeout = null;
+
+      function showToast(message, icon = 'fa-check-circle') {
+        if (toastTimeout) clearTimeout(toastTimeout);
+        toastMessage.textContent = message;
+        toastIcon.className = 'fas ' + icon;
+        toast.classList.add('show');
+        toastTimeout = setTimeout(() => toast.classList.remove('show'), 2400);
+      }
+
+      // ============================================================
+      // APPLY THEME (called on load and on every change)
+      // ============================================================
+      function getStoredValue(key, fallback) {
+        try {
+          const v = localStorage.getItem(key);
+          return v === null ? fallback : v;
+        } catch { return fallback; }
+      }
+
+      function setStoredValue(key, value) {
+        try { localStorage.setItem(key, value); } catch { /* ignore */ }
+      }
+
+      function resolveThemeMode(mode) {
+        if (mode === 'system') {
+          return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+            ? 'dark' : 'light';
+        }
+        return mode === 'dark' ? 'dark' : 'light';
+      }
+
+      function applyThemeMode(mode) {
+        const resolved = resolveThemeMode(mode);
+        html.setAttribute('data-theme', resolved);
+        // Update active state
+        themeModeBtns.forEach(btn => {
+          btn.classList.toggle('active', btn.getAttribute('data-theme-mode') === mode);
+        });
+      }
+
+      function applyAccent(accent) {
+        html.setAttribute('data-accent', accent);
+        accentSwatches.forEach(btn => {
+          btn.classList.toggle('active', btn.getAttribute('data-accent') === accent);
+        });
+      }
+
+      function applySidebarImage(key) {
+        const value = SIDEBAR_IMAGES[key] || SIDEBAR_IMAGES.concrete;
+        html.style.setProperty('--sidebar-image', value);
+        sidebarImgBtns.forEach(btn => {
+          btn.classList.toggle('active', btn.getAttribute('data-sidebar-img') === key);
+        });
+      }
+
+      function applyDensity(mode) {
+        html.setAttribute('data-density', mode === 'compact' ? 'compact' : 'comfortable');
+        densityBtns.forEach(btn => {
+          btn.classList.toggle('active', btn.getAttribute('data-density-mode') === mode);
+        });
+      }
+
+      // ============================================================
+      // INITIAL STATE
+      // ============================================================
+      function loadPreferences() {
+        const mode = getStoredValue(STORAGE.THEME_MODE, 'light');
+        const accent = getStoredValue(STORAGE.ACCENT, 'amber');
+        const sidebarKey = getStoredValue(STORAGE.SIDEBAR_IMAGE, 'concrete');
+        const density = getStoredValue(STORAGE.DENSITY, 'comfortable');
+
+        applyThemeMode(mode);
+        applyAccent(accent);
+        applySidebarImage(sidebarKey);
+        applyDensity(density);
+      }
+
+      // ============================================================
+      // EVENT HANDLERS
+      // ============================================================
+      themeModeBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+          const mode = btn.getAttribute('data-theme-mode');
+          applyThemeMode(mode);
+          setStoredValue(STORAGE.THEME_MODE, mode);
+          showToast('Theme set to ' + mode, 'fa-circle-half-stroke');
+        });
+      });
+
+      accentSwatches.forEach(btn => {
+        btn.addEventListener('click', () => {
+          const accent = btn.getAttribute('data-accent');
+          applyAccent(accent);
+          setStoredValue(STORAGE.ACCENT, accent);
+          showToast('Accent colour updated', 'fa-droplet');
+        });
+      });
+
+      sidebarImgBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+          const key = btn.getAttribute('data-sidebar-img');
+          applySidebarImage(key);
+          setStoredValue(STORAGE.SIDEBAR_IMAGE, key);
+          showToast(key === 'none' ? 'Sidebar image removed' : 'Sidebar image updated', 'fa-image');
+        });
+      });
+
+      densityBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+          const mode = btn.getAttribute('data-density-mode');
+          applyDensity(mode);
+          setStoredValue(STORAGE.DENSITY, mode);
+          showToast('Density set to ' + mode, 'fa-bars-staggered');
+        });
+      });
+
+      // ============================================================
+      // LIVE SYSTEM THEME SYNC
+      // ============================================================
+      if (window.matchMedia) {
+        const mq = window.matchMedia('(prefers-color-scheme: dark)');
+        const onChange = () => {
+          if (getStoredValue(STORAGE.THEME_MODE, 'light') === 'system') {
+            applyThemeMode('system');
+          }
+        };
+        if (mq.addEventListener) mq.addEventListener('change', onChange);
+        else if (mq.addListener) mq.addListener(onChange);
+      }
+
+      // ============================================================
+      // USER PROFILE
+      // ============================================================
+      document.getElementById('userProfile').addEventListener('click', function() {
+        showToast('Signed in as BOSS (Admin)', 'fa-user-shield');
+      });
+
+      // ============================================================
+      // KEYBOARD: "/" is not needed here, but Escape closes nothing
+      // (kept for consistency with the rest of the app)
+      // ============================================================
+      document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+          // no modals on this page, harmless no-op
+        }
+      });
+
+      // ============================================================
+      // BOOT
+      // ============================================================
+      loadPreferences();
+    })();
+  </script>
+</body>
+</html>
