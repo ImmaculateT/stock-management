@@ -1,1 +1,1876 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+  <title>Maricopa · Inventory Management</title>
+  <!-- Font Awesome Icons (v6 free) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    /* ---------- RESET & GLOBAL ---------- */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+    }
 
+    body {
+      background: #f4f7fc;
+      display: flex;
+      min-height: 100vh;
+    }
+
+    /* ---------- SIDEBAR ---------- */
+    .sidebar {
+      width: 260px;
+      background: #1a2b3c;
+      color: #e0e9f2;
+      display: flex;
+      flex-direction: column;
+      padding: 28px 16px;
+      transition: all 0.2s ease;
+      flex-shrink: 0;
+      box-shadow: 2px 0 12px rgba(0, 0, 0, 0.05);
+    }
+
+    .sidebar-brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 0 12px 32px 12px;
+      font-weight: 700;
+      font-size: 1.5rem;
+      letter-spacing: -0.02em;
+      color: white;
+      cursor: pointer;
+      transition: opacity 0.15s;
+      text-decoration: none;
+    }
+
+    .sidebar-brand:hover {
+      opacity: 0.85;
+    }
+
+    .sidebar-brand i {
+      font-size: 2rem;
+      color: #f0b34b;
+    }
+
+    .sidebar-brand span {
+      background: linear-gradient(135deg, #ffffff, #e8eef5);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .sidebar-nav {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      flex: 1;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 12px 16px;
+      border-radius: 12px;
+      color: #b8c9db;
+      text-decoration: none;
+      font-weight: 500;
+      font-size: 0.95rem;
+      transition: all 0.15s ease;
+      cursor: pointer;
+      border: none;
+      background: transparent;
+      width: 100%;
+      text-align: left;
+      font-family: inherit;
+    }
+
+    .nav-item i {
+      width: 20px;
+      font-size: 1.1rem;
+      text-align: center;
+    }
+
+    .nav-item.active {
+      background: #2f4a64;
+      color: white;
+      box-shadow: 0 6px 12px -6px rgba(0, 80, 200, 0.2);
+      border-left: 3px solid #f0b34b;
+    }
+
+    .nav-item:hover:not(.active) {
+      background: #233545;
+      color: #e0e9f2;
+    }
+
+    .nav-item:active {
+      transform: scale(0.98);
+    }
+
+    .sidebar-footer {
+      border-top: 1px solid #2e4458;
+      padding-top: 20px;
+      margin-top: 12px;
+    }
+
+    .sidebar-footer .nav-item {
+      color: #8faec9;
+    }
+
+    /* ---------- MAIN CONTENT ---------- */
+    .main-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      padding: 24px 32px;
+      overflow-x: auto;
+    }
+
+    /* header */
+    .top-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 28px;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .page-title h1 {
+      font-size: 1.8rem;
+      font-weight: 600;
+      color: #0b1d2e;
+      letter-spacing: -0.02em;
+    }
+
+    .page-title p {
+      color: #5b6f84;
+      font-size: 0.9rem;
+      margin-top: 4px;
+    }
+
+    .page-title p i {
+      color: #d6952c;
+      margin-right: 6px;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .search-box {
+      display: flex;
+      align-items: center;
+      background: white;
+      padding: 8px 16px;
+      border-radius: 40px;
+      gap: 10px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+      border: 1px solid #dae3ec;
+    }
+
+    .search-box i {
+      color: #8da1b5;
+      font-size: 1rem;
+    }
+
+    .search-box input {
+      border: none;
+      outline: none;
+      font-size: 0.9rem;
+      background: transparent;
+      width: 200px;
+      color: #1f3449;
+    }
+
+    .search-box input::placeholder {
+      color: #9bb0c5;
+    }
+
+    .user-profile {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: white;
+      padding: 6px 12px 6px 16px;
+      border-radius: 40px;
+      border: 1px solid #dae3ec;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      user-select: none;
+    }
+
+    .user-profile:hover {
+      border-color: #b0c8e0;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+    }
+
+    .user-profile:active {
+      transform: scale(0.98);
+    }
+
+    .user-profile span {
+      font-weight: 500;
+      font-size: 0.9rem;
+      color: #1f3449;
+    }
+
+    .avatar {
+      background: #1a2b3c;
+      color: #f0b34b;
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      font-weight: 600;
+      font-size: 0.9rem;
+      border: 1px solid #f0b34b40;
+    }
+
+    /* ---------- STATS STRIP ---------- */
+    .stats-strip {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .stat-pill {
+      background: white;
+      border: 1px solid #e9eff6;
+      border-radius: 18px;
+      padding: 16px 18px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
+      transition: all 0.15s ease;
+    }
+
+    .stat-pill:hover {
+      border-color: #cbdae9;
+      transform: translateY(-1px);
+    }
+
+    .stat-pill i {
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 12px;
+      font-size: 1.1rem;
+      background: #fef4e6;
+      color: #d6952c;
+      flex-shrink: 0;
+    }
+
+    .stat-pill .stat-info {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .stat-pill .stat-value {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: #0b1d2e;
+      line-height: 1.1;
+    }
+
+    .stat-pill .stat-label {
+      font-size: 0.78rem;
+      color: #687e94;
+      font-weight: 500;
+      margin-top: 2px;
+    }
+
+    /* ---------- TOOLBAR ---------- */
+    .toolbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 18px;
+      flex-wrap: wrap;
+    }
+
+    .toolbar-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 20px;
+      border-radius: 40px;
+      font-size: 0.88rem;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+      border: 1px solid transparent;
+      transition: all 0.15s ease;
+      white-space: nowrap;
+      text-decoration: none;
+    }
+
+    .btn:active {
+      transform: scale(0.96);
+    }
+
+    .btn-primary {
+      background: #1a2b3c;
+      color: #f0e9df;
+      border-color: #1a2b3c;
+      box-shadow: 0 6px 14px -6px rgba(26, 43, 60, 0.4);
+    }
+
+    .btn-primary:hover {
+      background: #233a50;
+      border-color: #233a50;
+    }
+
+    .btn-primary i {
+      color: #f0b34b;
+    }
+
+    .btn-outline {
+      background: white;
+      border-color: #d0ddee;
+      color: #2a4b6e;
+    }
+
+    .btn-outline:hover {
+      background: #f5f9ff;
+      border-color: #b0c8e0;
+    }
+
+    .btn-outline i {
+      font-size: 0.85rem;
+    }
+
+    .btn-danger {
+      background: white;
+      border-color: #f3cdcd;
+      color: #b13b3b;
+    }
+
+    .btn-danger:hover {
+      background: #fff5f5;
+      border-color: #e8b0b0;
+    }
+
+    .filter-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .filter-select {
+      background: white;
+      border: 1px solid #d0ddee;
+      border-radius: 40px;
+      padding: 9px 16px;
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: #2a4b6e;
+      font-family: inherit;
+      cursor: pointer;
+      outline: none;
+      transition: 0.15s;
+    }
+
+    .filter-select:hover {
+      border-color: #b0c8e0;
+    }
+
+    .filter-select:focus {
+      border-color: #d6952c;
+      box-shadow: 0 0 0 3px rgba(214, 149, 44, 0.12);
+    }
+
+    /* ---------- TABLE SECTION ---------- */
+    .table-section {
+      background: white;
+      border-radius: 24px;
+      border: 1px solid #e9eff6;
+      padding: 8px 0 8px 0;
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.02);
+      overflow: hidden;
+      margin-bottom: 24px;
+    }
+
+    .table-wrapper {
+      overflow-x: auto;
+      padding: 0 4px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 900px;
+    }
+
+    th {
+      text-align: left;
+      padding: 16px 18px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      color: #5d768e;
+      background: #f9fcff;
+      border-bottom: 1px solid #e2ebf4;
+      white-space: nowrap;
+      user-select: none;
+    }
+
+    th.sortable {
+      cursor: pointer;
+    }
+
+    th.sortable:hover {
+      color: #2a4b6e;
+      background: #f0f6fd;
+    }
+
+    th .sort-icon {
+      margin-left: 6px;
+      font-size: 0.65rem;
+      color: #a3b8cc;
+    }
+
+    td {
+      padding: 14px 18px;
+      font-size: 0.88rem;
+      color: #1e3145;
+      border-bottom: 1px solid #edf2f9;
+      white-space: nowrap;
+      vertical-align: middle;
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    tbody tr {
+      transition: background 0.1s;
+    }
+
+    tbody tr:hover {
+      background: #fafdff;
+    }
+
+    .product-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .product-icon {
+      background: #fef4e6;
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 10px;
+      color: #d6952c;
+      font-size: 0.95rem;
+      flex-shrink: 0;
+    }
+
+    .product-name {
+      font-weight: 500;
+      color: #0b1d2e;
+    }
+
+    .product-sku {
+      font-size: 0.75rem;
+      color: #8da1b5;
+      margin-top: 2px;
+      display: block;
+    }
+
+    .stock-badge {
+      background: #e6f3e6;
+      color: #1e6d3a;
+      padding: 4px 12px;
+      border-radius: 40px;
+      font-weight: 500;
+      font-size: 0.78rem;
+      display: inline-block;
+      white-space: nowrap;
+    }
+
+    .stock-badge.low {
+      background: #fff0e0;
+      color: #b1590e;
+    }
+
+    .stock-badge.out {
+      background: #ffe6e6;
+      color: #b13b3b;
+    }
+
+    .qty-cell {
+      font-weight: 600;
+      color: #0b1d2e;
+    }
+
+    .qty-cell .unit {
+      font-weight: 400;
+      color: #8da1b5;
+      font-size: 0.78rem;
+      margin-left: 3px;
+    }
+
+    .price-cell {
+      font-weight: 500;
+      color: #1e3145;
+    }
+
+    .row-actions {
+      display: flex;
+      gap: 6px;
+      justify-content: flex-end;
+    }
+
+    .icon-btn {
+      width: 32px;
+      height: 32px;
+      border-radius: 9px;
+      border: 1px solid #e2ebf4;
+      background: white;
+      color: #5d768e;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.8rem;
+      cursor: pointer;
+      transition: all 0.12s ease;
+      font-family: inherit;
+    }
+
+    .icon-btn:hover {
+      background: #f5f9ff;
+      border-color: #b0c8e0;
+      color: #2a4b6e;
+    }
+
+    .icon-btn:active {
+      transform: scale(0.92);
+    }
+
+    .icon-btn.edit:hover {
+      color: #b1590e;
+      border-color: #f0d0a8;
+      background: #fffaf3;
+    }
+
+    .icon-btn.delete:hover {
+      color: #b13b3b;
+      border-color: #f3cdcd;
+      background: #fff5f5;
+    }
+
+    /* empty state */
+    .empty-state {
+      padding: 60px 24px;
+      text-align: center;
+      color: #8da1b5;
+    }
+
+    .empty-state i {
+      font-size: 3rem;
+      color: #d7e3ef;
+      margin-bottom: 16px;
+      display: block;
+    }
+
+    .empty-state h3 {
+      font-size: 1.1rem;
+      color: #5d768e;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+
+    .empty-state p {
+      font-size: 0.88rem;
+    }
+
+    /* table footer */
+    .table-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 24px 12px 24px;
+      font-size: 0.85rem;
+      color: #5d768e;
+      border-top: 1px solid #edf2f9;
+      margin-top: 4px;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .pagination {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+    }
+
+    .page-btn {
+      background: white;
+      border: 1px solid #dae3ec;
+      width: 32px;
+      height: 32px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.8rem;
+      color: #3b5e7e;
+      cursor: pointer;
+      transition: 0.1s;
+      font-family: inherit;
+    }
+
+    .page-btn.active {
+      background: #1a2b3c;
+      border-color: #1a2b3c;
+      color: white;
+    }
+
+    .page-btn:hover:not(.active):not(:disabled) {
+      background: #f2f7ff;
+      border-color: #b8cee3;
+    }
+
+    .page-btn:active:not(:disabled) {
+      transform: scale(0.94);
+    }
+
+    .page-btn:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    /* ---------- MODAL ---------- */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(11, 29, 46, 0.55);
+      backdrop-filter: blur(3px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      z-index: 1000;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.25s ease;
+    }
+
+    .modal-overlay.open {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .modal {
+      background: white;
+      border-radius: 28px;
+      width: 100%;
+      max-width: 620px;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: 0 32px 80px rgba(0, 0, 0, 0.3);
+      transform: translateY(24px) scale(0.97);
+      transition: all 0.25s cubic-bezier(0.34, 1.4, 0.64, 1);
+    }
+
+    .modal-overlay.open .modal {
+      transform: translateY(0) scale(1);
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 24px 28px 18px 28px;
+      border-bottom: 1px solid #edf2f9;
+      position: sticky;
+      top: 0;
+      background: white;
+      z-index: 2;
+      border-radius: 28px 28px 0 0;
+    }
+
+    .modal-header h2 {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: #0b1d2e;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .modal-header h2 i {
+      color: #d6952c;
+      font-size: 1.1rem;
+    }
+
+    .modal-close {
+      width: 36px;
+      height: 36px;
+      border-radius: 12px;
+      border: 1px solid #e2ebf4;
+      background: white;
+      color: #5d768e;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.95rem;
+      transition: all 0.12s ease;
+      font-family: inherit;
+    }
+
+    .modal-close:hover {
+      background: #fff5f5;
+      border-color: #f3cdcd;
+      color: #b13b3b;
+    }
+
+    .modal-close:active {
+      transform: scale(0.92);
+    }
+
+    .modal-body {
+      padding: 24px 28px 8px 28px;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .form-group.full {
+      grid-column: 1 / -1;
+    }
+
+    .form-group label {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: #3b5e7e;
+      letter-spacing: 0.01em;
+    }
+
+    .form-group label .req {
+      color: #d64545;
+      margin-left: 2px;
+    }
+
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      padding: 11px 14px;
+      border: 1px solid #d0ddee;
+      border-radius: 12px;
+      font-size: 0.9rem;
+      font-family: inherit;
+      color: #1f3449;
+      background: white;
+      outline: none;
+      transition: all 0.15s ease;
+      width: 100%;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+      border-color: #d6952c;
+      box-shadow: 0 0 0 3px rgba(214, 149, 44, 0.13);
+    }
+
+    .form-group input::placeholder,
+    .form-group textarea::placeholder {
+      color: #a3b8cc;
+    }
+
+    .form-group textarea {
+      resize: vertical;
+      min-height: 70px;
+    }
+
+    .input-hint {
+      font-size: 0.72rem;
+      color: #8da1b5;
+      margin-top: 2px;
+    }
+
+    .modal-footer {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      padding: 20px 28px 26px 28px;
+      border-top: 1px solid #edf2f9;
+      margin-top: 16px;
+      flex-wrap: wrap;
+      position: sticky;
+      bottom: 0;
+      background: white;
+      border-radius: 0 0 28px 28px;
+    }
+
+    /* ---------- TOAST ---------- */
+    .toast {
+      position: fixed;
+      bottom: 28px;
+      right: 28px;
+      background: #1a2b3c;
+      color: #f0e9df;
+      padding: 14px 22px;
+      border-radius: 14px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.25);
+      border-left: 4px solid #f0b34b;
+      transform: translateY(120%);
+      opacity: 0;
+      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      z-index: 2000;
+      pointer-events: none;
+      max-width: 340px;
+    }
+
+    .toast.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    .toast i {
+      color: #f0b34b;
+      font-size: 1.1rem;
+      flex-shrink: 0;
+    }
+
+    .toast.error {
+      border-left-color: #e05c5c;
+    }
+
+    .toast.error i {
+      color: #e05c5c;
+    }
+
+    /* ---------- RESPONSIVE ---------- */
+    @media (max-width: 900px) {
+      .sidebar {
+        width: 80px;
+        padding: 28px 8px;
+      }
+
+      .sidebar-brand span,
+      .nav-item span {
+        display: none;
+      }
+
+      .sidebar-brand i {
+        margin: 0 auto;
+      }
+
+      .nav-item {
+        justify-content: center;
+        padding: 14px 0;
+      }
+
+      .nav-item i {
+        font-size: 1.3rem;
+      }
+
+      .sidebar-footer .nav-item span {
+        display: none;
+      }
+
+      .main-content {
+        padding: 20px;
+      }
+    }
+
+    @media (max-width: 700px) {
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .form-group.full {
+        grid-column: 1;
+      }
+    }
+
+    @media (max-width: 600px) {
+      .main-content {
+        padding: 16px;
+      }
+
+      .top-header {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .header-actions {
+        justify-content: space-between;
+        flex-wrap: wrap;
+      }
+
+      .search-box {
+        flex: 1;
+      }
+
+      .search-box input {
+        width: 100%;
+      }
+
+      .user-profile span {
+        display: none;
+      }
+
+      .user-profile {
+        padding: 6px;
+      }
+
+      .toolbar {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .toolbar-left {
+        width: 100%;
+      }
+
+      .filter-group {
+        width: 100%;
+      }
+
+      .filter-select {
+        flex: 1;
+      }
+
+      .table-footer {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .toast {
+        left: 16px;
+        right: 16px;
+        bottom: 16px;
+        max-width: none;
+      }
+
+      .modal-body {
+        padding: 20px 20px 4px 20px;
+      }
+
+      .modal-header {
+        padding: 20px 20px 16px 20px;
+      }
+
+      .modal-footer {
+        padding: 16px 20px 22px 20px;
+      }
+    }
+
+    .no-wrap {
+      white-space: nowrap;
+    }
+  </style>
+</head>
+<body>
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <a href="#" class="sidebar-brand" data-action="Home dashboard">
+      <i class="fas fa-cubes"></i>
+      <span>Maricopa</span>
+    </a>
+
+    <nav class="sidebar-nav">
+      <button class="nav-item" data-action="Dashboard">
+        <i class="fas fa-chart-pie"></i>
+        <span>Dashboard</span>
+      </button>
+      <button class="nav-item active" data-action="Inventory">
+        <i class="fas fa-boxes"></i>
+        <span>Inventory</span>
+      </button>
+      <button class="nav-item" data-action="Orders">
+        <i class="fas fa-truck"></i>
+        <span>Orders</span>
+      </button>
+      <button class="nav-item" data-action="Analytics">
+        <i class="fas fa-chart-line"></i>
+        <span>Analytics</span>
+      </button>
+      <button class="nav-item" data-action="Settings">
+        <i class="fas fa-cog"></i>
+        <span>Settings</span>
+      </button>
+    </nav>
+
+    <div class="sidebar-footer">
+      <button class="nav-item" data-action="Support">
+        <i class="fas fa-circle-question"></i>
+        <span>Support</span>
+      </button>
+      <button class="nav-item" data-action="Logout">
+        <i class="fas fa-right-from-bracket"></i>
+        <span>Logout</span>
+      </button>
+    </div>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <main class="main-content">
+    <!-- HEADER -->
+    <header class="top-header">
+      <div class="page-title">
+        <h1>Inventory</h1>
+        <p><i class="fas fa-hard-hat"></i> Maricopa · Manage your concrete stock</p>
+      </div>
+
+      <div class="header-actions">
+        <div class="search-box">
+          <i class="fas fa-search"></i>
+          <input type="text" id="searchInput" placeholder="Search name, SKU, category...">
+        </div>
+        <div class="user-profile" data-action="User profile">
+          <span>Alex Rivera</span>
+          <div class="avatar">AR</div>
+        </div>
+      </div>
+    </header>
+
+    <!-- STATS STRIP -->
+    <div class="stats-strip">
+      <div class="stat-pill">
+        <i class="fas fa-cubes"></i>
+        <div class="stat-info">
+          <span class="stat-value" id="statTotal">0</span>
+          <span class="stat-label">Total items</span>
+        </div>
+      </div>
+      <div class="stat-pill">
+        <i class="fas fa-warehouse"></i>
+        <div class="stat-info">
+          <span class="stat-value" id="statUnits">0</span>
+          <span class="stat-label">Total units</span>
+        </div>
+      </div>
+      <div class="stat-pill">
+        <i class="fas fa-exclamation-triangle"></i>
+        <div class="stat-info">
+          <span class="stat-value" id="statLow">0</span>
+          <span class="stat-label">Low stock</span>
+        </div>
+      </div>
+      <div class="stat-pill">
+        <i class="fas fa-ban"></i>
+        <div class="stat-info">
+          <span class="stat-value" id="statOut">0</span>
+          <span class="stat-label">Out of stock</span>
+        </div>
+      </div>
+      <div class="stat-pill">
+        <i class="fas fa-coins"></i>
+        <div class="stat-info">
+          <span class="stat-value" id="statValue">KSH 0</span>
+          <span class="stat-label">Stock value</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- TOOLBAR -->
+    <div class="toolbar">
+      <div class="toolbar-left">
+        <button class="btn btn-primary" id="btnAddItem">
+          <i class="fas fa-plus"></i> Add stock item
+        </button>
+        <button class="btn btn-outline" id="btnExport">
+          <i class="fas fa-download"></i> Export CSV
+        </button>
+        <button class="btn btn-danger" id="btnClearAll">
+          <i class="fas fa-trash-can"></i> Clear all
+        </button>
+      </div>
+      <div class="filter-group">
+        <select class="filter-select" id="filterCategory">
+          <option value="">All categories</option>
+          <option value="Ready-mix">Ready-mix</option>
+          <option value="Precast">Precast</option>
+          <option value="Cement">Cement</option>
+          <option value="Chemicals">Chemicals</option>
+          <option value="Aggregates">Aggregates</option>
+          <option value="Steel">Steel</option>
+          <option value="Other">Other</option>
+        </select>
+        <select class="filter-select" id="filterStatus">
+          <option value="">All statuses</option>
+          <option value="in">In stock</option>
+          <option value="low">Low stock</option>
+          <option value="out">Out of stock</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- TABLE SECTION -->
+    <div class="table-section">
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th class="sortable" data-sort="name">Item <span class="sort-icon"><i class="fas fa-sort"></i></span></th>
+              <th class="sortable" data-sort="sku">SKU <span class="sort-icon"><i class="fas fa-sort"></i></span></th>
+              <th class="sortable" data-sort="category">Category <span class="sort-icon"><i class="fas fa-sort"></i></span></th>
+              <th class="sortable" data-sort="quantity">Quantity <span class="sort-icon"><i class="fas fa-sort"></i></span></th>
+              <th class="sortable" data-sort="price">Unit price <span class="sort-icon"><i class="fas fa-sort"></i></span></th>
+              <th class="sortable" data-sort="status">Status <span class="sort-icon"><i class="fas fa-sort"></i></span></th>
+              <th style="text-align:right;">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="inventoryBody">
+            <!-- rows injected by JS -->
+          </tbody>
+        </table>
+        <div class="empty-state" id="emptyState" style="display:none;">
+          <i class="fas fa-box-open"></i>
+          <h3>No inventory items yet</h3>
+          <p>Click "Add stock item" to get started.</p>
+        </div>
+      </div>
+
+      <div class="table-footer">
+        <span id="footerInfo">Showing 0 items</span>
+        <div class="pagination" id="pagination">
+          <!-- pagination buttons injected -->
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- ADD / EDIT MODAL -->
+  <div class="modal-overlay" id="modalOverlay">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <div class="modal-header">
+        <h2 id="modalTitle"><i class="fas fa-boxes-stacked"></i> Add stock item</h2>
+        <button class="modal-close" id="modalClose" aria-label="Close">
+          <i class="fas fa-xmark"></i>
+        </button>
+      </div>
+
+      <form id="itemForm">
+        <div class="modal-body">
+          <div class="form-grid">
+            <div class="form-group full">
+              <label for="itemName">Item name <span class="req">*</span></label>
+              <input type="text" id="itemName" name="name" placeholder="e.g. Ready-Mix Concrete C30/37" required>
+            </div>
+
+            <div class="form-group">
+              <label for="itemSku">SKU <span class="req">*</span></label>
+              <input type="text" id="itemSku" name="sku" placeholder="e.g. MRC-8902" required>
+            </div>
+
+            <div class="form-group">
+              <label for="itemCategory">Category <span class="req">*</span></label>
+              <select id="itemCategory" name="category" required>
+                <option value="" disabled selected>Select category</option>
+                <option value="Ready-mix">Ready-mix</option>
+                <option value="Precast">Precast</option>
+                <option value="Cement">Cement</option>
+                <option value="Chemicals">Chemicals</option>
+                <option value="Aggregates">Aggregates</option>
+                <option value="Steel">Steel</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="itemQuantity">Quantity <span class="req">*</span></label>
+              <input type="number" id="itemQuantity" name="quantity" min="0" step="1" placeholder="e.g. 147" required>
+              <span class="input-hint">Current amount in stock</span>
+            </div>
+
+            <div class="form-group">
+              <label for="itemUnit">Unit</label>
+              <input type="text" id="itemUnit" name="unit" placeholder="e.g. m³, bags, tons, pallets">
+              <span class="input-hint">Measurement unit</span>
+            </div>
+
+            <div class="form-group">
+              <label for="itemPrice">Unit price (KSH) <span class="req">*</span></label>
+              <input type="number" id="itemPrice" name="price" min="0" step="0.01" placeholder="e.g. 8999.00" required>
+            </div>
+
+            <div class="form-group">
+              <label for="itemThreshold">Low-stock threshold</label>
+              <input type="number" id="itemThreshold" name="threshold" min="0" step="1" placeholder="e.g. 10" value="10">
+              <span class="input-hint">Alert when quantity falls below this</span>
+            </div>
+
+            <div class="form-group full">
+              <label for="itemSupplier">Supplier</label>
+              <input type="text" id="itemSupplier" name="supplier" placeholder="e.g. Bamburi Cement Ltd.">
+            </div>
+
+            <div class="form-group full">
+              <label for="itemNotes">Notes</label>
+              <textarea id="itemNotes" name="notes" placeholder="Optional notes about this stock item…"></textarea>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline" id="modalCancel">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="modalSave">
+            <i class="fas fa-check"></i> Save item
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- TOAST -->
+  <div class="toast" id="toast">
+    <i class="fas fa-check-circle" id="toastIcon"></i>
+    <span id="toastMessage">Action completed</span>
+  </div>
+
+  <script>
+    (function() {
+      'use strict';
+
+      // ============================================================
+      // STATE
+      // ============================================================
+      const STORAGE_KEY = 'maricopa_inventory_v1';
+      const PAGE_SIZE = 8;
+
+      let inventory = [];
+      let editingId = null;
+      let currentPage = 1;
+      let sortKey = 'name';
+      let sortDir = 'asc';
+      let filters = { search: '', category: '', status: '' };
+
+      // ============================================================
+      // DOM REFS
+      // ============================================================
+      const tbody = document.getElementById('inventoryBody');
+      const emptyState = document.getElementById('emptyState');
+      const footerInfo = document.getElementById('footerInfo');
+      const pagination = document.getElementById('pagination');
+      const searchInput = document.getElementById('searchInput');
+      const filterCategory = document.getElementById('filterCategory');
+      const filterStatus = document.getElementById('filterStatus');
+      const statTotal = document.getElementById('statTotal');
+      const statUnits = document.getElementById('statUnits');
+      const statLow = document.getElementById('statLow');
+      const statOut = document.getElementById('statOut');
+      const statValue = document.getElementById('statValue');
+
+      const modalOverlay = document.getElementById('modalOverlay');
+      const modalTitle = document.getElementById('modalTitle');
+      const itemForm = document.getElementById('itemForm');
+      const modalSave = document.getElementById('modalSave');
+
+      // ============================================================
+      // TOAST
+      // ============================================================
+      const toast = document.getElementById('toast');
+      const toastMessage = document.getElementById('toastMessage');
+      const toastIcon = document.getElementById('toastIcon');
+      let toastTimeout = null;
+
+      function showToast(message, type = 'success') {
+        if (toastTimeout) clearTimeout(toastTimeout);
+        toastMessage.textContent = message;
+        toastIcon.className = type === 'error' ? 'fas fa-circle-exclamation' : 'fas fa-check-circle';
+        toast.classList.toggle('error', type === 'error');
+        toast.classList.add('show');
+        toastTimeout = setTimeout(() => toast.classList.remove('show'), 2800);
+      }
+
+      // ============================================================
+      // PERSISTENCE
+      // ============================================================
+      function loadInventory() {
+        try {
+          const raw = localStorage.getItem(STORAGE_KEY);
+          inventory = raw ? JSON.parse(raw) : [];
+          if (!Array.isArray(inventory)) inventory = [];
+        } catch (e) {
+          inventory = [];
+        }
+      }
+
+      function saveInventory() {
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(inventory));
+        } catch (e) {
+          showToast('Could not save to storage.', 'error');
+        }
+      }
+
+      // ============================================================
+      // HELPERS
+      // ============================================================
+      function uid() {
+        return 'id_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 8);
+      }
+
+      function formatKSH(n) {
+        const num = Number(n) || 0;
+        return 'KSH ' + num.toLocaleString('en-KE', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      }
+
+      function formatNumber(n) {
+        return Number(n || 0).toLocaleString('en-KE');
+      }
+
+      function getStatus(item) {
+        const qty = Number(item.quantity) || 0;
+        const threshold = Number(item.threshold) || 10;
+        if (qty <= 0) return 'out';
+        if (qty <= threshold) return 'low';
+        return 'in';
+      }
+
+      function statusLabel(status) {
+        return status === 'out' ? 'Out of stock' : status === 'low' ? 'Low stock' : 'In stock';
+      }
+
+      function statusClass(status) {
+        return status === 'out' ? 'stock-badge out' : status === 'low' ? 'stock-badge low' : 'stock-badge';
+      }
+
+      function categoryIcon(category) {
+        const map = {
+          'Ready-mix': 'fa-trowel',
+          'Precast': 'fa-cubes',
+          'Cement': 'fa-truck-loading',
+          'Chemicals': 'fa-water',
+          'Aggregates': 'fa-mountain',
+          'Steel': 'fa-bars',
+          'Other': 'fa-box'
+        };
+        return map[category] || 'fa-box';
+      }
+
+      function escapeHtml(str) {
+        if (str === null || str === undefined) return '';
+        return String(str)
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;')
+          .replace(/'/g, '&#039;');
+      }
+
+      // ============================================================
+      // FILTERING + SORTING
+      // ============================================================
+      function getFilteredItems() {
+        const q = filters.search.trim().toLowerCase();
+        return inventory.filter(item => {
+          // search
+          if (q) {
+            const hay = (
+              (item.name || '') + ' ' +
+              (item.sku || '') + ' ' +
+              (item.category || '') + ' ' +
+              (item.supplier || '')
+            ).toLowerCase();
+            if (!hay.includes(q)) return false;
+          }
+          // category
+          if (filters.category && item.category !== filters.category) return false;
+          // status
+          if (filters.status) {
+            if (getStatus(item) !== filters.status) return false;
+          }
+          return true;
+        });
+      }
+
+      function getSortedItems(items) {
+        const dir = sortDir === 'asc' ? 1 : -1;
+        return items.slice().sort((a, b) => {
+          let av, bv;
+          switch (sortKey) {
+            case 'name':     av = (a.name || '').toLowerCase(); bv = (b.name || '').toLowerCase(); break;
+            case 'sku':      av = (a.sku || '').toLowerCase();  bv = (b.sku || '').toLowerCase(); break;
+            case 'category': av = (a.category || '').toLowerCase(); bv = (b.category || '').toLowerCase(); break;
+            case 'quantity': av = Number(a.quantity) || 0; bv = Number(b.quantity) || 0; break;
+            case 'price':    av = Number(a.price) || 0; bv = Number(b.price) || 0; break;
+            case 'status': {
+              const order = { in: 2, low: 1, out: 0 };
+              av = order[getStatus(a)]; bv = order[getStatus(b)];
+              break;
+            }
+            default: av = ''; bv = '';
+          }
+          if (av < bv) return -1 * dir;
+          if (av > bv) return 1 * dir;
+          return 0;
+        });
+      }
+
+      // ============================================================
+      // STATS
+      // ============================================================
+      function updateStats() {
+        const total = inventory.length;
+        let units = 0, low = 0, out = 0, value = 0;
+
+        inventory.forEach(item => {
+          const qty = Number(item.quantity) || 0;
+          const price = Number(item.price) || 0;
+          units += qty;
+          value += qty * price;
+          const s = getStatus(item);
+          if (s === 'low') low++;
+          if (s === 'out') out++;
+        });
+
+        statTotal.textContent = formatNumber(total);
+        statUnits.textContent = formatNumber(units);
+        statLow.textContent = formatNumber(low);
+        statOut.textContent = formatNumber(out);
+        statValue.textContent = formatKSH(value);
+      }
+
+      // ============================================================
+      // RENDER TABLE
+      // ============================================================
+      function renderTable() {
+        const filtered = getFilteredItems();
+        const sorted = getSortedItems(filtered);
+
+        // pagination bounds
+        const totalPages = Math.max(1, Math.ceil(sorted.length / PAGE_SIZE));
+        if (currentPage > totalPages) currentPage = totalPages;
+        if (currentPage < 1) currentPage = 1;
+
+        const start = (currentPage - 1) * PAGE_SIZE;
+        const pageItems = sorted.slice(start, start + PAGE_SIZE);
+
+        // rows
+        tbody.innerHTML = '';
+        if (pageItems.length === 0) {
+          emptyState.style.display = 'block';
+          tbody.style.display = 'none';
+        } else {
+          emptyState.style.display = 'none';
+          tbody.style.display = '';
+          pageItems.forEach(item => {
+            const status = getStatus(item);
+            const tr = document.createElement('tr');
+            tr.setAttribute('data-id', item.id);
+            tr.innerHTML = `
+              <td>
+                <div class="product-info">
+                  <div class="product-icon"><i class="fas ${categoryIcon(item.category)}"></i></div>
+                  <div>
+                    <div class="product-name">${escapeHtml(item.name)}</div>
+                    <span class="product-sku">${escapeHtml(item.supplier || '')}</span>
+                  </div>
+                </div>
+              </td>
+              <td><span class="no-wrap">${escapeHtml(item.sku)}</span></td>
+              <td>${escapeHtml(item.category)}</td>
+              <td class="qty-cell">${formatNumber(item.quantity)}<span class="unit">${escapeHtml(item.unit || '')}</span></td>
+              <td class="price-cell">${formatKSH(item.price)}</td>
+              <td><span class="${statusClass(status)}">${statusLabel(status)}</span></td>
+              <td>
+                <div class="row-actions">
+                  <button class="icon-btn edit" data-edit="${item.id}" title="Edit item" aria-label="Edit item">
+                    <i class="fas fa-pen"></i>
+                  </button>
+                  <button class="icon-btn delete" data-delete="${item.id}" title="Delete item" aria-label="Delete item">
+                    <i class="fas fa-trash"></i>
+                  </button>
+                </div>
+              </td>
+            `;
+            tbody.appendChild(tr);
+          });
+        }
+
+        // footer info
+        const showing = pageItems.length;
+        footerInfo.textContent = sorted.length === 0
+          ? 'Showing 0 items'
+          : `Showing ${start + 1}–${start + showing} of ${sorted.length} item${sorted.length !== 1 ? 's' : ''}`;
+
+        // pagination controls
+        renderPagination(totalPages);
+
+        // sort icons
+        document.querySelectorAll('th.sortable').forEach(th => {
+          const icon = th.querySelector('.sort-icon i');
+          if (th.dataset.sort === sortKey) {
+            icon.className = sortDir === 'asc' ? 'fas fa-sort-up' : 'fas fa-sort-down';
+            th.style.color = '#d6952c';
+          } else {
+            icon.className = 'fas fa-sort';
+            th.style.color = '';
+          }
+        });
+
+        updateStats();
+      }
+
+      function renderPagination(totalPages) {
+        pagination.innerHTML = '';
+        if (totalPages <= 1) return;
+
+        const prev = document.createElement('button');
+        prev.className = 'page-btn';
+        prev.innerHTML = '<i class="fas fa-chevron-left"></i>';
+        prev.disabled = currentPage === 1;
+        prev.addEventListener('click', () => {
+          if (currentPage > 1) { currentPage--; renderTable(); }
+        });
+        pagination.appendChild(prev);
+
+        // page numbers (max 5 visible)
+        let startPage = Math.max(1, currentPage - 2);
+        let endPage = Math.min(totalPages, startPage + 4);
+        if (endPage - startPage < 4) startPage = Math.max(1, endPage - 4);
+
+        for (let i = startPage; i <= endPage; i++) {
+          const btn = document.createElement('button');
+          btn.className = 'page-btn' + (i === currentPage ? ' active' : '');
+          btn.textContent = i;
+          btn.addEventListener('click', () => { currentPage = i; renderTable(); });
+          pagination.appendChild(btn);
+        }
+
+        const next = document.createElement('button');
+        next.className = 'page-btn';
+        next.innerHTML = '<i class="fas fa-chevron-right"></i>';
+        next.disabled = currentPage === totalPages;
+        next.addEventListener('click', () => {
+          if (currentPage < totalPages) { currentPage++; renderTable(); }
+        });
+        pagination.appendChild(next);
+      }
+
+      // ============================================================
+      // MODAL
+      // ============================================================
+      function openModal(item = null) {
+        editingId = item ? item.id : null;
+        modalTitle.innerHTML = item
+          ? '<i class="fas fa-pen-to-square"></i> Edit stock item'
+          : '<i class="fas fa-boxes-stacked"></i> Add stock item';
+        modalSave.innerHTML = item
+          ? '<i class="fas fa-check"></i> Update item'
+          : '<i class="fas fa-check"></i> Save item';
+
+        itemForm.reset();
+        if (item) {
+          document.getElementById('itemName').value = item.name || '';
+          document.getElementById('itemSku').value = item.sku || '';
+          document.getElementById('itemCategory').value = item.category || '';
+          document.getElementById('itemQuantity').value = item.quantity ?? '';
+          document.getElementById('itemUnit').value = item.unit || '';
+          document.getElementById('itemPrice').value = item.price ?? '';
+          document.getElementById('itemThreshold').value = item.threshold ?? 10;
+          document.getElementById('itemSupplier').value = item.supplier || '';
+          document.getElementById('itemNotes').value = item.notes || '';
+        } else {
+          document.getElementById('itemThreshold').value = 10;
+        }
+
+        modalOverlay.classList.add('open');
+        setTimeout(() => document.getElementById('itemName').focus(), 120);
+      }
+
+      function closeModal() {
+        modalOverlay.classList.remove('open');
+        editingId = null;
+        itemForm.reset();
+      }
+
+      // ============================================================
+      // FORM SUBMIT
+      // ============================================================
+      itemForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        const name = document.getElementById('itemName').value.trim();
+        const sku = document.getElementById('itemSku').value.trim();
+        const category = document.getElementById('itemCategory').value;
+        const quantityRaw = document.getElementById('itemQuantity').value;
+        const unit = document.getElementById('itemUnit').value.trim();
+        const priceRaw = document.getElementById('itemPrice').value;
+        const thresholdRaw = document.getElementById('itemThreshold').value;
+        const supplier = document.getElementById('itemSupplier').value.trim();
+        const notes = document.getElementById('itemNotes').value.trim();
+
+        // validation
+        if (!name) { showToast('Item name is required.', 'error'); return; }
+        if (!sku) { showToast('SKU is required.', 'error'); return; }
+        if (!category) { showToast('Please select a category.', 'error'); return; }
+        if (quantityRaw === '' || Number(quantityRaw) < 0) { showToast('Enter a valid quantity.', 'error'); return; }
+        if (priceRaw === '' || Number(priceRaw) < 0) { showToast('Enter a valid price.', 'error'); return; }
+
+        // duplicate SKU check (excluding current edit)
+        const dup = inventory.find(i =>
+          i.sku.toLowerCase() === sku.toLowerCase() && i.id !== editingId
+        );
+        if (dup) { showToast('SKU "' + sku + '" already exists.', 'error'); return; }
+
+        const payload = {
+          name,
+          sku,
+          category,
+          quantity: Number(quantityRaw),
+          unit: unit || 'units',
+          price: Number(priceRaw),
+          threshold: thresholdRaw === '' ? 10 : Number(thresholdRaw),
+          supplier,
+          notes
+        };
+
+        if (editingId) {
+          const idx = inventory.findIndex(i => i.id === editingId);
+          if (idx !== -1) {
+            inventory[idx] = { ...inventory[idx], ...payload };
+            showToast('Item updated successfully.');
+          }
+        } else {
+          inventory.push({ id: uid(), ...payload, createdAt: Date.now() });
+          showToast('Item added to inventory.');
+        }
+
+        saveInventory();
+        closeModal();
+        currentPage = 1;
+        renderTable();
+      });
+
+      // ============================================================
+      // ROW ACTIONS (event delegation)
+      // ============================================================
+      tbody.addEventListener('click', function(e) {
+        const editBtn = e.target.closest('[data-edit]');
+        const delBtn = e.target.closest('[data-delete]');
+
+        if (editBtn) {
+          const id = editBtn.getAttribute('data-edit');
+          const item = inventory.find(i => i.id === id);
+          if (item) openModal(item);
+          return;
+        }
+
+        if (delBtn) {
+          const id = delBtn.getAttribute('data-delete');
+          const item = inventory.find(i => i.id === id);
+          if (!item) return;
+          if (confirm('Delete "' + item.name + '"? This cannot be undone.')) {
+            inventory = inventory.filter(i => i.id !== id);
+            saveInventory();
+            showToast('Item deleted.');
+            renderTable();
+          }
+        }
+      });
+
+      // ============================================================
+      // TOOLBAR ACTIONS
+      // ============================================================
+      document.getElementById('btnAddItem').addEventListener('click', () => openModal());
+      document.getElementById('btnExport').addEventListener('click', exportCSV);
+      document.getElementById('btnClearAll').addEventListener('click', function() {
+        if (inventory.length === 0) {
+          showToast('Inventory is already empty.', 'error');
+          return;
+        }
+        if (confirm('Delete ALL ' + inventory.length + ' inventory items? This cannot be undone.')) {
+          inventory = [];
+          saveInventory();
+          currentPage = 1;
+          renderTable();
+          showToast('All inventory cleared.');
+        }
+      });
+
+      function exportCSV() {
+        if (inventory.length === 0) {
+          showToast('Nothing to export — inventory is empty.', 'error');
+          return;
+        }
+        const headers = ['Name', 'SKU', 'Category', 'Quantity', 'Unit', 'Unit Price (KSH)', 'Threshold', 'Status', 'Supplier', 'Notes'];
+        const rows = inventory.map(item => [
+          item.name,
+          item.sku,
+          item.category,
+          item.quantity,
+          item.unit,
+          item.price,
+          item.threshold,
+          statusLabel(getStatus(item)),
+          item.supplier || '',
+          item.notes || ''
+        ]);
+        const csv = [headers, ...rows]
+          .map(r => r.map(cell => '"' + String(cell).replace(/"/g, '""') + '"').join(','))
+          .join('\r\n');
+
+        const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'maricopa-inventory-' + new Date().toISOString().slice(0, 10) + '.csv';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        showToast('Inventory exported as CSV.');
+      }
+
+      // ============================================================
+      // FILTERS + SEARCH
+      // ============================================================
+      searchInput.addEventListener('input', function() {
+        filters.search = this.value;
+        currentPage = 1;
+        renderTable();
+      });
+
+      filterCategory.addEventListener('change', function() {
+        filters.category = this.value;
+        currentPage = 1;
+        renderTable();
+      });
+
+      filterStatus.addEventListener('change', function() {
+        filters.status = this.value;
+        currentPage = 1;
+        renderTable();
+      });
+
+      // ============================================================
+      // SORTING (click on headers)
+      // ============================================================
+      document.querySelectorAll('th.sortable').forEach(th => {
+        th.addEventListener('click', function() {
+          const key = this.dataset.sort;
+          if (sortKey === key) {
+            sortDir = sortDir === 'asc' ? 'desc' : 'asc';
+          } else {
+            sortKey = key;
+            sortDir = 'asc';
+          }
+          renderTable();
+        });
+      });
+
+      // ============================================================
+      // MODAL EVENTS
+      // ============================================================
+      document.getElementById('modalClose').addEventListener('click', closeModal);
+      document.getElementById('modalCancel').addEventListener('click', closeModal);
+
+      modalOverlay.addEventListener('click', function(e) {
+        if (e.target === modalOverlay) closeModal();
+      });
+
+      document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && modalOverlay.classList.contains('open')) {
+          closeModal();
+        }
+        // "/" focuses search when not typing in a field
+        if (e.key === '/' && !modalOverlay.classList.contains('open')) {
+          const tag = (document.activeElement.tagName || '').toLowerCase();
+          if (tag !== 'input' && tag !== 'textarea' && tag !== 'select') {
+            e.preventDefault();
+            searchInput.focus();
+          }
+        }
+      });
+
+      // ============================================================
+      // SIDEBAR NAV (visual only, keeps theme consistent)
+      // ============================================================
+      document.querySelectorAll('.nav-item[data-action]').forEach(btn => {
+        btn.addEventListener('click', function() {
+          if (this.classList.contains('active')) return;
+          document.querySelectorAll('.sidebar .nav-item').forEach(n => n.classList.remove('active'));
+          this.classList.add('active');
+          if (this.dataset.action !== 'Inventory') {
+            showToast(this.dataset.action + ' panel — coming soon', 'success');
+          }
+        });
+      });
+
+      document.querySelector('.sidebar-brand').addEventListener('click', function(e) {
+        e.preventDefault();
+        showToast('Maricopa · Concrete stock management', 'success');
+      });
+
+      document.querySelector('.user-profile').addEventListener('click', function() {
+        showToast('Signed in as Alex Rivera (Admin)', 'success');
+      });
+
+      // ============================================================
+      // SEED DATA (only if storage is completely empty — first run)
+      // ============================================================
+      function seedIfEmpty() {
+        if (inventory.length > 0) return;
+        const seeds = [
+          { name: 'Ready-Mix Concrete C30/37', sku: 'MRC-8902', category: 'Ready-mix', quantity: 147, unit: 'm³', price: 8999, threshold: 20, supplier: 'Maricopa Batch Plant', notes: 'High-strength structural mix.' },
+          { name: 'Precast Concrete Blocks 20cm', sku: 'MRC-2341', category: 'Precast', quantity: 8, unit: 'pallets', price: 125, threshold: 10, supplier: 'Maricopa Precast Yard', notes: '' },
+          { name: 'Rapid Set Cement – 25kg', sku: 'MRC-5621', category: 'Cement', quantity: 0, unit: 'bags', price: 1290, threshold: 15, supplier: 'Bamburi Cement Ltd.', notes: 'Urgent restock required.' },
+          { name: 'Concrete Admixture – Superplasticizer', sku: 'MRC-7712', category: 'Chemicals', quantity: 56, unit: 'drums', price: 12950, threshold: 10, supplier: 'Sika Kenya', notes: '' },
+          { name: 'Crushed Limestone Aggregate 20mm', sku: 'MRC-3410', category: 'Aggregates', quantity: 12, unit: 'tons', price: 5999, threshold: 15, supplier: 'Maricopa Quarry', notes: '' },
+          { name: 'Steel Reinforcement Bar 12mm', sku: 'MRC-1150', category: 'Steel', quantity: 240, unit: 'bars', price: 850, threshold: 50, supplier: 'Devki Steel Mills', notes: 'Grade 500.' },
+          { name: 'Concrete Curing Compound 20L', sku: 'MRC-6603', category: 'Chemicals', quantity: 18, unit: 'drums', price: 7400, threshold: 8, supplier: 'Fosroc Kenya', notes: '' }
+        ];
+        inventory = seeds.map(s => ({ id: uid(), ...s, createdAt: Date.now() }));
+        saveInventory();
+      }
+
+      // ============================================================
+      // INIT
+      // ============================================================
+      loadInventory();
+      seedIfEmpty();
+      renderTable();
+    })();
+  </script>
+</body>
+</html>
