@@ -196,6 +196,20 @@ html[data-theme=dark] .pg.active{background:var(--accent);color:#1a2b3c;border-c
 .seg input{position:absolute;opacity:0;pointer-events:none}
 .seg input:checked+label,.seg label:has(input:checked){border-color:var(--accent);background:var(--accent-bg);color:var(--accent-strong)}
 
+/* scanned receipt review */
+.rl{border:1px solid var(--line);border-radius:16px;padding:12px;margin-bottom:10px;background:var(--surface-2)}
+.rl.off{opacity:.55}
+.rl-top{display:flex;gap:10px;align-items:center;margin-bottom:8px}
+.rl-top input[type=checkbox]{width:18px;height:18px;accent-color:var(--accent-strong);flex-shrink:0}
+.rl input[type=text],.rl input[type=number],.rl select{padding:9px 12px;border:1px solid var(--line-2);border-radius:12px;font-size:.9rem;color:var(--text);background:var(--surface);outline:0;width:100%;min-width:0}
+.rl input:focus,.rl select:focus{border-color:var(--accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 22%,transparent)}
+.rl .rl-name{font-weight:600}
+.rl select{margin-bottom:8px}
+.rl-nums{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.rl-nums label{font-size:.7rem;color:var(--text-2);font-weight:600;display:flex;flex-direction:column;gap:3px}
+.chk{display:flex;align-items:center;gap:10px;font-size:.85rem;color:var(--text-2);margin-bottom:14px;cursor:pointer}
+.chk input{width:18px;height:18px;accent-color:var(--accent-strong)}
+
 /* report */
 .sum{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:22px}
 .sum div{background:var(--surface-2);border:1px solid var(--line);border-radius:16px;padding:14px;text-align:center}
@@ -226,7 +240,7 @@ html[data-theme=dark] .pg.active{background:var(--accent);color:#1a2b3c;border-c
 .nav-item.active{box-shadow:inset 0 -3px 0 var(--accent)}
 body{flex-direction:column}.main{padding:18px 16px 96px}
 .toast{bottom:84px}}
-@media(max-width:700px){.grid{grid-template-columns:1fr}.fg.full{grid-column:1}.sum{grid-template-columns:1fr 1fr}}
+@media(max-width:700px){.grid{grid-template-columns:1fr}.fg.full{grid-column:1}.sum{grid-template-columns:1fr 1fr}.rl-nums{grid-template-columns:1fr 1fr}}
 @media(max-width:600px){
 .top{flex-direction:column;align-items:stretch}.top-actions{justify-content:space-between}
 .search{flex:1;min-width:0}.search input{width:100%}.search kbd{display:none}.user span{display:none}.user{padding:5px}
@@ -304,7 +318,7 @@ body{background:#fff!important;color:#000!important;display:block}
   <div class="toolbar">
     <div>
       <button class="btn btn-primary" id="btnAdd"><i class="fas fa-plus"></i> Add stock item</button>
-      <button class="btn btn-scan" id="btnScanReceipt" title="Scan a full receipt — auto-fills name, qty, unit price"><i class="fas fa-receipt"></i> Scan receipt</button>
+      <button class="btn btn-scan" id="btnScanReceipt" title="Scan a full receipt — auto-fills name, qty, unit price, customer"><i class="fas fa-receipt"></i> Scan receipt</button>
       <button class="btn btn-outline" id="btnScan" data-scan="lookup" title="Scan a single barcode / SKU"><i class="fas fa-qrcode"></i> Scan item</button>
       <button class="btn btn-outline" id="btnReport"><i class="fas fa-chart-pie"></i> View report</button>
       <button class="btn btn-danger" id="btnClear"><i class="fas fa-trash-can"></i> Clear all</button>
@@ -368,7 +382,7 @@ body{background:#fff!important;color:#000!important;display:block}
             <select id="fCategory"><option value="" disabled selected>Select category</option>
               <option>Ready-mix</option><option>Precast</option><option>Cement</option><option>Chemicals</option><option>Aggregates</option><option>Steel</option><option>Other</option></select></div>
           <div class="fg"><label for="fQty">Quantity<em>*</em></label><input type="number" id="fQty" min="0" step="any" inputmode="decimal" placeholder="e.g. 147"><span class="hint">Current amount in stock</span></div>
-          <div class="fg"><label for="fUnit">Unit</label><input id="fUnit" list="unitList" placeholder="e.g. m³, bags, tons"><datalist id="unitList"><option>m³</option><option>bags</option><option>tons</option><option>pallets</option><option>pcs</option><option>litres</option></datalist><span class="hint">Measurement unit</span></div>
+          <div class="fg"><label for="fUnit">Unit</label><input id="fUnit" list="unitList" placeholder="e.g. m³, bags, tons"><datalist id="unitList"><option>m³</option><option>bags</option><option>tons</option><option>pallets</option><option>pcs</option><option>litres</option><option>kg</option></datalist><span class="hint">Measurement unit</span></div>
           <div class="fg"><label for="fPrice">Unit price (KSH)<em>*</em></label><input type="number" id="fPrice" min="0" step="0.01" inputmode="decimal" placeholder="e.g. 8999.00"></div>
           <div class="fg"><label for="fThreshold">Low-stock threshold</label><input type="number" id="fThreshold" min="0" step="1" inputmode="numeric" value="10"><span class="hint">Alert when quantity falls to this or below</span></div>
           <div class="fg full"><label for="fSupplier">Supplier</label>
@@ -447,18 +461,27 @@ body{background:#fff!important;color:#000!important;display:block}
   </div>
 </div>
 
-<!-- Receipt review (fallback path if scanner returns ?lines=) -->
+<!-- Scanned receipt review -->
 <div class="overlay" id="receiptModal">
   <div class="panel wide" role="dialog" aria-modal="true" aria-labelledby="receiptTitle">
     <div class="p-head">
       <h2 id="receiptTitle"><i class="fas fa-receipt"></i> Review scanned receipt</h2>
       <div class="meta">
-        <span><i class="fas fa-arrow-down"></i> Mode: <b id="rMode">Stock in</b></span>
+        <span><i class="fas fa-arrow-down" id="rModeIcon"></i> Mode: <b id="rMode">Stock in</b></span>
       </div>
       <button class="chip-btn plain" id="receiptClose" aria-label="Close"><i class="fas fa-xmark"></i></button>
     </div>
     <div class="p-body">
-      <div class="scan-note"><i class="fas fa-circle-info"></i><span>Match each line to an inventory item. Only checked lines will be applied.</span></div>
+      <div class="scan-note"><i class="fas fa-circle-info"></i><span>Match each line to an inventory item (or create a new one). Only checked lines are applied.</span></div>
+      <div class="seg" style="margin-bottom:14px">
+        <label><input type="radio" name="rmode" value="in"> <i class="fas fa-arrow-down"></i> Stock in (receive)</label>
+        <label><input type="radio" name="rmode" value="out"> <i class="fas fa-arrow-up"></i> Stock out (issue)</label>
+      </div>
+      <div class="grid" style="margin-bottom:14px">
+        <div class="fg"><label for="rCustomer">Customer name</label><input id="rCustomer" placeholder="Not found on document" autocomplete="off"></div>
+        <div class="fg"><label for="rRef">Reference / invoice no.</label><input id="rRef" placeholder="Optional" autocomplete="off"></div>
+      </div>
+      <label class="chk" id="rPriceWrap"><input type="checkbox" id="rUpdPrice" checked> Update unit prices from this receipt</label>
       <div id="rLines"></div>
     </div>
     <div class="p-foot">
@@ -478,13 +501,15 @@ body{background:#fff!important;color:#000!important;display:block}
 /* ---------- Config ---------- */
 const API={BASE:'https://stock-backend-3-r6rq.onrender.com',
   url(id){return this.BASE+'/inventory'+(id?'/'+encodeURIComponent(id):'')}};
-/* Scanner hand-off.
+/* Scanner hand-off (scanner.html).
    - Full receipt:  scanner.html?return=inventory.html            (NO `field` param)
-   - Single field:  scanner.html?field=sku|name|supplier|search|lookup&return=inventory.html */
+       -> returns   inventory.html?lines=<double-encoded JSON>&customer=...&reference=...
+   - Single field:  scanner.html?field=sku|name|supplier|search|lookup&return=inventory.html
+       -> returns   inventory.html?field=...&scanned=... */
 const SCANNER_URL='scanner.html';
 const DRAFT_KEY='mrc.inventoryDraft';
 const FIELD_IDS={name:'fName',sku:'fSku',supplier:'fSupplier'};
-const FIELD_LABEL={name:'Item name',sku:'SKU',supplier:'Supplier',search:'Search',lookup:'Scan item'};
+const CATEGORIES=['Ready-mix','Precast','Cement','Chemicals','Aggregates','Steel','Other'];
 
 async function req(url,opt={}){
   let res;
@@ -501,7 +526,8 @@ const Data={
   create:i=>req(API.url(),json('POST',i)),
   update:(id,i)=>req(API.url(id),json('PUT',i)),
   remove:id=>req(API.url(id),{method:'DELETE'}),
-  clear:()=>req(API.url(),{method:'DELETE'})
+  clear:()=>req(API.url(),{method:'DELETE'}),
+  bulk:b=>req(API.url()+'/bulk-movement',json('POST',b))
 };
 
 /* ---------- State ---------- */
@@ -523,6 +549,7 @@ function toast(msg,type='success',ms=3200){
   el.toast.classList.add('show');tt=setTimeout(()=>el.toast.classList.remove('show'),ms);
 }
 const num=n=>Number(n)||0;
+const round2=n=>Math.round(n*100)/100;
 const fmtN=n=>num(n).toLocaleString('en-KE');
 const ksh=n=>'KSH '+num(n).toLocaleString('en-KE',{minimumFractionDigits:2,maximumFractionDigits:2});
 const esc=s=>s==null?'':String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
@@ -538,14 +565,16 @@ function setOnline(ok,msg){
   const was=!online;online=ok;
   $('banner').classList.toggle('show',!ok);
   if(!ok)$('bannerMsg').textContent=msg||'Cannot reach the server. Check your connection and try again.';
-  ['btnAdd','btnClear','btnReport','btnScanReceipt'].forEach(id=>$(id).disabled=!ok);
+  /* Scan receipt stays enabled offline: the scanner page talks to the server itself. */
+  ['btnAdd','btnClear','btnReport'].forEach(id=>$(id).disabled=!ok);
   if(ok&&was)toast('Reconnected to server.');
 }
 function fail(err,label){
+  const det=err&&err.body&&Array.isArray(err.body.details)&&err.body.details.length?' '+err.body.details.join('; '):'';
   if(err&&err.isNetwork){setOnline(false,'Server unreachable — the backend may be waking up. Try again in a few seconds.');toast(label+' failed: server not connected.','error',4200);return}
-  if(err&&err.status===409)return toast(err.message||'SKU already exists.','error');
-  if(err&&err.status===400)return toast('Validation error: '+(err.body&&err.body.details?err.body.details.join(', '):err.message),'error');
-  if(err&&err.status===404)return toast('Item not found — it may have been deleted elsewhere.','error');
+  if(err&&err.status===409)return toast((err.message||'Conflict.')+det,'error',5200);
+  if(err&&err.status===400)return toast('Validation error: '+(det.trim()||err.message),'error');
+  if(err&&err.status===404)return toast((err.message||'Item not found')+det,'error');
   toast((err&&err.message)||label+' failed.','error');
 }
 
@@ -629,6 +658,12 @@ async function load(spin=true){
   catch(e){fail(e,'Loading inventory');inv=[]}
   finally{loading=false;render()}
 }
+/* After a successful bulk change, show the touched rows */
+function showItem(id){
+  F.search='';F.category='';F.status='';el.search.value='';el.cat.value='';el.stat.value='';sync();
+  sortKey='name';sortDir='asc';
+  const pos=sorted(inv).findIndex(i=>i.id===id);page=pos>=0?Math.floor(pos/PAGE)+1:1;flashId=id;render();
+}
 
 /* ---------- Overlays ---------- */
 const open=o=>o.classList.add('open'),close=o=>o.classList.remove('open');
@@ -643,7 +678,7 @@ function gotoScanner(field){
   location.href=SCANNER_URL+'?field='+encodeURIComponent(field)+'&return='+encodeURIComponent('inventory.html');
 }
 function gotoReceiptScanner(){
-  // No `field` param => scanner runs the full receipt pipeline (name / qty / price / total).
+  // No `field` param => scanner runs the full receipt pipeline (name / qty / price / total / customer).
   location.href=SCANNER_URL+'?return='+encodeURIComponent('inventory.html');
 }
 document.addEventListener('click',e=>{
@@ -654,18 +689,20 @@ function readDraft(){
   try{const d=JSON.parse(sessionStorage.getItem(DRAFT_KEY)||'null');sessionStorage.removeItem(DRAFT_KEY);return d}catch(_){return null}
 }
 
-/* ---------- Receipt return handler ---------- */
+/* ---------- Scan return handler ---------- */
 function handleScanReturn(){
   const p=new URLSearchParams(location.search);
 
-  // Path A — scanner returned raw lines (fallback if scanner is configured to hand back data)
+  // Path A — full receipt from scanner.html
   const linesRaw=p.get('lines');
   if(linesRaw){
+    const meta={customer:(p.get('customer')||'').trim(),reference:(p.get('reference')||'').trim()};
     history.replaceState(null,'',location.pathname);
     let lines=[];
-    try{lines=JSON.parse(decodeURIComponent(linesRaw))}catch(_){lines=[]}
+    try{lines=JSON.parse(decodeURIComponent(linesRaw))}
+    catch(_){try{lines=JSON.parse(linesRaw)}catch(__){lines=[]}}
     if(!Array.isArray(lines)||!lines.length){toast('No lines were read from the receipt.','warning');return}
-    openReceiptModal(lines);
+    openReceiptModal(lines,meta);
     return;
   }
 
@@ -686,106 +723,156 @@ function handleScanReturn(){
     else{openModal(null,null,{sku:text});toast('New SKU “'+text+'”. Fill in the details to add it.','warning',4200)}
     return;
   }
+  if(!(field in FIELD_IDS)){toast('Unknown scan field.','warning');return}
   const draftItem=draft&&draft.editId?inv.find(i=>i.id===draft.editId):null;
   openModal(draftItem||null,draft,{[field]:text});
 }
 
-/* ---------- Receipt review modal (Path A fallback) ---------- */
-let receiptLines=[],receiptMode='in';
-function openReceiptModal(lines){
-  receiptLines=lines.map(l=>({
-    name:(l.name||'').trim(),
-    qty:l.qty==null?'':l.qty,
-    price:l.price==null?'':l.price,
-    total:l.total==null?'':l.total,
-    unit:l.unit||'',
-    include:true,
-    itemId:(l.itemId&&inv.some(i=>i.id===l.itemId))?l.itemId:autoMatch(l.name,Number(l.price)||0)
-  }));
-  receiptMode=localStorage.getItem('mrc.receiptMode')==='out'?'out':'in';
+/* ---------- Scanned receipt review ---------- */
+let receiptLines=[],receiptMode='in',receiptBusy=false;
+const toks=s=>String(s||'').toLowerCase().replace(/[^a-z0-9.]+/g,' ').split(' ').filter(w=>w.length>1);
+function autoMatch(name,price){
+  const a=toks(name);if(!a.length||!inv.length)return '';
+  const low=String(name).toLowerCase();let best=0,bid='';
+  inv.forEach(it=>{
+    let s=0;const b=toks(it.name);
+    if(it.sku&&low.includes(String(it.sku).toLowerCase()))s=1;
+    else if(b.length){const sa=new Set(a);s=2*b.filter(w=>sa.has(w)).length/(a.length+b.length)}
+    const p=num(it.price);if(price>0&&p>0&&Math.abs(price-p)/p<0.02)s+=0.15;
+    if(s>best){best=s;bid=it.id}
+  });
+  return best>=0.55?bid:'';
+}
+function guessCat(n){
+  n=String(n||'').toLowerCase();
+  if(/ready.?mix|concrete|c\d{2}\/\d{2}/.test(n))return'Ready-mix';
+  if(/cement|opc|ppc/.test(n))return'Cement';
+  if(/steel|rebar|\by\d{1,2}\b|mesh|\bbar\b|bars|binding|wire|angle|\brod/.test(n))return'Steel';
+  if(/ballast|sand|aggregate|quarry|hardcore|gravel|chips|murram|stone/.test(n))return'Aggregates';
+  if(/admix|plasticizer|plasticiser|chemical|additive|sealant|bonding|waterproof/.test(n))return'Chemicals';
+  if(/precast|block|slab|paver|kerb|culvert|post/.test(n))return'Precast';
+  return'Other';
+}
+function setReceiptMode(m){
+  receiptMode=m==='out'?'out':'in';
+  try{localStorage.setItem('mrc.receiptMode',receiptMode)}catch(_){}
   $('rMode').textContent=receiptMode==='out'?'Stock out (issue)':'Stock in (receive)';
+  $('rModeIcon').className='fas '+(receiptMode==='out'?'fa-arrow-up':'fa-arrow-down');
+  $('rPriceWrap').hidden=receiptMode==='out';
+  $('receiptApply').innerHTML='<i class="fas fa-check"></i> '+(receiptMode==='out'?'Issue from inventory':'Add to inventory');
+  document.querySelectorAll('input[name=rmode]').forEach(r=>r.checked=r.value===receiptMode);
+}
+function openReceiptModal(lines,meta){
+  meta=meta||{};
+  receiptLines=lines.map(l=>{
+    const name=String(l.name||'').trim(),price=l.price==null?'':l.price;
+    return{name,qty:l.qty==null?'':l.qty,price,total:l.total==null?'':l.total,unit:l.unit||'',include:true,
+      category:guessCat(name),
+      itemId:(l.itemId&&inv.some(i=>i.id===l.itemId))?l.itemId:autoMatch(name,Number(price)||0)};
+  });
+  $('rCustomer').value=meta.customer||'';$('rRef').value=meta.reference||'';
+  setReceiptMode(localStorage.getItem('mrc.receiptMode')==='out'?'out':'in');
   renderReceiptLines();
   open($('receiptModal'));
 }
-function autoMatch(name,price){
-  const n=String(name||'').toLowerCase().replace(/[^a-z0-9.]+/g,' ').trim();
-  if(!n)return '';
-  let best=0,bid='';
-  inv.forEach(it=>{
-    const t=String(it.name||'').toLowerCase().replace(/[^a-z0-9.]+/g,' ').trim();
-    const s=t.includes(n)||n.includes(t)?0.8:0;
-    const p=Number(it.price)||0;
-    if(price>0&&p>0&&Math.abs(price-p)/p<0.02&&s+0.2>best){best=s+0.2;bid=it.id}
-    else if(s>best){best=s;bid=it.id}
-  });
-  return best>=0.5?bid:'';
-}
 function renderReceiptLines(){
   const host=$('rLines');
-  if(!receiptLines.length){host.innerHTML='<p style="color:var(--text-3);padding:18px 0">No lines.</p>';$('rSummary').textContent='0 lines';return}
-  const opts=inv.slice().sort((a,b)=>String(a.name).localeCompare(b.name));
+  if(!receiptLines.length){host.innerHTML='<p style="color:var(--text-3);padding:18px 0">No lines.</p>';$('rSummary').textContent='0 lines';$('receiptApply').disabled=true;return}
+  const opts=inv.slice().sort((a,b)=>String(a.name).localeCompare(String(b.name)));
   host.innerHTML=receiptLines.map((l,i)=>{
-    const matchOpts='<option value="">— Pick item —</option>'+opts.map(it=>
-      `<option value="${esc(it.id)}"${it.id===l.itemId?' selected':''}>${esc(it.name)} · ${esc(it.sku)}</option>`).join('');
-    return `<div class="line" data-i="${i}" style="border:1px solid var(--line);border-radius:14px;padding:12px;margin-bottom:10px;background:var(--surface-2)">
-      <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px">
-        <input type="checkbox" data-f="include"${l.include?' checked':''} style="width:18px;height:18px">
-        <input data-f="name" value="${esc(l.name)}" placeholder="Item name" style="flex:1;font-weight:600">
+    if(receiptMode==='out'&&l.itemId==='__new')l.itemId='';
+    const matchOpts='<option value="">— Pick item —</option>'
+      +(receiptMode==='in'?`<option value="__new"${l.itemId==='__new'?' selected':''}>+ Create as new item</option>`:'')
+      +opts.map(it=>`<option value="${esc(it.id)}"${it.id===l.itemId?' selected':''}>${esc(it.name)} · ${esc(it.sku)}</option>`).join('');
+    const cats=CATEGORIES.map(c=>`<option${c===l.category?' selected':''}>${c}</option>`).join('');
+    return `<div class="rl${l.include?'':' off'}" data-i="${i}">
+      <div class="rl-top">
+        <input type="checkbox" data-f="include"${l.include?' checked':''} aria-label="Include this line">
+        <input type="text" class="rl-name" data-f="name" value="${esc(l.name)}" placeholder="Item name">
       </div>
-      <select data-f="itemId" style="margin-bottom:8px">${matchOpts}</select>
-      <div style="display:grid;grid-template-columns:1fr 1fr 1.3fr;gap:8px">
-        <label style="font-size:.7rem;color:var(--text-2)">Qty<input type="number" step="any" data-f="qty" value="${esc(l.qty)}" style="margin-top:3px"></label>
-        <label style="font-size:.7rem;color:var(--text-2)">Unit price<input type="number" step="any" data-f="price" value="${esc(l.price)}" style="margin-top:3px"></label>
-        <label style="font-size:.7rem;color:var(--text-2)">Total<input type="number" step="any" data-f="total" value="${esc(l.total)}" style="margin-top:3px"></label>
+      <select data-f="itemId" aria-label="Inventory item">${matchOpts}</select>
+      ${l.itemId==='__new'?`<select data-f="category" aria-label="Category for new item">${cats}</select>`:''}
+      <div class="rl-nums">
+        <label>Qty<input type="number" step="any" inputmode="decimal" data-f="qty" value="${esc(l.qty)}"></label>
+        <label>Unit<input type="text" list="unitList" data-f="unit" value="${esc(l.unit)}"></label>
+        <label>Unit price<input type="number" step="any" inputmode="decimal" data-f="price" value="${esc(l.price)}"></label>
+        <label>Total<input type="number" step="any" inputmode="decimal" data-f="total" value="${esc(l.total)}"></label>
       </div>
     </div>`;
   }).join('');
   updateReceiptSummary();
 }
 function updateReceiptSummary(){
-  const sel=receiptLines.filter(l=>l.include);
-  $('rSummary').textContent=sel.length+' of '+receiptLines.length+' lines selected';
-  $('receiptApply').disabled=!sel.length;
+  const sel=receiptLines.filter(l=>l.include),sum=sel.reduce((a,l)=>a+num(l.total),0);
+  $('rSummary').textContent=sel.length+' of '+receiptLines.length+' lines selected'+(sum?' · '+ksh(sum):'');
+  $('receiptApply').disabled=!sel.length||receiptBusy;
 }
 $('rLines').addEventListener('input',e=>{
-  const t=e.target,f=t.dataset.f,w=t.closest('.line');if(!w||!f)return;
-  const i=+w.dataset.i,l=receiptLines[i];if(!l)return;
-  l[f]=t.type==='checkbox'?t.checked:t.value;
+  const t=e.target,f=t.dataset.f,w=t.closest('.rl');if(!w||!f)return;
+  const l=receiptLines[+w.dataset.i];if(!l)return;
+  if(f==='include'){l.include=t.checked;w.classList.toggle('off',!l.include);return updateReceiptSummary()}
+  l[f]=t.value;
   if(f==='qty'||f==='price'){
-    const q=Number(l.qty)||0,p=Number(l.price)||0;
-    if(q>0&&p>0){l.total=Math.round(q*p*100)/100;const ti=w.querySelector('[data-f=total]');if(ti)ti.value=l.total}
+    const q=num(l.qty),p=num(l.price);
+    if(q>0&&p>0){l.total=round2(q*p);const ti=w.querySelector('[data-f=total]');if(ti)ti.value=l.total}
+  }
+  if(f==='total'){
+    const q=num(l.qty),tot=num(l.total);
+    if(q>0&&tot>0){l.price=round2(tot/q);const pi=w.querySelector('[data-f=price]');if(pi)pi.value=l.price}
   }
   updateReceiptSummary();
 });
 $('rLines').addEventListener('change',e=>{
   const t=e.target;if(t.dataset.f!=='itemId')return;
-  const w=t.closest('.line'),l=receiptLines[+w.dataset.i];if(l)l.itemId=t.value;
+  const l=receiptLines[+t.closest('.rl').dataset.i];if(!l)return;
+  l.itemId=t.value;
+  const it=inv.find(i=>i.id===t.value);if(it&&!l.unit)l.unit=it.unit||'';
+  renderReceiptLines();
 });
+document.querySelectorAll('input[name=rmode]').forEach(r=>r.onchange=()=>{setReceiptMode(r.value);renderReceiptLines()});
+
+function genSku(){
+  for(let t=0;t<30;t++){const s='MRC-'+Math.floor(1000+Math.random()*9000);if(!findSku(s))return s}
+  return'MRC-'+Date.now().toString().slice(-7);
+}
+async function createFromLine(l){
+  for(let t=0;t<4;t++){
+    try{
+      const it=await Data.create({name:l.name.trim(),sku:genSku(),category:l.category||'Other',quantity:0,unit:l.unit||'units',
+        price:num(l.price),threshold:10,supplier:'',notes:'Created from a scanned document'});
+      inv.push(it);return it;
+    }catch(err){if(err.status!==409||t===3)throw err}
+  }
+}
 async function applyReceipt(){
+  if(receiptBusy)return;
+  if(!online)return toast('Server is offline. Retry once it is connected.','warning');
   const sel=receiptLines.filter(l=>l.include);
   if(!sel.length)return toast('Select at least one line.','error');
-  const bad=sel.find(l=>!l.itemId||!(Number(l.qty)>0));
-  if(bad)return toast('Every selected line needs an item and a quantity.','error');
+  const bad=sel.find(l=>!l.name.trim()||!l.itemId||!(Number(l.qty)>0));
+  if(bad)return toast('Every selected line needs a name, an item (or "Create as new item") and a quantity.','error');
   if(!confirm(`Apply ${sel.length} line(s) as ${receiptMode==='out'?'stock out':'stock in'}?`))return;
+  receiptBusy=true;
   const btn=$('receiptApply');btn.disabled=true;btn.innerHTML='<i class="fas fa-spinner fa-spin"></i> Applying…';
-  let ok=0,fail=0,failMsg='';
-  for(const l of sel){
-    const it=inv.find(i=>i.id===l.itemId);if(!it)continue;
-    const q=Number(l.qty)||0,cur=num(it.quantity),next=receiptMode==='out'?cur-q:cur+q;
-    if(next<0){fail++;failMsg='Not enough stock for '+it.name;continue}
-    const payload={name:it.name,sku:it.sku,category:it.category,quantity:next,unit:it.unit||'units',
-      price:receiptMode==='in'&&Number(l.price)>0?Number(l.price):num(it.price),
-      threshold:thr(it),supplier:it.supplier||'',notes:it.notes||''};
-    try{
-      const u=await Data.update(it.id,payload);
-      const x=inv.findIndex(r=>r.id===it.id);if(x!==-1)inv[x]={...it,...(u||{}),...payload};
-      ok++;
-    }catch(err){fail++;failMsg=err.message}
+  try{
+    for(const l of sel.filter(x=>x.itemId==='__new')){const it=await createFromLine(l);l.itemId=it.id}
+    const customer=$('rCustomer').value.trim(),reference=$('rRef').value.trim();
+    const note=[customer?'Customer: '+customer:'','Scanned document'].filter(Boolean).join(' · ');
+    const res=await Data.bulk({type:receiptMode,reference,note,source:'scanner',
+      lines:sel.map(l=>({id:l.itemId,quantity:num(l.qty),
+        price:num(l.price)>0?num(l.price):undefined,
+        updatePrice:receiptMode==='in'&&$('rUpdPrice').checked&&num(l.price)>0}))});
+    (res.items||[]).forEach(u=>{const x=inv.findIndex(i=>i.id===u.id);if(x!==-1)inv[x]={...inv[x],...u};else inv.push(u)});
+    setOnline(true);close($('receiptModal'));
+    showItem(res.items&&res.items[0]?res.items[0].id:null);
+    toast(`${sel.length} line(s) applied.`+(customer?' Customer: '+customer+'.':''));
+  }catch(err){
+    console.error(err);
+    renderReceiptLines();
+    fail(err,'Applying receipt');
+  }finally{
+    receiptBusy=false;btn.innerHTML='<i class="fas fa-check"></i> '+(receiptMode==='out'?'Issue from inventory':'Add to inventory');updateReceiptSummary();
   }
-  btn.disabled=false;btn.innerHTML='<i class="fas fa-check"></i> Apply to inventory';
-  close($('receiptModal'));
-  setOnline(true);render();
-  toast(fail?`${ok} applied, ${fail} failed (${failMsg}).`:`${ok} line(s) applied.`,fail?'error':'success');
 }
 $('receiptApply').onclick=applyReceipt;
 $('receiptClose').onclick=$('receiptCancel').onclick=()=>close($('receiptModal'));
@@ -795,7 +882,7 @@ $('receiptModal').addEventListener('mousedown',e=>{if(e.target===$('receiptModal
 const FIELD_ORDER=['fName','fSku','fCategory','fQty','fUnit','fPrice','fThreshold','fSupplier','fNotes'];
 function clearErrors(){FIELD_ORDER.forEach(id=>$(id).classList.remove('bad'));$('skuHint').textContent='';$('skuHint').className='hint'}
 function openModal(item,draft,scanned){
-  if(!online){toast('Cannot edit while the server is offline.','warning');return}
+  if(!online&&!scanned&&!draft){toast('Cannot edit while the server is offline.','warning');return}
   editId=item?item.id:(draft&&draft.editId)||null;
   const it=item||(editId?inv.find(i=>i.id===editId):null);
   $('modalTitle').innerHTML=editId?'<i class="fas fa-pen-to-square"></i> Edit stock item':'<i class="fas fa-boxes-stacked"></i> Add stock item';
@@ -979,6 +1066,8 @@ matchMedia('(prefers-color-scheme: dark)').addEventListener('change',ev=>{
   if((localStorage.getItem('mrc.themeMode')||'system')!=='system')return;
   ev.matches?document.documentElement.setAttribute('data-theme','dark'):document.documentElement.removeAttribute('data-theme');
 });
+/* Back button from the scanner can restore a stale page from cache: refresh data */
+addEventListener('pageshow',e=>{if(e.persisted)load(false)});
 
 /* ---------- Boot ---------- */
 load().then(handleScanReturn);
