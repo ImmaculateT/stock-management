@@ -29,16 +29,20 @@ header h1{font-size:1.5rem;letter-spacing:-.02em}header p{color:var(--tx2);font-
 .banner.show{display:flex}.banner.info{background:var(--acb);border-color:var(--ac);color:var(--tx)}.banner button{margin-left:auto;background:var(--dg);color:#fff;border:0;padding:7px 16px;border-radius:40px;font-weight:600;cursor:pointer}
 .card{background:var(--sf);border:1px solid var(--bd);border-radius:22px;padding:20px;box-shadow:var(--sh);margin-bottom:16px}
 .card h2{font-size:1.05rem;margin-bottom:14px;display:flex;align-items:center;gap:10px}.card h2 i{color:var(--acs)}
-.seg{display:inline-flex;background:var(--sf);border:1px solid var(--bd2);border-radius:40px;padding:4px}
-.seg button{border:0;background:transparent;color:var(--tx2);padding:9px 18px;border-radius:40px;font-weight:600;font-size:.85rem;cursor:pointer}
+.seg{display:inline-flex;background:var(--sf);border:1px solid var(--bd2);border-radius:40px;padding:4px;gap:2px}
+.seg button{border:0;background:transparent;color:var(--tx2);padding:10px 18px;border-radius:40px;font-weight:600;font-size:.85rem;cursor:pointer;display:inline-flex;align-items:center;gap:7px;transition:.15s}
 .seg button.on{background:var(--navy);color:#fff}
+.seg button.on i{color:var(--ac)}
+.seg button:not(.on):hover{color:var(--tx)}
+#modeHint{font-size:.78rem;color:var(--tx2);margin-top:8px}
+#modeHint b{color:var(--tx)}
 .actions{display:flex;gap:10px;flex-wrap:wrap}.actions .btn{flex:1;min-width:140px}
 #preview{display:none;margin-top:16px;text-align:center}#preview canvas{max-width:100%;max-height:340px;border-radius:14px;border:1px solid var(--bd2)}
 .pv-actions{display:flex;gap:8px;justify-content:center;margin-top:10px;flex-wrap:wrap}
 .prog{display:none;margin-top:14px}.prog .bar{height:8px;background:var(--bd);border-radius:8px;overflow:hidden}.prog .bar div{height:100%;width:0;background:var(--ac);transition:width .2s}.prog p{font-size:.82rem;color:var(--tx2);margin-top:6px}
 details{margin-top:14px}summary{cursor:pointer;font-size:.85rem;color:var(--tx2);font-weight:600}
 textarea{width:100%;min-height:110px;margin-top:8px;padding:10px 12px;border:1px solid var(--bd2);border-radius:12px;background:var(--sf);color:var(--tx);font:.82rem ui-monospace,Menlo,monospace}
-.line{border:1px solid var(--bd);border-radius:16px;padding:12px;margin-bottom:10px;background:var(--sf2);border-left:4px solid var(--ok)}
+.line{border:1px solid var(--bd);border-radius:16px;padding:12px;margin-bottom:10px;background:var(--sf2);border-left:4px solid var(--ok);transition:.15s}
 .line.warn{border-left-color:var(--ac)}.line.bad{border-left-color:var(--dg)}.line.off{opacity:.5}
 .crop{display:block;width:100%;max-height:64px;object-fit:contain;object-position:left;background:#fff;border:1px solid var(--bd2);border-radius:8px;margin-bottom:10px}
 .l-top{display:flex;gap:8px;align-items:center;margin-bottom:8px}.l-top input[type=checkbox]{width:20px;height:20px;accent-color:var(--acs);flex-shrink:0}
@@ -59,7 +63,7 @@ input:focus,select:focus{border-color:var(--ac);box-shadow:0 0 0 3px rgba(240,17
 .chip:hover,.chip.on{border-color:var(--ac);background:var(--acb)}
 .toast{position:fixed;left:50%;bottom:24px;transform:translate(-50%,150%);background:var(--navy);color:#f0e9df;padding:13px 20px;border-radius:14px;border-left:4px solid var(--ac);font-size:.88rem;font-weight:500;z-index:50;transition:.3s;max-width:92vw;display:flex;gap:10px;align-items:center}
 .toast.show{transform:translate(-50%,0)}.toast.error{border-left-color:var(--dg)}
-@media(max-width:520px){.nums{grid-template-columns:1fr 1fr}.nums label:last-child{grid-column:1/-1}.btn.big{width:100%}}
+@media(max-width:520px){.nums{grid-template-columns:1fr 1fr}.nums label:last-child{grid-column:1/-1}.btn.big{width:100%}.seg{width:100%}.seg button{flex:1;justify-content:center;font-size:.8rem;padding:10px 8px}}
 @media(prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 </head>
@@ -74,8 +78,13 @@ input:focus,select:focus{border-color:var(--ac);box-shadow:0 0 0 3px rgba(240,17
 
   <div class="card">
     <h2><i class="fas fa-camera"></i> 1. Capture <span id="capWhat">receipt</span></h2>
-    <div style="margin-bottom:14px" id="modeRow"><div class="seg" id="modeSeg">
-      <button data-mode="in" class="on">Stock in (delivery)</button><button data-mode="out">Stock out (sale / issue)</button></div></div>
+    <div style="margin-bottom:14px" id="modeRow">
+      <div class="seg" id="modeSeg" role="tablist" aria-label="Stock direction">
+        <button data-mode="in" class="on" role="tab" aria-selected="true"><i class="fas fa-arrow-down"></i> Stock in (delivery)</button>
+        <button data-mode="out" role="tab" aria-selected="false"><i class="fas fa-arrow-up"></i> Stock out (sale / issue)</button>
+      </div>
+      <div id="modeHint">Quantities will be <b>added</b> to the current balance.</div>
+    </div>
     <div class="actions">
       <button class="btn pri big" id="btnCam"><i class="fas fa-camera"></i> Take photo</button>
       <button class="btn big" id="btnUp"><i class="fas fa-image"></i> Upload image</button>
@@ -167,7 +176,6 @@ function canon(u){u=String(u||'').toLowerCase().replace(/[^a-z0-9³]/g,'').repla
 
 /* ================= number reading ================= */
 function near(a,b){return Math.abs(a-b)<=Math.max(.5,Math.abs(b)*.006)}
-// Fix typical OCR confusions inside numeric-looking tokens (O→0, l→1, S→5 …) then parse
 function toNum(t){
   t=String(t).trim().replace(/[.,:;]+$/,'');
   if(!/^[\dOolI|SBZ.,]+$/.test(t)||!/\d/.test(t))return null;
@@ -177,41 +185,68 @@ function toNum(t){
   else t=t.replace(/,/g,'');
   return /^\d+(\.\d+)?$/.test(t)?parseFloat(t):null;
 }
-// Decide which number is qty / unit price / total using arithmetic (q × p = t)
+// Brute-force: try every triple of trailing numbers to find q × p = t
+// Handles receipts with 1–4 trailing numbers and optional line-number prefix
 function assign(n,lead){
-  var a,b,c;
-  if(n.length>=3){a=n[n.length-3];b=n[n.length-2];c=n[n.length-1];
-    if(near(a*b,c)){return (a%1&&!(b%1))?{q:b,p:a,t:c,ok:1}:{q:a,p:b,t:c,ok:1}}
-    if(near(b*c,a))return{q:b,p:c,t:a,ok:1};
-    return{q:a,p:b,t:c,ok:0};
+  if(!n.length)return null;
+  var tail=n.slice(-4),best=null,i,j,k;
+  // 1) Find any triple where a*b ≈ c
+  for(i=0;i<tail.length;i++)for(j=0;j<tail.length;j++)for(k=0;k<tail.length;k++){
+    if(i===j||j===k||i===k)continue;
+    var a=tail[i],b=tail[j],c=tail[k];
+    if(a>0&&b>0&&c>0&&near(a*b,c)){
+      // prefer smaller-integer qty × larger price = total
+      var q=a,p=b,t=c;
+      if(Number.isInteger(b)&&!Number.isInteger(a)){q=b;p=a}
+      if(!best||Math.abs(a*b-c)<Math.abs(best.q*best.p-best.t))
+        best={q:q,p:p,t:t,ok:1};
+    }
   }
-  a=n[0];b=n[1];
-  if(lead!=null&&near(lead*a,b))return{q:lead,p:a,t:b,ok:1,lead:1};
-  return{q:a,p:a>0?r2(b/a):0,t:b,ok:0,derived:1};
+  if(best)return best;
+  // 2) Lead qty on line: "5  Pieces  1,200  6,000"
+  if(lead!=null&&n.length>=2&&near(lead*n[n.length-2],n[n.length-1]))
+    return{q:lead,p:n[n.length-2],t:n[n.length-1],ok:1,lead:1};
+  // 3) Two numbers: assume last = total, derive unit price (flagged)
+  if(n.length>=2){
+    var t=n[n.length-1],p=n[n.length-2];
+    if(p>0)return{q:r2(t/p),p:p,t:t,ok:0,derived:1};
+    return{q:1,p:t,t:t,ok:0,derived:1};
+  }
+  // 4) Single number — qty only, user fills the rest
+  return{q:n[0],p:0,t:0,ok:0,derived:1};
 }
-var UNITS=/^(bags?|pcs?|pieces?|nos?|tons?|tonnes?|kgs?|ltrs?|litres?|liters?|m3|m³|pallets?|lengths?|rolls?|sheets?|trips?|tins?|buckets?|bundles?)$/i;
+var UNITS=/^(bags?|pcs?|pieces?|nos?|tons?|tonnes?|kgs?|kilos?|ltrs?|litres?|liters?|m3|m³|pallets?|lengths?|rolls?|sheets?|trips?|tins?|buckets?|bundles?|drum|drums|cartons?|boxes?|box|pkt|packets?)$/i;
 var SKIP=/\b(sub\s?total|total|vat|tax|change|cash|balance|amount|tendered|mpesa|card|date|receipt|invoice|tel|thank|served|discount)\b/i;
 var JUNK=/^([x×@=*:\-]|ksh\.?|kes\.?|sh\.?|\/=)$/i;
 
 function parseTokens(tk){
   var t=[];
-  tk.forEach(function(w){var m=w.t.match(/^(\d+[.,]?\d*)[x×*@](\d.*)$/i);
+  tk.forEach(function(w){var m=w.t.match(/^(\d+[.,]?\d*)\s*[x×*@]\s*(\d.*)$/i);
     if(m){t.push({t:m[1],b:w.b});t.push({t:m[2],b:w.b})}else t.push(w)});
   t=t.filter(function(w){return w.t&&!JUNK.test(w.t)});
   var tail=[];
-  while(t.length&&tail.length<3){var v=toNum(t[t.length-1].t);if(v==null)break;var w=t.pop();tail.unshift({v:v,b:w.b})}
-  if(tail.length<2)return null;
+  while(t.length&&tail.length<4){var v=toNum(t[t.length-1].t);if(v==null)break;var w=t.pop();tail.unshift({v:v,b:w.b})}
+  if(!tail.length)return null;
   var unit='';
   if(t.length>1&&UNITS.test(t[t.length-1].t))unit=t.pop().t;
   var lead=null;
-  if(t.length>1&&tail.length===2){var lv=toNum(t[0].t);if(lv!=null&&lv>0&&lv<10000&&!/[.)]$/.test(t[0].t)){lead=lv}}
+  if(t.length>1&&tail.length>=2){
+    var lv=toNum(t[0].t);
+    if(lv!=null&&lv>0&&lv<10000&&!/[.)]$/.test(t[0].t))lead=lv;
+  }
   var n=tail.map(function(x){return x.v}),a=assign(n,lead);
+  if(!a)return null;
   var nameToks=t.slice();if(a.lead)nameToks.shift();
-  var name=nameToks.map(function(w){return w.t}).join(' ').replace(/^\d{1,2}[.)]\s*/,'').replace(/[^\w\s\-\/.()%'"×]/g,' ').replace(/\s+/g,' ').trim();
+  var name=nameToks.map(function(w){return w.t}).join(' ')
+    .replace(/^\d{1,2}[.)]\s*/,'')
+    .replace(/[^\w\s\-\/.()%'"×]/g,' ')
+    .replace(/\s+/g,' ').trim();
   var xs=tail.map(function(x){return x.b}).filter(Boolean);
   return{name:name,unit:unit,q:a.q,p:a.p,t:a.t,ok:a.ok,derived:a.derived,lead:lead,
-    nb:xs.length?{x0:Math.min.apply(0,xs.map(function(b){return b.x0})),x1:Math.max.apply(0,xs.map(function(b){return b.x1})),
-      y0:Math.min.apply(0,xs.map(function(b){return b.y0})),y1:Math.max.apply(0,xs.map(function(b){return b.y1}))}:null};
+    nb:xs.length?{x0:Math.min.apply(0,xs.map(function(b){return b.x0})),
+                  x1:Math.max.apply(0,xs.map(function(b){return b.x1})),
+                  y0:Math.min.apply(0,xs.map(function(b){return b.y0})),
+                  y1:Math.max.apply(0,xs.map(function(b){return b.y1}))}:null};
 }
 function lastNum(tk){for(var i=tk.length-1;i>=0;i--){var v=toNum(tk[i].t);if(v!=null)return v}return null}
 
@@ -227,7 +262,7 @@ function parseData(data){
     var p=parseTokens(tk);
     if(!p){pend=(/[a-z]{3,}/i.test(txt)&&!/\d{3,}/.test(txt))?{name:txt.replace(/[^\w\s\-\/.()%'"]/g,' ').trim(),b:L.bbox}:null;return}
     var bb={x0:L.bbox.x0,x1:L.bbox.x1,y0:L.bbox.y0,y1:L.bbox.y1};
-    if(!/[a-z]{2}/i.test(p.name)){ // wrapped receipts: name on the previous line
+    if(!/[a-z]{2}/i.test(p.name)){
       if(!pend)return;p.name=pend.name;bb.y0=Math.min(bb.y0,pend.b.y0);bb.x0=Math.min(bb.x0,pend.b.x0)}
     pend=null;
     if(p.name.length<2||!/[a-z]/i.test(p.name))return;
@@ -261,19 +296,17 @@ function decide(r){
   ['q','p','t','ok','derived','lead','unit'].forEach(function(k){if(pick[k]!==undefined&&(k!=='unit'||pick[k]))r[k]=pick[k]});
   r.nb=pick.nb||r.nb;r.name=keep.name;r.bb=keep.bb;r.cands=keep.cands;r.itemId=id;
 }
-// Second look: re-read only the numbers of a doubtful line, zoomed in, digits only
 async function reread(w,r,pre){
   if(!r.nb)return false;
   for(var k=0;k<2;k++){
     var c=crop(k?getB(pre):pre.a,{x0:r.nb.x0-12,x1:r.nb.x1+12,y0:r.nb.y0-5,y1:r.nb.y1+5},90);
     var res=await w.recognize(c);
     var n=(res.data.text.match(/\d[\d.,]*/g)||[]).map(toNum).filter(function(v){return v!=null});
-    if(n.length>=2){var a=assign(n.slice(-3),r.lead);
-      if(a.ok){r.q=a.q;r.p=a.p;r.t=a.t;r.ok=1;r.derived=0;r.conf='ok';r.notes.push(['info','Fixed by zooming in and re-reading the numbers.']);return true}}
+    if(n.length>=2){var a=assign(n.slice(-4),r.lead);
+      if(a&&a.ok){r.q=a.q;r.p=a.p;r.t=a.t;r.ok=1;r.derived=0;r.conf='ok';r.notes.push(['info','Fixed by zooming in and re-reading the numbers.']);return true}}
   }
   return false;
 }
-// Last resort: use the stock item's own price to repair a misread digit — always flagged for confirmation
 function repair(r){
   var it=itemOf(r.itemId);if(r.ok||!it)return;
   var P=Number(it.price),q=r.q,t=r.t;if(!(P>0)||!(t>0))return;
@@ -369,7 +402,6 @@ async function runOcr(){
     $('ocrText').value=ra.data.text;
     if(FM){showPicks(ra.data,{});return}
     if(ip)await ip;
-    // Pass 1 is usually enough: only look again if some line does not add up
     var pa=parseData(ra.data),pb=null,list=pair(pa.rows,[]);
     list.forEach(decide);
     if(!list.length||list.some(function(r){return !r.ok})){
@@ -405,11 +437,11 @@ function addRow(o){
   rows.push(r);return r;
 }
 function parseText(text){
-  var data={lines:text.split(/\r?\n/).map(function(l){return{text:l,bbox:{x0:0,y0:0,x1:0,y1:0},words:l.split(/\s+/).filter(Boolean).map(function(w){return{text:w,bbox:null}})}})};
+  var data={lines:text.split(/\r?\n/).map(function(l){return{text:l,bbox:{x0:0,y0:0,x1:0,y1:0},words:l.split(/\s+/).filter(Boolean).map(function(w){return{text:w,bbox:null}})}})};  
   return parseData(data).rows;
 }
 
-/* ================= field mode (hand text back to inventory) ================= */
+/* ================= field mode ================= */
 function go(v){location.href=RET+(RET.indexOf('?')<0?'?':'&')+'scanned='+encodeURIComponent(v)+'&field='+encodeURIComponent(FIELD)}
 function showPicks(a,b){
   var seen={},list=[],wantCode=FIELD==='sku'||FIELD==='lookup';
@@ -433,14 +465,14 @@ function check(r){
   if(!(q>0))o.push(['bad','Enter a quantity']);
   else if(isFinite(p)&&isFinite(t)&&!near(q*p,t))
     o.push(['warn','Qty × price = '+money(q*p)+' but total is '+money(t)+' <button class="lnk" data-act="fix">Use '+money(q*p)+'</button>']);
-  else if(r.conf!=='verified')o.push(['ok','Qty × price = total']);
+  else if(r.conf!=='verified'&&isFinite(p)&&isFinite(t)&&q>0)o.push(['ok','Qty × price = total']);
   if(it&&q>0){
     var cur=Number(it.quantity)||0;
-    if(mode==='out'&&q>cur)o.push(['bad','Only '+num(cur)+' '+esc(it.unit||'')+' in stock']);
+    if(mode==='out'&&q>cur)o.push(['bad','Only '+num(cur)+' '+(it.unit||'')+' in stock']);
     if(mode==='in'&&p>0&&Math.abs(p-Number(it.price))>.005)
-      o.push(['warn','Price changed '+money(it.price)+' → '+money(p)+' <label class="lnk"><input type="checkbox" data-f="updPrice"'+(r.updPrice?' checked':'')+'> update item price</label>']);
+      o.push(['warn','Price '+money(it.price)+' → '+money(p)+' <label class="lnk"><input type="checkbox" data-f="updPrice"'+(r.updPrice?' checked':'')+'> update price</label>']);
     if(r.unit&&it.unit&&canon(r.unit)!==canon(it.unit))o.push(['warn','Receipt says “'+esc(r.unit)+'” but this item is counted in '+esc(it.unit)]);
-    o.push(['info','Balance: '+num(cur)+' → '+num(mode==='out'?cur-q:cur+q)+' '+esc(it.unit||'')]);
+    o.push(['info','Balance: '+num(cur)+' → '+num(mode==='out'?cur-q:cur+q)+' '+(it.unit||'')]);
   }
   return o;
 }
@@ -481,7 +513,6 @@ $('lines').addEventListener('input',function(e){
   var t=e.target,f=t.dataset.f,r=rowOf(t);if(!r||!f||f==='itemId')return;
   r[f]=t.type==='checkbox'?t.checked:t.value;
   if(f==='qty'||f==='price'){var q=parseFloat(r.qty),p=parseFloat(r.price);if(q>0&&p>=0){r.total=r2(q*p);var ti=t.closest('.line').querySelector('[data-f=total]');if(ti)ti.value=r.total}}
-  if(f==='name'&&!r.itemId){/* keep manual choice */}
   refresh(r);
 });
 $('lines').addEventListener('change',function(e){var t=e.target,r=rowOf(t);if(r&&t.dataset.f==='itemId'){r.itemId=t.value;r.updPrice=false;r.conf=r.conf==='verified'?'ok':r.conf;refresh(r)}});
@@ -503,7 +534,7 @@ function applyAll(){
   var ok=0,fail=0,failMsg='';
   sel.reduce(function(chain,r){return chain.then(function(){
     var it=itemOf(r.itemId),q=parseFloat(r.qty),cur=Number(it.quantity)||0,next=mode==='out'?cur-q:cur+q;
-    if(next<0){fail++;failMsg='Not enough stock for '+it.name;return}
+    if(mode==='out'&&next<0){fail++;failMsg='Not enough stock for '+it.name;return}
     var pl={name:it.name,sku:it.sku,category:it.category,quantity:next,unit:it.unit||'units',
       price:(mode==='in'&&r.updPrice)?parseFloat(r.price):Number(it.price)||0,
       threshold:it.threshold===undefined||it.threshold===null?10:Number(it.threshold),supplier:it.supplier||'',notes:it.notes||''};
@@ -518,20 +549,31 @@ function applyAll(){
   });
 }
 
+/* ================= mode toggle ================= */
+function setMode(m){
+  mode=m;
+  [].forEach.call($('modeSeg').children,function(x){
+    var on=x.dataset.mode===m;x.classList.toggle('on',on);x.setAttribute('aria-selected',on?'true':'false');
+  });
+  var hint=$('modeHint');
+  if(hint)hint.innerHTML=m==='in'?'Quantities will be <b>added</b> to the current balance.':'Quantities will be <b>subtracted</b> from the current balance.';
+  try{localStorage.setItem('mrc.scanMode',m)}catch(e){}
+  render();
+}
+
 /* ================= events ================= */
 $('btnCam').onclick=function(){$('fileCam').click()};
 $('btnUp').onclick=function(){$('fileUp').click()};
 ['fileCam','fileUp'].forEach(function(id){$(id).onchange=function(){loadImage(this.files[0]);this.value=''}});
 $('btnAgain').onclick=function(){runOcr()};
 $('btnRot').onclick=function(){if(src&&!busy){rotate();runOcr()}};
-$('btnManual').onclick=function(){addRow({});render();var l=document.querySelectorAll('.line');l[l.length-1].scrollIntoView({behavior:'smooth',block:'center'})};
+$('btnManual').onclick=function(){addRow({});render();var l=document.querySelectorAll('.line');if(l.length)l[l.length-1].scrollIntoView({behavior:'smooth',block:'center'})};
 $('btnReparse').onclick=function(){var p=parseText($('ocrText').value);if(!p.length)return toast('No item lines found in the text.','error');
   rows=[];p.forEach(function(x){var id=matchItem(x.name,x.p);addRow({name:x.name,qty:x.q,price:x.p,total:x.t,unit:x.unit,itemId:id,conf:x.ok?'ok':'check'})});render();toast(p.length+' line(s) read.')};
 $('btnClear').onclick=function(){if(rows.length&&confirm('Remove all lines from this screen?')){rows=[];render()}};
 $('btnApply').onclick=applyAll;
 $('retry').onclick=loadItems;
-$('modeSeg').onclick=function(e){var b=e.target.closest('button');if(!b)return;mode=b.dataset.mode;
-  [].forEach.call(this.children,function(x){x.classList.toggle('on',x===b)});render()};
+$('modeSeg').onclick=function(e){var b=e.target.closest('button');if(b)setMode(b.dataset.mode)};
 $('chips').onclick=function(e){var c=e.target.closest('.chip');if(!c)return;
   [].forEach.call($('chips').children,function(x){x.classList.toggle('on',x===c)});$('pickVal').value=c.dataset.v;$('pickVal').focus()};
 $('usePick').onclick=function(){var v=$('pickVal').value.trim();if(!v)return toast('Tap a piece of text or type it first.','error');go(v)};
@@ -546,7 +588,11 @@ if(FM){
   var back=RET+(RET.indexOf('?')<0?'?':'&')+'scanned=&field='+encodeURIComponent(FIELD);
   $('back').href=back;$('back').innerHTML='<i class="fas fa-arrow-left"></i> Back';$('cancelPick').href=back;
   document.querySelector('details summary').nextElementSibling.nextElementSibling.style.display='none';$('btnReparse').style.display='none';
-}else loadItems();
+}else{
+  // restore saved mode
+  try{var sm=localStorage.getItem('mrc.scanMode');if(sm==='in'||sm==='out')setMode(sm)}catch(e){}
+  loadItems();
+}
 setTimeout(function(){getWorker().catch(function(){})},300);
 })();
 </script>
