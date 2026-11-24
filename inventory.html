@@ -214,6 +214,7 @@ html[data-theme=dark] .pg.active{background:var(--accent);color:#1a2b3c;border-c
 .toast{position:fixed;bottom:28px;right:28px;background:var(--sidebar);color:#f0e9df;padding:14px 22px;border-radius:14px;font-size:.9rem;font-weight:500;display:flex;align-items:center;gap:10px;box-shadow:var(--sh-3);border-left:4px solid var(--accent);transform:translateY(140%);opacity:0;transition:transform .3s var(--ease),opacity .3s;z-index:2000;pointer-events:none;max-width:360px}
 .toast.show{transform:none;opacity:1}.toast i{color:var(--accent)}
 .toast.error{border-left-color:var(--danger)}.toast.error i{color:var(--danger)}
+.toast.warning{border-left-color:var(--warn)}.toast.warning i{color:var(--warn)}
 
 /* responsive */
 @media(max-width:900px){
@@ -239,7 +240,7 @@ body{flex-direction:column}.main{padding:18px 16px 96px}
 @media print{
 @page{size:A4 landscape;margin:12mm}
 body{background:#fff!important;color:#000!important;display:block}
-.sidebar,.main,.toast,.p-foot .btn,.report-x,#modal,#moveModal,#confirmModal{display:none!important}
+.sidebar,.main,.toast,.p-foot .btn,.report-x,#modal,#moveModal,#confirmModal,#receiptModal{display:none!important}
 #reportModal{position:static;background:none;backdrop-filter:none;padding:0;opacity:1;visibility:visible;display:block}
 #reportModal .panel{box-shadow:none;border:0;max-height:none;max-width:100%;transform:none;background:#fff;color:#000}
 .p-head,.p-foot{position:static;background:#fff;color:#000;border-color:#000}
@@ -303,7 +304,8 @@ body{background:#fff!important;color:#000!important;display:block}
   <div class="toolbar">
     <div>
       <button class="btn btn-primary" id="btnAdd"><i class="fas fa-plus"></i> Add stock item</button>
-      <button class="btn btn-scan" id="btnScan" data-scan="lookup"><i class="fas fa-qrcode"></i> Scan item</button>
+      <button class="btn btn-scan" id="btnScanReceipt" title="Scan a full receipt — auto-fills name, qty, unit price"><i class="fas fa-receipt"></i> Scan receipt</button>
+      <button class="btn btn-outline" id="btnScan" data-scan="lookup" title="Scan a single barcode / SKU"><i class="fas fa-qrcode"></i> Scan item</button>
       <button class="btn btn-outline" id="btnReport"><i class="fas fa-chart-pie"></i> View report</button>
       <button class="btn btn-danger" id="btnClear"><i class="fas fa-trash-can"></i> Clear all</button>
     </div>
@@ -357,7 +359,7 @@ body{background:#fff!important;color:#000!important;display:block}
         <div class="grid">
           <div class="fg full"><label for="fName">Item name<em>*</em></label>
             <div class="with-scan"><input id="fName" placeholder="e.g. Ready-Mix Concrete C30/37" autocomplete="off">
-            <button type="button" class="chip-btn" data-scan="name" title="Scan name" aria-label="Scan item name"><i class="fas fa-barcode"></i></button></div></div>
+            <button type="button" class="chip-btn" data-scan="name" title="Scan item name" aria-label="Scan item name"><i class="fas fa-barcode"></i></button></div></div>
           <div class="fg"><label for="fSku">SKU<em>*</em></label>
             <div class="with-scan"><input id="fSku" placeholder="e.g. MRC-8902" autocomplete="off">
             <button type="button" class="chip-btn" data-scan="sku" title="Scan SKU" aria-label="Scan SKU"><i class="fas fa-barcode"></i></button></div>
@@ -445,6 +447,28 @@ body{background:#fff!important;color:#000!important;display:block}
   </div>
 </div>
 
+<!-- Receipt review (fallback path if scanner returns ?lines=) -->
+<div class="overlay" id="receiptModal">
+  <div class="panel wide" role="dialog" aria-modal="true" aria-labelledby="receiptTitle">
+    <div class="p-head">
+      <h2 id="receiptTitle"><i class="fas fa-receipt"></i> Review scanned receipt</h2>
+      <div class="meta">
+        <span><i class="fas fa-arrow-down"></i> Mode: <b id="rMode">Stock in</b></span>
+      </div>
+      <button class="chip-btn plain" id="receiptClose" aria-label="Close"><i class="fas fa-xmark"></i></button>
+    </div>
+    <div class="p-body">
+      <div class="scan-note"><i class="fas fa-circle-info"></i><span>Match each line to an inventory item. Only checked lines will be applied.</span></div>
+      <div id="rLines"></div>
+    </div>
+    <div class="p-foot">
+      <span class="hint" style="margin-right:auto" id="rSummary">0 lines</span>
+      <button class="btn btn-outline" id="receiptCancel">Cancel</button>
+      <button class="btn btn-primary" id="receiptApply"><i class="fas fa-check"></i> Apply to inventory</button>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast" role="status" aria-live="polite"><i class="fas fa-check-circle" id="toastIcon"></i><span id="toastMsg"></span></div>
 
 <script>
@@ -454,12 +478,13 @@ body{background:#fff!important;color:#000!important;display:block}
 /* ---------- Config ---------- */
 const API={BASE:'https://stock-backend-3-r6rq.onrender.com',
   url(id){return this.BASE+'/inventory'+(id?'/'+encodeURIComponent(id):'')}};
-/* Scanner hand-off. scanner.html should send the user back to:
-   inventory.html?scanned=<text>&field=<field>   (field is echoed from the request) */
+/* Scanner hand-off.
+   - Full receipt:  scanner.html?return=inventory.html            (NO `field` param)
+   - Single field:  scanner.html?field=sku|name|supplier|search|lookup&return=inventory.html */
 const SCANNER_URL='scanner.html';
 const DRAFT_KEY='mrc.inventoryDraft';
 const FIELD_IDS={name:'fName',sku:'fSku',supplier:'fSupplier'};
-const FIELD_LABEL={name:'Item name',sku:'SKU',supplier:'Supplier',search:'Search',lookup:'Scan'};
+const FIELD_LABEL={name:'Item name',sku:'SKU',supplier:'Supplier',search:'Search',lookup:'Scan item'};
 
 async function req(url,opt={}){
   let res;
@@ -491,9 +516,10 @@ const el={tbody:$('tbody'),empty:$('empty'),foot:$('footInfo'),pager:$('pager'),
 /* ---------- Helpers ---------- */
 let tt;
 function toast(msg,type='success',ms=3200){
-  clearTimeout(tt);$('toastMsg').textContent=msg;el.toast.classList.remove('error');
+  clearTimeout(tt);$('toastMsg').textContent=msg;el.toast.classList.remove('error','warning');
   $('toastIcon').className=type==='error'?'fas fa-circle-exclamation':type==='warning'?'fas fa-triangle-exclamation':'fas fa-check-circle';
   if(type==='error')el.toast.classList.add('error');
+  if(type==='warning')el.toast.classList.add('warning');
   el.toast.classList.add('show');tt=setTimeout(()=>el.toast.classList.remove('show'),ms);
 }
 const num=n=>Number(n)||0;
@@ -512,7 +538,7 @@ function setOnline(ok,msg){
   const was=!online;online=ok;
   $('banner').classList.toggle('show',!ok);
   if(!ok)$('bannerMsg').textContent=msg||'Cannot reach the server. Check your connection and try again.';
-  ['btnAdd','btnClear','btnReport'].forEach(id=>$(id).disabled=!ok);
+  ['btnAdd','btnClear','btnReport','btnScanReceipt'].forEach(id=>$(id).disabled=!ok);
   if(ok&&was)toast('Reconnected to server.');
 }
 function fail(err,label){
@@ -550,7 +576,7 @@ function stats(){
   inv.forEach(x=>{const q=num(x.quantity);u+=q;v+=q*num(x.price);const s=status(x);s==='in'?i++:s==='low'?l++:o++});
   $('statTotal').textContent=fmtN(inv.length);$('statUnits').textContent=fmtN(u);$('statIn').textContent=fmtN(i);
   $('statLow').textContent=fmtN(l);$('statOut').textContent=fmtN(o);$('statValue').textContent=ksh(v);
-  document.querySelectorAll('button.stat').forEach(b=>b.classList.toggle('on',F.status===b.dataset.stat));
+  document.querySelectorAll('button.stat').forEach(b=>b.classList.toggle('on',!!F.status&&F.status===b.dataset.stat));
 }
 function skeleton(){
   el.tbody.innerHTML=Array.from({length:5}).map(()=>'<tr class="skeleton">'+'<td><div style="width:180px"></div></td>'.repeat(1)+'<td><div style="width:80px"></div></td>'.repeat(2)+'<td><div style="width:60px"></div></td>'.repeat(2)+'<td><div style="width:80px"></div></td><td></td></tr>').join('');
@@ -616,6 +642,10 @@ function gotoScanner(field){
   }
   location.href=SCANNER_URL+'?field='+encodeURIComponent(field)+'&return='+encodeURIComponent('inventory.html');
 }
+function gotoReceiptScanner(){
+  // No `field` param => scanner runs the full receipt pipeline (name / qty / price / total).
+  location.href=SCANNER_URL+'?return='+encodeURIComponent('inventory.html');
+}
 document.addEventListener('click',e=>{
   const b=e.target.closest('[data-scan]');
   if(b){e.preventDefault();gotoScanner(b.dataset.scan)}
@@ -623,8 +653,23 @@ document.addEventListener('click',e=>{
 function readDraft(){
   try{const d=JSON.parse(sessionStorage.getItem(DRAFT_KEY)||'null');sessionStorage.removeItem(DRAFT_KEY);return d}catch(_){return null}
 }
+
+/* ---------- Receipt return handler ---------- */
 function handleScanReturn(){
   const p=new URLSearchParams(location.search);
+
+  // Path A — scanner returned raw lines (fallback if scanner is configured to hand back data)
+  const linesRaw=p.get('lines');
+  if(linesRaw){
+    history.replaceState(null,'',location.pathname);
+    let lines=[];
+    try{lines=JSON.parse(decodeURIComponent(linesRaw))}catch(_){lines=[]}
+    if(!Array.isArray(lines)||!lines.length){toast('No lines were read from the receipt.','warning');return}
+    openReceiptModal(lines);
+    return;
+  }
+
+  // Path B — single-string hand-back (field=sku|name|supplier|search|lookup)
   const text=(p.get('scanned')||p.get('code')||p.get('text')||'').trim();
   const field=p.get('field')||'sku';
   if(!p.has('scanned')&&!p.has('code')&&!p.has('text'))return;
@@ -641,8 +686,110 @@ function handleScanReturn(){
     else{openModal(null,null,{sku:text});toast('New SKU “'+text+'”. Fill in the details to add it.','warning',4200)}
     return;
   }
-  openModal(draft&&draft.editId?inv.find(i=>i.id===draft.editId):null,draft,{[field]:text});
+  const draftItem=draft&&draft.editId?inv.find(i=>i.id===draft.editId):null;
+  openModal(draftItem||null,draft,{[field]:text});
 }
+
+/* ---------- Receipt review modal (Path A fallback) ---------- */
+let receiptLines=[],receiptMode='in';
+function openReceiptModal(lines){
+  receiptLines=lines.map(l=>({
+    name:(l.name||'').trim(),
+    qty:l.qty==null?'':l.qty,
+    price:l.price==null?'':l.price,
+    total:l.total==null?'':l.total,
+    unit:l.unit||'',
+    include:true,
+    itemId:(l.itemId&&inv.some(i=>i.id===l.itemId))?l.itemId:autoMatch(l.name,Number(l.price)||0)
+  }));
+  receiptMode=localStorage.getItem('mrc.receiptMode')==='out'?'out':'in';
+  $('rMode').textContent=receiptMode==='out'?'Stock out (issue)':'Stock in (receive)';
+  renderReceiptLines();
+  open($('receiptModal'));
+}
+function autoMatch(name,price){
+  const n=String(name||'').toLowerCase().replace(/[^a-z0-9.]+/g,' ').trim();
+  if(!n)return '';
+  let best=0,bid='';
+  inv.forEach(it=>{
+    const t=String(it.name||'').toLowerCase().replace(/[^a-z0-9.]+/g,' ').trim();
+    const s=t.includes(n)||n.includes(t)?0.8:0;
+    const p=Number(it.price)||0;
+    if(price>0&&p>0&&Math.abs(price-p)/p<0.02&&s+0.2>best){best=s+0.2;bid=it.id}
+    else if(s>best){best=s;bid=it.id}
+  });
+  return best>=0.5?bid:'';
+}
+function renderReceiptLines(){
+  const host=$('rLines');
+  if(!receiptLines.length){host.innerHTML='<p style="color:var(--text-3);padding:18px 0">No lines.</p>';$('rSummary').textContent='0 lines';return}
+  const opts=inv.slice().sort((a,b)=>String(a.name).localeCompare(b.name));
+  host.innerHTML=receiptLines.map((l,i)=>{
+    const matchOpts='<option value="">— Pick item —</option>'+opts.map(it=>
+      `<option value="${esc(it.id)}"${it.id===l.itemId?' selected':''}>${esc(it.name)} · ${esc(it.sku)}</option>`).join('');
+    return `<div class="line" data-i="${i}" style="border:1px solid var(--line);border-radius:14px;padding:12px;margin-bottom:10px;background:var(--surface-2)">
+      <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px">
+        <input type="checkbox" data-f="include"${l.include?' checked':''} style="width:18px;height:18px">
+        <input data-f="name" value="${esc(l.name)}" placeholder="Item name" style="flex:1;font-weight:600">
+      </div>
+      <select data-f="itemId" style="margin-bottom:8px">${matchOpts}</select>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1.3fr;gap:8px">
+        <label style="font-size:.7rem;color:var(--text-2)">Qty<input type="number" step="any" data-f="qty" value="${esc(l.qty)}" style="margin-top:3px"></label>
+        <label style="font-size:.7rem;color:var(--text-2)">Unit price<input type="number" step="any" data-f="price" value="${esc(l.price)}" style="margin-top:3px"></label>
+        <label style="font-size:.7rem;color:var(--text-2)">Total<input type="number" step="any" data-f="total" value="${esc(l.total)}" style="margin-top:3px"></label>
+      </div>
+    </div>`;
+  }).join('');
+  updateReceiptSummary();
+}
+function updateReceiptSummary(){
+  const sel=receiptLines.filter(l=>l.include);
+  $('rSummary').textContent=sel.length+' of '+receiptLines.length+' lines selected';
+  $('receiptApply').disabled=!sel.length;
+}
+$('rLines').addEventListener('input',e=>{
+  const t=e.target,f=t.dataset.f,w=t.closest('.line');if(!w||!f)return;
+  const i=+w.dataset.i,l=receiptLines[i];if(!l)return;
+  l[f]=t.type==='checkbox'?t.checked:t.value;
+  if(f==='qty'||f==='price'){
+    const q=Number(l.qty)||0,p=Number(l.price)||0;
+    if(q>0&&p>0){l.total=Math.round(q*p*100)/100;const ti=w.querySelector('[data-f=total]');if(ti)ti.value=l.total}
+  }
+  updateReceiptSummary();
+});
+$('rLines').addEventListener('change',e=>{
+  const t=e.target;if(t.dataset.f!=='itemId')return;
+  const w=t.closest('.line'),l=receiptLines[+w.dataset.i];if(l)l.itemId=t.value;
+});
+async function applyReceipt(){
+  const sel=receiptLines.filter(l=>l.include);
+  if(!sel.length)return toast('Select at least one line.','error');
+  const bad=sel.find(l=>!l.itemId||!(Number(l.qty)>0));
+  if(bad)return toast('Every selected line needs an item and a quantity.','error');
+  if(!confirm(`Apply ${sel.length} line(s) as ${receiptMode==='out'?'stock out':'stock in'}?`))return;
+  const btn=$('receiptApply');btn.disabled=true;btn.innerHTML='<i class="fas fa-spinner fa-spin"></i> Applying…';
+  let ok=0,fail=0,failMsg='';
+  for(const l of sel){
+    const it=inv.find(i=>i.id===l.itemId);if(!it)continue;
+    const q=Number(l.qty)||0,cur=num(it.quantity),next=receiptMode==='out'?cur-q:cur+q;
+    if(next<0){fail++;failMsg='Not enough stock for '+it.name;continue}
+    const payload={name:it.name,sku:it.sku,category:it.category,quantity:next,unit:it.unit||'units',
+      price:receiptMode==='in'&&Number(l.price)>0?Number(l.price):num(it.price),
+      threshold:thr(it),supplier:it.supplier||'',notes:it.notes||''};
+    try{
+      const u=await Data.update(it.id,payload);
+      const x=inv.findIndex(r=>r.id===it.id);if(x!==-1)inv[x]={...it,...(u||{}),...payload};
+      ok++;
+    }catch(err){fail++;failMsg=err.message}
+  }
+  btn.disabled=false;btn.innerHTML='<i class="fas fa-check"></i> Apply to inventory';
+  close($('receiptModal'));
+  setOnline(true);render();
+  toast(fail?`${ok} applied, ${fail} failed (${failMsg}).`:`${ok} line(s) applied.`,fail?'error':'success');
+}
+$('receiptApply').onclick=applyReceipt;
+$('receiptClose').onclick=$('receiptCancel').onclick=()=>close($('receiptModal'));
+$('receiptModal').addEventListener('mousedown',e=>{if(e.target===$('receiptModal'))close($('receiptModal'))});
 
 /* ---------- Add / edit ---------- */
 const FIELD_ORDER=['fName','fSku','fCategory','fQty','fUnit','fPrice','fThreshold','fSupplier','fNotes'];
@@ -805,12 +952,14 @@ $('btnRetry').onclick=async function(){
 
 /* ---------- Modal wiring ---------- */
 $('btnAdd').onclick=()=>openModal();
+$('btnScanReceipt').onclick=gotoReceiptScanner;
 $('modalClose').onclick=$('modalCancel').onclick=closeModal;
 $('moveClose').onclick=$('moveCancel').onclick=closeMove;
-[[el.modal,closeModal],[el.move,closeMove],[el.report,closeReport]].forEach(([o,fn])=>o.addEventListener('mousedown',e=>{if(e.target===o)fn()}));
+[[el.modal,closeModal],[el.move,closeMove],[el.report,closeReport],[$('receiptModal'),()=>close($('receiptModal'))]].forEach(([o,fn])=>o.addEventListener('mousedown',e=>{if(e.target===o)fn()}));
 document.addEventListener('keydown',e=>{
   if(e.key==='Escape'){
     if($('confirmModal').classList.contains('open'))return $('cNo').click();
+    if($('receiptModal').classList.contains('open'))return close($('receiptModal'));
     if(el.modal.classList.contains('open'))closeModal();
     if(el.move.classList.contains('open'))closeMove();
     if(el.report.classList.contains('open'))closeReport();
