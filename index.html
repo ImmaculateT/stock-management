@@ -4,9 +4,15 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Maricopa Concrete · Loading</title>
-  <!-- PWA manifest (inline for simplicity, but usually a separate .webmanifest file) -->
-  <link rel="manifest" href='data:application/manifest+json,{"name":"Maricopa Concrete","short_name":"Maricopa","start_url":"./home.html","display":"standalone","background_color":"#1e1e1e","theme_color":"#2a2a2a","icons":[{"src":"data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 100 100\'%3E%3Crect width=\'100\' height=\'100\' fill=\'%232a2a2a\'/%3E%3Ctext x=\'50\' y=\'70\' font-size=\'70\' text-anchor=\'middle\' fill=\'%23d4af37\' font-family=\'Arial Black\'%3EC%3C/text%3E%3C/svg%3E","sizes":"192x192","type":"image/svg+xml"},{"src":"data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 100 100\'%3E%3Crect width=\'100\' height=\'100\' fill=\'%232a2a2a\'/%3E%3Ctext x=\'50\' y=\'70\' font-size=\'70\' text-anchor=\'middle\' fill=\'%23d4af37\' font-family=\'Arial Black\'%3EC%3C/text%3E%3C/svg%3E","sizes":"512x512","type":"image/svg+xml"}]}'>
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%232a2a2a'/%3E%3Ctext x='50' y='70' font-size='70' text-anchor='middle' fill='%23d4af37' font-family='Arial Black'%3EC%3C/text%3E%3C/svg%3E">
+  <!-- PWA Manifest with proper name and icons (inline for single-file demo) -->
+  <link rel="manifest" href='data:application/manifest+json,{"name":"Maricopa Concrete","short_name":"Maricopa","start_url":"./home.html","display":"standalone","background_color":"#1e1e1e","theme_color":"#2a2a2a","icons":[{"src":"data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 100 100\'%3E%3Crect width=\'100\' height=\'100\' fill=\'%232a2a2a\'/%3E%3Ccircle cx=\'50\' cy=\'50\' r=\'40\' fill=\'%23d4af37\'/%3E%3Ctext x=\'50\' y=\'70\' font-size=\'60\' text-anchor=\'middle\' fill=\'%232a2a2a\' font-family=\'Arial Black\' font-weight=\'bold\'%3EC%3C/text%3E%3C/svg%3E","sizes":"192x192","type":"image/svg+xml"},{"src":"data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 100 100\'%3E%3Crect width=\'100\' height=\'100\' fill=\'%232a2a2a\'/%3E%3Ccircle cx=\'50\' cy=\'50\' r=\'40\' fill=\'%23d4af37\'/%3E%3Ctext x=\'50\' y=\'70\' font-size=\'60\' text-anchor=\'middle\' fill=\'%232a2a2a\' font-family=\'Arial Black\' font-weight=\'bold\'%3EC%3C/text%3E%3C/svg%3E","sizes":"512x512","type":"image/svg+xml"}]}'>
+  
+  <!-- Apple Touch Icon for iOS -->
+  <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%232a2a2a'/%3E%3Ccircle cx='50' cy='50' r='40' fill='%23d4af37'/%3E%3Ctext x='50' y='70' font-size='60' text-anchor='middle' fill='%232a2a2a' font-family='Arial Black' font-weight='bold'%3EC%3C/text%3E%3C/svg%3E">
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%232a2a2a'/%3E%3Ccircle cx='50' cy='50' r='40' fill='%23d4af37'/%3E%3Ctext x='50' y='70' font-size='60' text-anchor='middle' fill='%232a2a2a' font-family='Arial Black' font-weight='bold'%3EC%3C/text%3E%3C/svg%3E">
+
   <style>
     /* ----- RESET & BASE ----- */
     * {
@@ -31,12 +37,12 @@
                                   rgba(40, 40, 40, 0.02) 2px, rgba(40, 40, 40, 0.02) 6px);
     }
 
-    /* ----- INSTALL BUTTON (prominent, concrete style) ----- */
+    /* ----- INSTALL BUTTON ----- */
     #installBtn {
       position: fixed;
       top: 24px;
       right: 24px;
-      z-index: 1000;
+      z-index: 9999;
       padding: 12px 28px;
       background: #2a2a2a;
       color: #d4af37;
@@ -65,7 +71,7 @@
       box-shadow: inset 0 2px 8px black;
     }
 
-    /* ----- MAIN LOADER CARD (cement block style) ----- */
+    /* ----- MAIN LOADER CARD ----- */
     .loader-container {
       background: #2a2a2a;
       padding: 2.5rem 3rem 3rem 3rem;
@@ -86,7 +92,7 @@
       z-index: 10;
     }
 
-    /* ----- HEADER / COMPANY NAME (like stamped concrete) ----- */
+    /* ----- HEADER ----- */
     .company-header {
       text-align: center;
       margin-bottom: 2.5rem;
@@ -121,7 +127,7 @@
       padding-right: 1rem;
     }
 
-    /* ----- CEMENT MIXER (animated drum with concrete particles) ----- */
+    /* ----- CEMENT MIXER ----- */
     .cement-mixer {
       position: relative;
       width: 160px;
@@ -268,7 +274,6 @@
       position: relative;
     }
 
-    /* Shimmer effect on progress bar */
     .progress-fill::after {
       content: '';
       position: absolute;
@@ -308,7 +313,7 @@
       100% { transform: translateX(100%); }
     }
 
-    /* Floating concrete particles in background (decorative) */
+    /* Background particles */
     .bg-particle {
       position: fixed;
       border-radius: 50%;
@@ -352,10 +357,10 @@
 </head>
 <body>
 
-  <!-- Install PWA button (hidden by default, shown when beforeinstallprompt fires) -->
+  <!-- Install PWA button (hidden by default) -->
   <button id="installBtn" hidden>📲 Install App</button>
 
-  <!-- Decorative background particles (cement dust) -->
+  <!-- Decorative background particles -->
   <div class="bg-particle" style="width: 4px; height: 4px; left: 10%; animation-duration: 25s; animation-delay: 0s;"></div>
   <div class="bg-particle" style="width: 6px; height: 6px; left: 25%; animation-duration: 18s; animation-delay: 2s;"></div>
   <div class="bg-particle" style="width: 3px; height: 3px; left: 40%; animation-duration: 30s; animation-delay: 5s;"></div>
@@ -397,17 +402,17 @@
 
   <script>
     // ============================================================
-    // 1. PWA INSTALL PROMPT LOGIC
+    // 1. PWA INSTALL PROMPT
     // ============================================================
     let deferredPrompt;
     const installBtn = document.getElementById('installBtn');
 
     window.addEventListener('beforeinstallprompt', (e) => {
-      // Prevent the mini-infobar from appearing on mobile
+      // Prevent the default mini-infobar
       e.preventDefault();
-      // Stash the event so it can be triggered later
+      // Save the event
       deferredPrompt = e;
-      // Update UI to show the install button
+      // Show the install button
       installBtn.hidden = false;
       console.log('✅ beforeinstallprompt fired – install button shown');
     });
@@ -417,18 +422,17 @@
         console.warn('No deferred prompt available');
         return;
       }
-      // Show the install prompt
+      // Show the browser install prompt
       deferredPrompt.prompt();
-      // Wait for the user to respond to the prompt
+      // Wait for user choice
       const { outcome } = await deferredPrompt.userChoice;
       console.log(`👤 User choice: ${outcome}`);
-      // Clear the saved prompt – it can only be used once
+      // Clear the prompt – can only be used once
       deferredPrompt = null;
-      // Hide the button since prompt is used
+      // Hide the button
       installBtn.hidden = true;
     });
 
-    // Optional: track when app is installed
     window.addEventListener('appinstalled', () => {
       console.log('🎉 App installed successfully');
       installBtn.hidden = true;
@@ -436,7 +440,7 @@
     });
 
     // ============================================================
-    // 2. LOADER / PROGRESS BAR (30 seconds duration)
+    // 2. LOADER (30 seconds)
     // ============================================================
     (function() {
       const REDIRECT_URL = 'home.html';
@@ -457,15 +461,12 @@
         const progress = Math.min(elapsed / LOAD_DURATION, 1);
         const percent = Math.floor(progress * 100);
 
-        // Update the bar width and text
         progressFill.style.width = percent + '%';
         percentageDisplay.textContent = percent + '%';
 
         if (progress < 1) {
-          // Continue animation
           animationFrame = requestAnimationFrame(updateProgress);
         } else {
-          // Loading complete – redirect after a tiny delay
           cancelAnimationFrame(animationFrame);
           setTimeout(() => {
             window.location.href = REDIRECT_URL;
@@ -473,10 +474,8 @@
         }
       }
 
-      // Start the animation
       animationFrame = requestAnimationFrame(updateProgress);
 
-      // Cleanup on page unload
       window.addEventListener('beforeunload', () => {
         if (animationFrame) {
           cancelAnimationFrame(animationFrame);
@@ -485,11 +484,8 @@
     })();
 
     // ============================================================
-    // 3. SERVICE WORKER REGISTRATION (required for PWA installability)
+    // 3. SERVICE WORKER (required for PWA installability)
     // ============================================================
-    // Since this is a single HTML file with no external SW file, we inline a
-    // minimal service worker using a Blob. This satisfies the "has a service worker"
-    // requirement for PWA installability.
     if ('serviceWorker' in navigator) {
       const swCode = `
         const CACHE_NAME = 'maricopa-v1';
