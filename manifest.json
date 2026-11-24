@@ -1,10 +1,10 @@
 
 {
-  "id": "./",
+  "id": "",
   "name": "Maricopa Concrete & Allied Co.",
   "short_name": "Maricopa",
   "description": "Maricopa Concrete Stock Management System",
-  "start_url": ".index.html",
+  "start_url": "index.html",
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#1e1e1e",
