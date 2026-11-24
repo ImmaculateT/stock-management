@@ -1,111 +1,152 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
   <title>Maricopa Concrete · Loading</title>
 
-  <!-- External manifest (make sure manifest.json is in the same folder) -->
-  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#2a2a2a">
+  <meta name="description" content="Maricopa Concrete & Allied Co. Stock Management System">
 
-  <!-- Apple Touch Icon for iOS (using an inline SVG for demo) -->
-  <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%232a2a2a'/%3E%3Ccircle cx='50' cy='50' r='40' fill='%23d4af37'/%3E%3Ctext x='50' y='70' font-size='60' text-anchor='middle' fill='%232a2a2a' font-family='Arial Black' font-weight='bold'%3EC%3C/text%3E%3C/svg%3E">
+  <!-- PWA Manifest -->
+  <link rel="manifest" href="./manifest.json">
+
+  <!-- Apple Installation Support -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Maricopa">
+
+  <link rel="apple-touch-icon"
+    href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%232a2a2a'/%3E%3Ccircle cx='50' cy='50' r='40' fill='%23d4af37'/%3E%3Ctext x='50' y='70' font-size='60' text-anchor='middle' fill='%232a2a2a' font-family='Arial Black' font-weight='bold'%3EC%3C/text%3E%3C/svg%3E">
 
   <!-- Favicon -->
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%232a2a2a'/%3E%3Ccircle cx='50' cy='50' r='40' fill='%23d4af37'/%3E%3Ctext x='50' y='70' font-size='60' text-anchor='middle' fill='%232a2a2a' font-family='Arial Black' font-weight='bold'%3EC%3C/text%3E%3C/svg%3E">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%232a2a2a'/%3E%3Ccircle cx='50' cy='50' r='40' fill='%23d4af37'/%3E%3Ctext x='50' y='70' font-size='60' text-anchor='middle' fill='%232a2a2a' font-family='Arial Black' font-weight='bold'%3EC%3C/text%3E%3C/svg%3E">
 
   <style>
-    /* ----- RESET & BASE ----- */
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    /* ==============================
+       RESET & BASE
+    ============================== */
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
 
     body {
       background: #1e1e1e;
-      font-family: 'Segoe UI', 'Roboto', system-ui, sans-serif;
+      font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
       min-height: 100vh;
+      min-height: 100dvh;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      overflow: hidden;
+      overflow-x: hidden;
+      overflow-y: auto;
+      padding: 25px 0;
+
       background-image:
-        radial-gradient(circle at 20% 30%, rgba(120, 120, 120, 0.08) 0%, transparent 25%),
-        radial-gradient(circle at 90% 70%, rgba(160, 160, 160, 0.06) 0%, transparent 35%),
-        repeating-linear-gradient(45deg, rgba(80, 80, 80, 0.02) 0px, rgba(80, 80, 80, 0.02) 2px,
-                                  rgba(40, 40, 40, 0.02) 2px, rgba(40, 40, 40, 0.02) 6px);
+        radial-gradient(circle at 20% 30%, rgba(120,120,120,0.08) 0%, transparent 25%),
+        radial-gradient(circle at 90% 70%, rgba(160,160,160,0.06) 0%, transparent 35%),
+        repeating-linear-gradient(
+          45deg,
+          rgba(80,80,80,0.02) 0px,
+          rgba(80,80,80,0.02) 2px,
+          rgba(40,40,40,0.02) 2px,
+          rgba(40,40,40,0.02) 6px
+        );
     }
 
-    /* ----- INSTALLED INDICATOR (bottom-left, only shown after install) ----- */
+    /* ==============================
+       INSTALLED BADGE
+    ============================== */
+
     #installedBadge {
       position: fixed;
       bottom: 24px;
       left: 24px;
       z-index: 9999;
-      display: none; /* hidden until we know the app is installed */
+
+      display: none;
       align-items: center;
       gap: 10px;
+
       padding: 10px 20px;
-      background: #2a2a2a;
+
+      background: linear-gradient(145deg,#333,#1e1e1e);
       color: #d4af37;
+
       border: 2px solid #4a4a4a;
       border-radius: 40px;
+
       font-weight: 700;
-      font-size: 0.9rem;
-      letter-spacing: 1.5px;
-      text-transform: uppercase;
+      font-size: 0.85rem;
+      letter-spacing: 1px;
+
       cursor: pointer;
-      box-shadow: 0 8px 16px rgba(0,0,0,0.6), inset 0 1px 3px rgba(255,255,255,0.1);
-      transition: all 0.2s ease;
-      font-family: 'Segoe UI', sans-serif;
-      background-image: linear-gradient(145deg, #333, #1e1e1e);
+
+      box-shadow: 0 8px 16px rgba(0,0,0,0.6);
     }
 
     #installedBadge:hover {
-      background: #3a3a3a;
       border-color: #d4af37;
-      box-shadow: 0 12px 20px rgba(0,0,0,0.8), 0 0 20px rgba(212,175,55,0.3);
-      transform: scale(1.02);
+      transform: scale(1.03);
     }
 
-    #installedBadge:active {
-      transform: scale(0.98);
-      box-shadow: inset 0 2px 8px black;
-    }
+    /* ==============================
+       MAIN CARD
+    ============================== */
 
-    /* ----- MAIN LOADER CARD ----- */
     .loader-container {
-      background: #2a2a2a;
-      padding: 2.5rem 3rem 3rem 3rem;
+      background: linear-gradient(145deg,#2e2e2e,#232323);
+
+      padding: 2.5rem 3rem 3rem;
+
       border-radius: 2rem;
+
       box-shadow:
-        0 25px 40px -10px rgba(0, 0, 0, 0.8),
-        inset 0 2px 4px rgba(255, 255, 255, 0.05),
-        inset 0 -4px 8px rgba(0, 0, 0, 0.6);
-      border: 1px solid rgba(200, 200, 200, 0.15);
+        0 25px 40px -10px rgba(0,0,0,0.8),
+        inset 0 2px 4px rgba(255,255,255,0.05),
+        inset 0 -4px 8px rgba(0,0,0,0.6);
+
+      border: 1px solid rgba(200,200,200,0.15);
+
       max-width: 650px;
-      width: 90vw;
-      transition: box-shadow 0.2s;
-      background-image:
-        linear-gradient(145deg, #2e2e2e, #232323),
-        repeating-linear-gradient(45deg, #3a3a3a 0px, #3a3a3a 1px, #2c2c2c 1px, #2c2c2c 5px);
-      background-blend-mode: overlay;
+      width: 90%;
+
       position: relative;
       z-index: 10;
+
+      text-align: center;
     }
 
-    /* ----- HEADER ----- */
-    .company-header { text-align: center; margin-bottom: 2.5rem; }
+    /* ==============================
+       HEADER
+    ============================== */
+
+    .company-header {
+      text-align: center;
+      margin-bottom: 2.5rem;
+    }
 
     .company-name {
       font-size: 1.9rem;
       font-weight: 800;
       letter-spacing: 2px;
       text-transform: uppercase;
+
       color: #d6d6d6;
+
       text-shadow:
         0 2px 0 #0a0a0a,
-        0 4px 6px rgba(0, 0, 0, 0.8),
-        0 0 10px rgba(180, 180, 180, 0.3);
-      font-family: 'Impact', 'Arial Black', 'Segoe UI Black', sans-serif;
+        0 4px 6px rgba(0,0,0,0.8),
+        0 0 10px rgba(180,180,180,0.3);
+
+      font-family: Impact, 'Arial Black', sans-serif;
       line-height: 1.2;
     }
 
@@ -114,23 +155,28 @@
       letter-spacing: 6px;
       color: #9b9b9b;
       text-transform: uppercase;
-      font-weight: 400;
+
       margin-top: 0.4rem;
-      text-shadow: 0 1px 2px black;
+
       border-top: 1px solid #555;
       padding-top: 0.75rem;
+
       display: inline-block;
       padding-left: 1rem;
       padding-right: 1rem;
     }
 
-    /* ----- CEMENT MIXER ----- */
+    /* ==============================
+       CEMENT MIXER
+    ============================== */
+
     .cement-mixer {
       position: relative;
       width: 160px;
       height: 160px;
       margin: 0 auto 2.5rem;
-      filter: drop-shadow(0 12px 12px rgba(0, 0, 0, 0.7));
+
+      filter: drop-shadow(0 12px 12px rgba(0,0,0,0.7));
     }
 
     .drum-ring {
@@ -138,6 +184,7 @@
       width: 100%;
       height: 100%;
       border-radius: 50%;
+
       background: conic-gradient(
         #7a7a7a 0deg 60deg,
         #5e5e5e 60deg 120deg,
@@ -146,13 +193,14 @@
         #6e6e6e 240deg 300deg,
         #7a7a7a 300deg 360deg
       );
+
       box-shadow:
         inset 0 0 20px #000000cc,
         inset 0 0 40px #1e1e1e,
         0 0 0 4px #353535,
         0 0 0 8px #222222;
+
       animation: rotateDrum 4s linear infinite;
-      transform-origin: center;
       border: 2px solid #4a4a4a;
     }
 
@@ -160,16 +208,18 @@
       position: absolute;
       top: 20px;
       left: 20px;
+
       width: calc(100% - 40px);
       height: calc(100% - 40px);
+
       border-radius: 50%;
-      background: radial-gradient(circle at 30% 30%, #9b9b9b, #4d4d4d 80%);
-      box-shadow:
-        inset 0 0 20px #000000,
-        inset 0 0 5px #ffffff30;
+
+      background: radial-gradient(circle at 30% 30%,#9b9b9b,#4d4d4d 80%);
+
       display: flex;
       align-items: center;
       justify-content: center;
+
       overflow: hidden;
       z-index: 2;
     }
@@ -178,6 +228,7 @@
       position: absolute;
       width: 100%;
       height: 100%;
+
       animation: rotateDrum 4s linear infinite reverse;
     }
 
@@ -185,309 +236,782 @@
       position: absolute;
       background: #b9b9b9;
       border-radius: 50%;
-      box-shadow: inset -2px -2px 5px #2e2e2e, inset 2px 2px 5px #f0f0f0;
+
+      box-shadow:
+        inset -2px -2px 5px #2e2e2e,
+        inset 2px 2px 5px #f0f0f0;
+
       opacity: 0.9;
     }
 
-    .aggregate span:nth-child(1) { width: 14px; height: 14px; top: 20%; left: 15%; background: #a8a8a8; }
-    .aggregate span:nth-child(2) { width: 10px; height: 10px; top: 70%; left: 25%; background: #888; }
-    .aggregate span:nth-child(3) { width: 18px; height: 18px; top: 40%; left: 70%; background: #b0b0b0; }
-    .aggregate span:nth-child(4) { width: 8px; height: 8px; top: 80%; left: 60%; background: #6e6e6e; }
-    .aggregate span:nth-child(5) { width: 12px; height: 12px; top: 15%; left: 80%; background: #9e9e9e; }
-    .aggregate span:nth-child(6) { width: 16px; height: 16px; top: 55%; left: 10%; background: #7e7e7e; }
-    .aggregate span:nth-child(7) { width: 9px; height: 9px; top: 35%; left: 45%; background: #c0c0c0; }
-    .aggregate span:nth-child(8) { width: 20px; height: 20px; top: 65%; left: 75%; background: #6a6a6a; }
-    .aggregate span:nth-child(9) { width: 11px; height: 11px; top: 50%; left: 55%; background: #aaaaaa; }
-    .aggregate span:nth-child(10) { width: 13px; height: 13px; top: 10%; left: 45%; background: #8f8f8f; }
+    .aggregate span:nth-child(1) {
+      width:14px;height:14px;top:20%;left:15%;
+    }
+
+    .aggregate span:nth-child(2) {
+      width:10px;height:10px;top:70%;left:25%;
+    }
+
+    .aggregate span:nth-child(3) {
+      width:18px;height:18px;top:40%;left:70%;
+    }
+
+    .aggregate span:nth-child(4) {
+      width:8px;height:8px;top:80%;left:60%;
+    }
+
+    .aggregate span:nth-child(5) {
+      width:12px;height:12px;top:15%;left:80%;
+    }
+
+    .aggregate span:nth-child(6) {
+      width:16px;height:16px;top:55%;left:10%;
+    }
+
+    .aggregate span:nth-child(7) {
+      width:9px;height:9px;top:35%;left:45%;
+    }
+
+    .aggregate span:nth-child(8) {
+      width:20px;height:20px;top:65%;left:75%;
+    }
+
+    .aggregate span:nth-child(9) {
+      width:11px;height:11px;top:50%;left:55%;
+    }
+
+    .aggregate span:nth-child(10) {
+      width:13px;height:13px;top:10%;left:45%;
+    }
 
     .center-badge {
       position: absolute;
       width: 50px;
       height: 50px;
+
       background: #2d2d2d;
       border-radius: 50%;
+
       z-index: 5;
+
       display: flex;
       align-items: center;
       justify-content: center;
+
       box-shadow:
         0 0 0 6px #4a4a4a,
         0 0 0 10px #1e1e1e,
         inset 0 0 8px black;
+
       color: #d4af37;
       font-size: 22px;
       font-weight: bold;
       font-family: 'Courier New', monospace;
+
       animation: pulseBadge 2s ease-in-out infinite;
     }
 
-    /* ----- LOADING TEXT & PROGRESS ----- */
+    /* ==============================
+       LOADING PROGRESS
+    ============================== */
+
     .loading-label {
       display: flex;
       justify-content: space-between;
+
       color: #bcbcbc;
       font-weight: 500;
       letter-spacing: 1px;
       text-transform: uppercase;
+
       font-size: 0.9rem;
-      text-shadow: 0 2px 3px black;
       margin-bottom: 0.75rem;
     }
 
-    .loading-label span:first-child { color: #e0e0e0; }
-    .loading-label span:last-child { color: #d4af37; font-weight: 700; }
+    .loading-label span:last-child {
+      color: #d4af37;
+      font-weight: 700;
+    }
 
     .progress-bar-bg {
       width: 100%;
       height: 18px;
+
       background: #1a1a1a;
       border-radius: 30px;
-      box-shadow:
-        inset 0 4px 8px #000000,
-        0 1px 0 #4a4a4a;
+
       padding: 2px;
       border: 1px solid #3b3b3b;
-      margin-bottom: 2rem;
+
+      margin-bottom: 1.5rem;
       overflow: hidden;
+
+      box-shadow:
+        inset 0 4px 8px #000,
+        0 1px 0 #4a4a4a;
     }
 
     .progress-fill {
       height: 100%;
       width: 0%;
-      background: linear-gradient(90deg, #7e7e7e, #c0c0c0, #e0e0e0);
+
+      background: repeating-linear-gradient(
+        45deg,
+        #bfbfbf 0px,
+        #bfbfbf 2px,
+        #a0a0a0 2px,
+        #a0a0a0 6px
+      );
+
       border-radius: 30px;
-      box-shadow:
-        0 0 12px #cccccc90,
-        inset 0 1px 4px white;
-      transition: width 0.1s ease;
-      background-image: repeating-linear-gradient(45deg, #bfbfbf 0px, #bfbfbf 2px, #a0a0a0 2px, #a0a0a0 6px);
-      background-blend-mode: overlay;
+
+      box-shadow: 0 0 12px #cccccc90;
+      transition: width 0.1s linear;
+
       position: relative;
     }
 
     .progress-fill::after {
       content: '';
       position: absolute;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+      inset: 0;
+
+      background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255,255,255,0.3),
+        transparent
+      );
+
       animation: shimmer 1.5s infinite;
     }
 
+    /* ==============================
+       INSTALL BUTTON
+    ============================== */
+
+    #installButton {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+
+      width: 100%;
+      max-width: 300px;
+
+      margin: 15px auto 0;
+      padding: 15px 22px;
+
+      background: linear-gradient(145deg,#d4af37,#a88419);
+
+      color: #1e1e1e;
+
+      border: 2px solid #e5c45a;
+      border-radius: 40px;
+
+      font-size: 0.95rem;
+      font-weight: 800;
+      letter-spacing: 1.3px;
+      text-transform: uppercase;
+
+      cursor: pointer;
+
+      box-shadow:
+        0 8px 20px rgba(0,0,0,0.5),
+        0 0 15px rgba(212,175,55,0.1);
+
+      transition: all 0.25s ease;
+    }
+
+    #installButton:hover {
+      background: #edca58;
+      transform: translateY(-3px);
+
+      box-shadow: 0 10px 25px rgba(212,175,55,0.3);
+    }
+
+    #installButton:active {
+      transform: scale(0.97);
+    }
+
+    #installButton:focus-visible {
+      outline: 3px solid white;
+      outline-offset: 4px;
+    }
+
+    .install-description {
+      text-align: center;
+      color: #999;
+
+      font-size: 0.75rem;
+      letter-spacing: 0.5px;
+
+      margin-top: 12px;
+      line-height: 1.6;
+
+      min-height: 20px;
+    }
+
+    /* ==============================
+       FOOTER
+    ============================== */
+
     .cement-note {
       text-align: center;
+
       font-size: 0.75rem;
       color: #6e6e6e;
+
       letter-spacing: 2px;
       text-transform: uppercase;
-      margin-top: 1rem;
+
+      margin-top: 1.5rem;
+
       border-top: 1px solid #3a3a3a;
       padding-top: 1.2rem;
-      font-weight: 300;
     }
 
-    /* ----- ANIMATIONS ----- */
-    @keyframes rotateDrum {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
+    /* ==============================
+       BACKGROUND PARTICLES
+    ============================== */
 
-    @keyframes pulseBadge {
-      0%, 100% { transform: scale(1); box-shadow: 0 0 0 6px #4a4a4a, 0 0 0 10px #1e1e1e, inset 0 0 8px black; }
-      50% { transform: scale(1.08); box-shadow: 0 0 0 8px #5a5a5a, 0 0 0 12px #2a2a2a, inset 0 0 12px black, 0 0 25px #d4af3750; }
-    }
-
-    @keyframes shimmer {
-      0% { transform: translateX(-100%); }
-      100% { transform: translateX(100%); }
-    }
-
-    /* Background particles */
     .bg-particle {
       position: fixed;
       border-radius: 50%;
-      background: rgba(150, 150, 150, 0.1);
+
+      background: rgba(150,150,150,0.1);
+
       pointer-events: none;
       z-index: 0;
+
       animation: floatParticle 20s infinite linear;
     }
 
-    @keyframes floatParticle {
-      0% { transform: translateY(0) rotate(0deg); opacity: 0; }
-      10% { opacity: 0.6; }
-      90% { opacity: 0.6; }
-      100% { transform: translateY(-100vh) rotate(720deg); opacity: 0; }
+    /* ==============================
+       ANIMATIONS
+    ============================== */
+
+    @keyframes rotateDrum {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
     }
 
-    /* Responsive */
-    @media (max-width: 500px) {
-      .loader-container { padding: 2rem 1.5rem; }
-      .company-name { font-size: 1.4rem; }
-      .company-sub { font-size: 0.7rem; letter-spacing: 3px; }
-      .cement-mixer { width: 130px; height: 130px; }
-      #installedBadge { bottom: 12px; left: 12px; padding: 8px 14px; font-size: 0.75rem; }
+    @keyframes pulseBadge {
+      0%,100% {
+        transform: scale(1);
+      }
+
+      50% {
+        transform: scale(1.08);
+      }
     }
+
+    @keyframes shimmer {
+      from { transform: translateX(-100%); }
+      to { transform: translateX(100%); }
+    }
+
+    @keyframes floatParticle {
+      0% {
+        transform: translateY(0) rotate(0deg);
+        opacity: 0;
+      }
+
+      10%,90% {
+        opacity: 0.6;
+      }
+
+      100% {
+        transform: translateY(-100vh) rotate(720deg);
+        opacity: 0;
+      }
+    }
+
+    /* ==============================
+       MOBILE RESPONSIVENESS
+    ============================== */
+
+    @media(max-width:500px) {
+
+      .loader-container {
+        padding: 2rem 1.5rem;
+      }
+
+      .company-name {
+        font-size: 1.4rem;
+      }
+
+      .company-sub {
+        font-size: 0.7rem;
+        letter-spacing: 3px;
+      }
+
+      .cement-mixer {
+        width: 130px;
+        height: 130px;
+      }
+
+      #installedBadge {
+        bottom: 12px;
+        left: 12px;
+        padding: 8px 14px;
+        font-size: 0.7rem;
+      }
+
+      #installButton {
+        font-size: 0.85rem;
+        padding: 13px;
+      }
+
+    }
+
+    @media(prefers-reduced-motion:reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        scroll-behavior: auto !important;
+      }
+    }
+
   </style>
 </head>
+
 <body>
 
-  <!-- Installed indicator (bottom-left, only shown after install) -->
-  <button id="installedBadge" title="App is installed">✅ Maricopa Installed</button>
+  <!-- INSTALLED BADGE -->
 
-  <!-- Decorative background particles -->
-  <div class="bg-particle" style="width: 4px; height: 4px; left: 10%; animation-duration: 25s; animation-delay: 0s;"></div>
-  <div class="bg-particle" style="width: 6px; height: 6px; left: 25%; animation-duration: 18s; animation-delay: 2s;"></div>
-  <div class="bg-particle" style="width: 3px; height: 3px; left: 40%; animation-duration: 30s; animation-delay: 5s;"></div>
-  <div class="bg-particle" style="width: 8px; height: 8px; left: 55%; animation-duration: 22s; animation-delay: 1s;"></div>
-  <div class="bg-particle" style="width: 5px; height: 5px; left: 70%; animation-duration: 28s; animation-delay: 7s;"></div>
-  <div class="bg-particle" style="width: 7px; height: 7px; left: 85%; animation-duration: 20s; animation-delay: 3s;"></div>
-  <div class="bg-particle" style="width: 4px; height: 4px; left: 15%; animation-duration: 35s; animation-delay: 10s;"></div>
-  <div class="bg-particle" style="width: 9px; height: 9px; left: 60%; animation-duration: 26s; animation-delay: 4s;"></div>
+  <button id="installedBadge" type="button">
+    ✅ MARICOPA INSTALLED
+  </button>
 
-  <div class="loader-container">
+
+  <!-- BACKGROUND PARTICLES -->
+
+  <div class="bg-particle" style="width:4px;height:4px;left:10%;animation-duration:25s;"></div>
+  <div class="bg-particle" style="width:6px;height:6px;left:25%;animation-duration:18s;animation-delay:2s;"></div>
+  <div class="bg-particle" style="width:3px;height:3px;left:40%;animation-duration:30s;animation-delay:5s;"></div>
+  <div class="bg-particle" style="width:8px;height:8px;left:55%;animation-duration:22s;animation-delay:1s;"></div>
+  <div class="bg-particle" style="width:5px;height:5px;left:70%;animation-duration:28s;animation-delay:7s;"></div>
+  <div class="bg-particle" style="width:7px;height:7px;left:85%;animation-duration:20s;animation-delay:3s;"></div>
+  <div class="bg-particle" style="width:4px;height:4px;left:15%;animation-duration:35s;animation-delay:10s;"></div>
+  <div class="bg-particle" style="width:9px;height:9px;left:60%;animation-duration:26s;animation-delay:4s;"></div>
+
+
+  <!-- MAIN LOADER -->
+
+  <main class="loader-container">
+
     <div class="company-header">
-      <div class="company-name">MARICOPA</div>
-      <div class="company-sub">CONCRETE & ALLIED CO.</div>
+
+      <div class="company-name">
+        MARICOPA
+      </div>
+
+      <div class="company-sub">
+        CONCRETE & ALLIED CO.
+      </div>
+
     </div>
 
+
+    <!-- CEMENT MIXER -->
+
     <div class="cement-mixer">
+
       <div class="drum-ring"></div>
+
       <div class="drum-inner">
+
         <div class="aggregate">
           <span></span><span></span><span></span><span></span><span></span>
           <span></span><span></span><span></span><span></span><span></span>
         </div>
+
       </div>
-      <div class="center-badge">C</div>
+
+      <div class="center-badge">
+        C
+      </div>
+
     </div>
 
+
+    <!-- PROGRESS -->
+
     <div class="loading-label">
+
       <span>⚙️ POURING CEMENT</span>
-      <span id="percentageDisplay">0%</span>
+
+      <span id="percentageDisplay">
+        0%
+      </span>
+
     </div>
+
     <div class="progress-bar-bg">
+
       <div class="progress-fill" id="progressFill"></div>
+
     </div>
+
+
+    <!-- INSTALL APPLICATION BUTTON -->
+
+    <button id="installButton" type="button">
+      <span>⬇</span>
+      INSTALL MARICOPA APP
+    </button>
+
+    <p class="install-description" id="installDescription" aria-live="polite">
+      Install Maricopa Concrete for quick and easy access.
+    </p>
+
+
+    <!-- FOOTER -->
 
     <div class="cement-note">
       ⚡ AGGREGATE · WATER · CEMENT · STRENGTH ⚡
     </div>
-  </div>
+
+  </main>
+
+
+  <!-- JAVASCRIPT -->
 
   <script>
-    // ============================================================
-    // 1. INSTALLED STATE DETECTION
-    // ============================================================
-    const installedBadge = document.getElementById('installedBadge');
 
-    // Check if the app is running in standalone mode (installed)
-    function checkInstalledState() {
-      const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
-      const isIOSStandalone = window.navigator.standalone === true;
-      if (isStandalone || isIOSStandalone) {
-        installedBadge.style.display = 'flex';
-        console.log('✅ Running in standalone mode – installed badge shown');
-      } else {
-        installedBadge.style.display = 'none';
-      }
+    // ==========================================
+    // 1. INSTALLATION SYSTEM
+    // ==========================================
+
+    const installButton =
+      document.getElementById('installButton');
+
+    const installDescription =
+      document.getElementById('installDescription');
+
+    const installedBadge =
+      document.getElementById('installedBadge');
+
+    let deferredInstallPrompt = null;
+
+
+    // Check installation state
+
+    function isAppInstalled() {
+
+      return (
+        window.matchMedia('(display-mode: standalone)').matches ||
+        window.matchMedia('(display-mode: fullscreen)').matches ||
+        window.navigator.standalone === true
+      );
+
     }
 
-    // Run once on load
-    checkInstalledState();
 
-    // Listen for changes in display mode
-    window.matchMedia('(display-mode: standalone)').addEventListener('change', (e) => {
-      checkInstalledState();
+    // Update installation interface
+
+    function updateInstallUI() {
+
+      if (isAppInstalled()) {
+
+        installButton.style.display = 'none';
+
+        installDescription.style.display = 'none';
+
+        installedBadge.style.display = 'flex';
+
+      } else {
+
+        installButton.style.display = 'flex';
+
+        installedBadge.style.display = 'none';
+
+        installDescription.style.display = 'block';
+
+      }
+
+    }
+
+
+    updateInstallUI();
+
+
+    // Browser announces that installation is available
+
+    window.addEventListener('beforeinstallprompt', (event) => {
+
+      event.preventDefault();
+
+      deferredInstallPrompt = event;
+
+      installButton.style.display = 'flex';
+
+      installButton.innerHTML =
+        '<span>⬇</span> INSTALL MARICOPA APP';
+
+      installDescription.textContent =
+        'Your device is ready to install Maricopa Concrete.';
+
     });
 
-    // Optional: if the app is installed from this page, show the badge
+
+    // Install button
+
+    installButton.addEventListener('click', async () => {
+
+      if (isAppInstalled()) {
+
+        updateInstallUI();
+
+        return;
+
+      }
+
+
+      // Native installation prompt
+
+      if (deferredInstallPrompt) {
+
+        const promptEvent = deferredInstallPrompt;
+
+        deferredInstallPrompt = null;
+
+        installButton.disabled = true;
+
+        try {
+
+          await promptEvent.prompt();
+
+          const result = await promptEvent.userChoice;
+
+          if (result.outcome === 'accepted') {
+
+            installButton.style.display = 'none';
+
+            installDescription.textContent =
+              'Maricopa installation accepted.';
+
+          } else {
+
+            installDescription.textContent =
+              'Installation cancelled. You can try again anytime.';
+
+          }
+
+        } catch (error) {
+
+          console.error('Installation error:', error);
+
+          installDescription.textContent =
+            'Unable to start installation. Please try again.';
+
+        } finally {
+
+          installButton.disabled = false;
+
+        }
+
+        return;
+
+      }
+
+
+      // Manual installation instructions
+
+      const userAgent = navigator.userAgent;
+
+      if (/iPhone|iPad|iPod/i.test(userAgent) ||
+          (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)) {
+
+        alert(
+          'INSTALL MARICOPA CONCRETE\n\n' +
+          '1. Open this website in Safari.\n' +
+          '2. Tap the Share button.\n' +
+          '3. Select "Add to Home Screen".\n' +
+          '4. Tap Add.'
+        );
+
+      } else if (/Android/i.test(userAgent)) {
+
+        alert(
+          'INSTALL MARICOPA CONCRETE\n\n' +
+          '1. Open this website in Chrome.\n' +
+          '2. Tap the three-dot menu.\n' +
+          '3. Select "Install app" or "Add to Home screen".\n' +
+          '4. Confirm installation.'
+        );
+
+      } else {
+
+        alert(
+          'INSTALL MARICOPA CONCRETE\n\n' +
+          '1. Open this website using Chrome or Edge.\n' +
+          '2. Look for the install icon in the address bar.\n' +
+          '3. Select "Install Maricopa Concrete".\n\n' +
+          'If installation is unavailable, check your PWA configuration.'
+        );
+
+      }
+
+    });
+
+
+    // Installation completed
+
     window.addEventListener('appinstalled', () => {
-      console.log('🎉 App installed successfully');
-      installedBadge.style.display = 'flex';
+
+      deferredInstallPrompt = null;
+
+      updateInstallUI();
+
+      installDescription.textContent =
+        'Maricopa Concrete installed successfully!';
+
+      console.log('Maricopa application installed.');
+
     });
 
-    // Clicking the badge gives a friendly confirmation
+
+    // Detect standalone changes
+
+    const standaloneQuery =
+      window.matchMedia('(display-mode: standalone)');
+
+    if (standaloneQuery.addEventListener) {
+
+      standaloneQuery.addEventListener('change', updateInstallUI);
+
+    } else {
+
+      standaloneQuery.addListener(updateInstallUI);
+
+    }
+
+
+    // Installed badge
+
     installedBadge.addEventListener('click', () => {
-      alert('Maricopa Concrete is installed on your device. Launch it from your home screen or app drawer.');
+
+      alert(
+        'Maricopa Concrete is installed on your device.\n\n' +
+        'Launch it from your home screen or application menu.'
+      );
+
     });
 
-    // ============================================================
-    // 2. LOADER (30 seconds)
-    // ============================================================
-    (function() {
-      const REDIRECT_URL = 'home.html';
-      const LOAD_DURATION = 30000; // 30 seconds
 
-      const progressFill = document.getElementById('progressFill');
-      const percentageDisplay = document.getElementById('percentageDisplay');
+    // ==========================================
+    // 2. SERVICE WORKER REGISTRATION
+    // ==========================================
+
+    if ('serviceWorker' in navigator) {
+
+      window.addEventListener('load', async () => {
+
+        try {
+
+          const registration =
+            await navigator.serviceWorker.register('./sw.js');
+
+          console.log(
+            'Maricopa Service Worker registered:',
+            registration.scope
+          );
+
+        } catch (error) {
+
+          console.error(
+            'Service Worker registration failed:',
+            error
+          );
+
+        }
+
+      });
+
+    }
+
+
+    // ==========================================
+    // 3. LOADING ANIMATION
+    // ==========================================
+
+    (function() {
+
+      const REDIRECT_URL = './home.html';
+
+      const LOAD_DURATION = 30000;
+
+      const progressFill =
+        document.getElementById('progressFill');
+
+      const percentageDisplay =
+        document.getElementById('percentageDisplay');
 
       let startTime = null;
+
       let animationFrame = null;
 
       function updateProgress(timestamp) {
+
         if (!startTime) {
+
           startTime = timestamp;
+
         }
 
         const elapsed = timestamp - startTime;
-        const progress = Math.min(elapsed / LOAD_DURATION, 1);
-        const percent = Math.floor(progress * 100);
+
+        const progress =
+          Math.min(elapsed / LOAD_DURATION, 1);
+
+        const percent =
+          Math.floor(progress * 100);
 
         progressFill.style.width = percent + '%';
-        percentageDisplay.textContent = percent + '%';
+
+        percentageDisplay.textContent =
+          percent + '%';
+
 
         if (progress < 1) {
-          animationFrame = requestAnimationFrame(updateProgress);
+
+          animationFrame =
+            requestAnimationFrame(updateProgress);
+
         } else {
+
           cancelAnimationFrame(animationFrame);
+
           setTimeout(() => {
+
             window.location.href = REDIRECT_URL;
+
           }, 300);
+
         }
+
       }
 
-      animationFrame = requestAnimationFrame(updateProgress);
+
+      animationFrame =
+        requestAnimationFrame(updateProgress);
+
 
       window.addEventListener('beforeunload', () => {
+
         if (animationFrame) {
+
           cancelAnimationFrame(animationFrame);
+
         }
+
       });
+
     })();
 
-    // ============================================================
-    // 3. SERVICE WORKER (required for PWA installability)
-    // ============================================================
-    if ('serviceWorker' in navigator) {
-      const swCode = `
-        const CACHE_NAME = 'maricopa-v1';
-        self.addEventListener('install', (event) => {
-          self.skipWaiting();
-          event.waitUntil(
-            caches.open(CACHE_NAME).then((cache) => cache.addAll(['./']))
-          );
-        });
-        self.addEventListener('activate', (event) => {
-          event.waitUntil(clients.claim());
-        });
-        self.addEventListener('fetch', (event) => {
-          event.respondWith(
-            caches.match(event.request).then((response) => {
-              return response || fetch(event.request);
-            })
-          );
-        });
-      `;
-      const blob = new Blob([swCode], { type: 'application/javascript' });
-      const swUrl = URL.createObjectURL(blob);
-
-      navigator.serviceWorker.register(swUrl)
-        .then((registration) => {
-          console.log('✅ Service Worker registered:', registration.scope);
-        })
-        .catch((error) => {
-          console.warn('⚠️ Service Worker registration failed:', error);
-        });
-    }
   </script>
+
 </body>
 </html>
