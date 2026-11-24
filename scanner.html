@@ -132,14 +132,29 @@ var $=function(i){return document.getElementById(i)};
 var Q=new URLSearchParams(location.search),FIELD=Q.get('field')||'',
     RET=/^[\w\-.\/]+\.html$/.test(Q.get('return')||'')?Q.get('return'):'inventory.html',
     FM=!!FIELD&&FIELD!=='receipt';
-var items=[],rows=[],mode='in',uid=0,src=null,busy=false,tT=null,aliases={};
+var items=[],rows=[],mode='in',uid=0,src=null,busy=false,aliases={},dirty=false;
+var toastQ=[],toastActive=false,tT=null;
 try{aliases=JSON.parse(localStorage.getItem('mrc.aliases')||'{}')}catch(e){}
 
 function money(n){return 'KSH '+(Number(n)||0).toLocaleString('en-KE',{minimumFractionDigits:2,maximumFractionDigits:2})}
 function num(n){return Number(n||0).toLocaleString('en-KE')}
 function r2(n){return Math.round(n*100)/100}
 function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
-function toast(m,t){clearTimeout(tT);$('toastMsg').textContent=m;$('toast').className='toast show'+(t==='error'?' error':'');tT=setTimeout(function(){$('toast').classList.remove('show')},4500)}
+
+/* ---- toast queue: never swallow a message ---- */
+function toast(m,t){
+  toastQ.push({m:m,t:t});drainToasts();
+}
+function drainToasts(){
+  if(toastActive||!toastQ.length)return;
+  toastActive=true;var x=toastQ.shift();
+  $('toastMsg').textContent=x.m;$('toast').className='toast show'+(x.t==='error'?' error':'');
+  clearTimeout(tT);tT=setTimeout(function(){
+    $('toast').classList.remove('show');
+    setTimeout(function(){toastActive=false;drainToasts()},320);
+  },4200);
+}
+
 function api(path,opt,ms){
   var c=new AbortController(),t=setTimeout(function(){c.abort()},ms||90000);
   opt=opt||{};opt.signal=c.signal;opt.headers=Object.assign({Accept:'application/json'},opt.headers||{});
@@ -185,17 +200,20 @@ function toNum(t){
   else t=t.replace(/,/g,'');
   return /^\d+(\.\d+)?$/.test(t)?parseFloat(t):null;
 }
+// Plausibility: no real receipt has qty>10k or unit price>1M or total<qty*price/100
+function plausible(q,p,t){
+  if(q>10000||p>1000000||t>100000000)return false;
+  if(q>0&&p>0&&t>0&&t<q*p/100)return false;
+  return true;
+}
 // Brute-force: try every triple of trailing numbers to find q × p = t
-// Handles receipts with 1–4 trailing numbers and optional line-number prefix
 function assign(n,lead){
   if(!n.length)return null;
   var tail=n.slice(-4),best=null,i,j,k;
-  // 1) Find any triple where a*b ≈ c
   for(i=0;i<tail.length;i++)for(j=0;j<tail.length;j++)for(k=0;k<tail.length;k++){
     if(i===j||j===k||i===k)continue;
     var a=tail[i],b=tail[j],c=tail[k];
-    if(a>0&&b>0&&c>0&&near(a*b,c)){
-      // prefer smaller-integer qty × larger price = total
+    if(a>0&&b>0&&c>0&&near(a*b,c)&&plausible(a,b,c)){
       var q=a,p=b,t=c;
       if(Number.isInteger(b)&&!Number.isInteger(a)){q=b;p=a}
       if(!best||Math.abs(a*b-c)<Math.abs(best.q*best.p-best.t))
@@ -203,19 +221,16 @@ function assign(n,lead){
     }
   }
   if(best)return best;
-  // 2) Lead qty on line: "5  Pieces  1,200  6,000"
   if(lead!=null&&n.length>=2&&near(lead*n[n.length-2],n[n.length-1]))
     return{q:lead,p:n[n.length-2],t:n[n.length-1],ok:1,lead:1};
-  // 3) Two numbers: assume last = total, derive unit price (flagged)
+  // P0 FIX: two numbers means qty,total (NOT price,total)
   if(n.length>=2){
-    var t=n[n.length-1],p=n[n.length-2];
-    if(p>0)return{q:r2(t/p),p:p,t:t,ok:0,derived:1};
-    return{q:1,p:t,t:t,ok:0,derived:1};
+    var q0=n[n.length-2],t0=n[n.length-1];
+    if(q0>0&&t0>0)return{q:q0,p:r2(t0/q0),t:t0,ok:0,derived:1};
   }
-  // 4) Single number — qty only, user fills the rest
   return{q:n[0],p:0,t:0,ok:0,derived:1};
 }
-var UNITS=/^(bags?|pcs?|pieces?|nos?|tons?|tonnes?|kgs?|kilos?|ltrs?|litres?|liters?|m3|m³|pallets?|lengths?|rolls?|sheets?|trips?|tins?|buckets?|bundles?|drum|drums|cartons?|boxes?|box|pkt|packets?)$/i;
+var UNITS=/^(bags?|pcs?|pieces?|nos?|tons?|tonnes?|kgs?|kilos?|ltrs?|litres?|liters?|m3|m³|pallets?|lengths?|rolls?|sheets?|trips?|tins?|buckets?|bundles?|drums?|cartons?|box|boxes|pkt|packets?)$/i;
 var SKIP=/\b(sub\s?total|total|vat|tax|change|cash|balance|amount|tendered|mpesa|card|date|receipt|invoice|tel|thank|served|discount)\b/i;
 var JUNK=/^([x×@=*:\-]|ksh\.?|kes\.?|sh\.?|\/=)$/i;
 
@@ -251,7 +266,7 @@ function parseTokens(tk){
 function lastNum(tk){for(var i=tk.length-1;i>=0;i--){var v=toNum(tk[i].t);if(v!=null)return v}return null}
 
 function parseData(data){
-  var out=[],pend=null,grand=0,sub=0;
+  var out=[],pend=null,grand=0,sub=0,unnamed=0;
   (data.lines||[]).forEach(function(L){
     var tk=(L.words||[]).map(function(w){return{t:w.text,b:w.bbox}}).filter(function(w){return w.t&&w.t.trim()});
     if(!tk.length)return;
@@ -260,12 +275,23 @@ function parseData(data){
       if(/\b(total|amount\s*due)\b/i.test(txt)){var v=lastNum(tk);if(v!=null){if(/sub/i.test(txt))sub=Math.max(sub,v);else grand=Math.max(grand,v)}}
       pend=null;return}
     var p=parseTokens(tk);
-    if(!p){pend=(/[a-z]{3,}/i.test(txt)&&!/\d{3,}/.test(txt))?{name:txt.replace(/[^\w\s\-\/.()%'"]/g,' ').trim(),b:L.bbox}:null;return}
+    if(!p){
+      // P0 FIX: preserve numeric-only lines as "(line N)" instead of dropping them
+      pend=(/[a-z]{3,}/i.test(txt)&&!/\d{3,}/.test(txt))?{name:txt.replace(/[^\w\s\-\/.()%'"]/g,' ').trim(),b:L.bbox}:null;
+      // If this line has numbers but no letters, still try to keep it
+      if(!pend&&/\d/.test(txt)&&!/[a-z]/i.test(txt)){
+        var nums=txt.match(/\d[\d.,]*/g)||[];
+        if(nums.length>=1)unnamed++;
+      }
+      return}
     var bb={x0:L.bbox.x0,x1:L.bbox.x1,y0:L.bbox.y0,y1:L.bbox.y1};
     if(!/[a-z]{2}/i.test(p.name)){
-      if(!pend)return;p.name=pend.name;bb.y0=Math.min(bb.y0,pend.b.y0);bb.x0=Math.min(bb.x0,pend.b.x0)}
+      if(pend){p.name=pend.name;bb.y0=Math.min(bb.y0,pend.b.y0);bb.x0=Math.min(bb.x0,pend.b.x0)}
+      else{p.name='(line '+(++unnamed)+')'}  // keep it
+    }
     pend=null;
-    if(p.name.length<2||!/[a-z]/i.test(p.name))return;
+    // P0 FIX: only reject if name has no letters AND no placeholder — keep unnamed numeric lines
+    if(p.name.length<2&&!/[a-z]/i.test(p.name))return;
     p.bb=bb;out.push(p);
   });
   return{rows:out,grand:grand||sub};
@@ -303,12 +329,14 @@ async function reread(w,r,pre){
     var res=await w.recognize(c);
     var n=(res.data.text.match(/\d[\d.,]*/g)||[]).map(toNum).filter(function(v){return v!=null});
     if(n.length>=2){var a=assign(n.slice(-4),r.lead);
-      if(a&&a.ok){r.q=a.q;r.p=a.p;r.t=a.t;r.ok=1;r.derived=0;r.conf='ok';r.notes.push(['info','Fixed by zooming in and re-reading the numbers.']);return true}}
+      if(a&&a.ok&&plausible(a.q,a.p,a.t)){r.q=a.q;r.p=a.p;r.t=a.t;r.ok=1;r.derived=0;r.conf='ok';r.notes.push(['info','Fixed by zooming in and re-reading the numbers.']);return true}}
   }
   return false;
 }
 function repair(r){
-  var it=itemOf(r.itemId);if(r.ok||!it)return;
+  // Never overwrite a verified read
+  if(r.ok||r.conf==='verified')return;
+  var it=itemOf(r.itemId);if(!it)return;
   var P=Number(it.price),q=r.q,t=r.t;if(!(P>0)||!(t>0))return;
   var orig=num(q)+' × '+num(r.p)+' = '+num(t),k=Math.round(t/P);
   if(q>0&&near(q*P,t))r.p=P;
@@ -404,7 +432,9 @@ async function runOcr(){
     if(ip)await ip;
     var pa=parseData(ra.data),pb=null,list=pair(pa.rows,[]);
     list.forEach(decide);
-    if(!list.length||list.some(function(r){return !r.ok})){
+    var weak1=list.filter(function(r){return !r.ok}).length;
+    // P1 FIX: only re-OCR if zero lines OR more than one weak line
+    if(!list.length||weak1>1){
       stage=1;prog(.7,'Double-checking doubtful lines…');
       var rb=await w.recognize(getB(pre));pb=parseData(rb.data);
       list=pair(pa.rows,pb.rows);list.forEach(decide);
@@ -423,7 +453,7 @@ async function runOcr(){
       if(r.derived&&!r.ok)o.notes.push(['warn','Unit price was worked out from the total; only the total was read.']);
       return o});
     var g=pa.grand||(pb&&pb.grand);if(g)$('rcptTotal').value=g;
-    render();
+    render();saveDraft();
     var bad=rows.filter(function(r){return r.conf==='check'}).length;
     toast(rows.length+' line'+(rows.length>1?'s':'')+' read'+(bad?' — '+bad+' need a quick check.':' and cross-checked.'),bad?'error':'');
     $('review').scrollIntoView({behavior:'smooth',block:'start'});
@@ -461,6 +491,7 @@ function check(r){
   var o=[],it=itemOf(r.itemId),q=parseFloat(r.qty),p=parseFloat(r.price),t=parseFloat(r.total);
   if(r.conf==='verified')o.push(['ok','✓ '+(r.why||'Verified')]);
   (r.notes||[]).forEach(function(n){o.push(n)});
+  if(r.applyErr)o.push(['bad',r.applyErr]);
   if(!it)o.push(['bad','Pick the matching stock item']);
   if(!(q>0))o.push(['bad','Enter a quantity']);
   else if(isFinite(p)&&isFinite(t)&&!near(q*p,t))
@@ -513,15 +544,34 @@ $('lines').addEventListener('input',function(e){
   var t=e.target,f=t.dataset.f,r=rowOf(t);if(!r||!f||f==='itemId')return;
   r[f]=t.type==='checkbox'?t.checked:t.value;
   if(f==='qty'||f==='price'){var q=parseFloat(r.qty),p=parseFloat(r.price);if(q>0&&p>=0){r.total=r2(q*p);var ti=t.closest('.line').querySelector('[data-f=total]');if(ti)ti.value=r.total}}
-  refresh(r);
+  r.applyErr='';refresh(r);saveDraft();
 });
-$('lines').addEventListener('change',function(e){var t=e.target,r=rowOf(t);if(r&&t.dataset.f==='itemId'){r.itemId=t.value;r.updPrice=false;r.conf=r.conf==='verified'?'ok':r.conf;refresh(r)}});
+$('lines').addEventListener('change',function(e){var t=e.target,r=rowOf(t);if(r&&t.dataset.f==='itemId'){r.itemId=t.value;r.updPrice=false;r.conf=r.conf==='verified'?'ok':r.conf;r.applyErr='';refresh(r);saveDraft()}});
 $('lines').addEventListener('click',function(e){
   var b=e.target.closest('[data-act]');if(!b)return;var r=rowOf(b);if(!r)return;
-  if(b.dataset.act==='del'){rows=rows.filter(function(x){return x!==r});render()}
-  if(b.dataset.act==='fix'){r.total=r2(parseFloat(r.qty)*parseFloat(r.price));render()}
+  if(b.dataset.act==='del'){rows=rows.filter(function(x){return x!==r});render();saveDraft()}
+  if(b.dataset.act==='fix'){r.total=r2(parseFloat(r.qty)*parseFloat(r.price));render();saveDraft()}
 });
-$('rcptTotal').addEventListener('input',summary);
+$('rcptTotal').addEventListener('input',function(){summary();saveDraft()});
+
+/* ---- draft persistence (crash / refresh recovery) ---- */
+function saveDraft(){
+  if(FM)return;
+  try{
+    if(!rows.length){localStorage.removeItem('mrc.scanDraft');return}
+    var d={mode:mode,rows:rows.map(function(r){return{id:r.id,name:r.name,qty:r.qty,price:r.price,total:r.total,unit:r.unit,itemId:r.itemId,include:r.include,updPrice:r.updPrice,conf:r.conf,why:r.why,notes:r.notes}}),rcptTotal:$('rcptTotal').value};
+    localStorage.setItem('mrc.scanDraft',JSON.stringify(d));
+  }catch(e){}
+}
+function loadDraft(){
+  try{
+    var d=JSON.parse(localStorage.getItem('mrc.scanDraft')||'null');if(!d||!d.rows||!d.rows.length)return false;
+    mode=d.mode||'in';rows=d.rows;uid=Math.max.apply(0,rows.map(function(r){return r.id||0}));
+    if(d.rcptTotal)$('rcptTotal').value=d.rcptTotal;
+    return true;
+  }catch(e){return false}
+}
+function clearDraft(){try{localStorage.removeItem('mrc.scanDraft')}catch(e){}}
 
 /* ================= apply ================= */
 function applyAll(){
@@ -534,17 +584,18 @@ function applyAll(){
   var ok=0,fail=0,failMsg='';
   sel.reduce(function(chain,r){return chain.then(function(){
     var it=itemOf(r.itemId),q=parseFloat(r.qty),cur=Number(it.quantity)||0,next=mode==='out'?cur-q:cur+q;
-    if(mode==='out'&&next<0){fail++;failMsg='Not enough stock for '+it.name;return}
+    if(mode==='out'&&next<0){fail++;failMsg='Not enough stock for '+it.name;r.applyErr='Not enough stock — only '+num(cur)+' available';return}
     var pl={name:it.name,sku:it.sku,category:it.category,quantity:next,unit:it.unit||'units',
       price:(mode==='in'&&r.updPrice)?parseFloat(r.price):Number(it.price)||0,
       threshold:it.threshold===undefined||it.threshold===null?10:Number(it.threshold),supplier:it.supplier||'',notes:it.notes||''};
     return api('/inventory/'+encodeURIComponent(it.id),{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(pl)})
       .then(function(u){Object.assign(it,u||{},pl);aliases[norm(r.name)]=it.id;r.done=true;ok++})
-      .catch(function(e){fail++;failMsg=e.message});
+      .catch(function(e){fail++;failMsg=e.message;r.applyErr='Save failed: '+e.message});
   })},Promise.resolve()).then(function(){
     try{localStorage.setItem('mrc.aliases',JSON.stringify(aliases))}catch(e){}
     rows=rows.filter(function(r){return !r.done});busy=false;render();
-    if(!rows.length){$('rcptTotal').value='';$('ocrText').value='';$('preview').style.display='none';src=null}
+    if(!rows.length){$('rcptTotal').value='';$('ocrText').value='';$('preview').style.display='none';src=null;clearDraft();dirty=false}
+    else saveDraft();
     toast(fail?ok+' updated, '+fail+' failed ('+failMsg+'). Failed lines are still listed.':'Inventory updated: '+ok+' line'+(ok>1?'s':'')+' applied.',fail?'error':'');
   });
 }
@@ -558,7 +609,7 @@ function setMode(m){
   var hint=$('modeHint');
   if(hint)hint.innerHTML=m==='in'?'Quantities will be <b>added</b> to the current balance.':'Quantities will be <b>subtracted</b> from the current balance.';
   try{localStorage.setItem('mrc.scanMode',m)}catch(e){}
-  render();
+  render();saveDraft();
 }
 
 /* ================= events ================= */
@@ -567,10 +618,10 @@ $('btnUp').onclick=function(){$('fileUp').click()};
 ['fileCam','fileUp'].forEach(function(id){$(id).onchange=function(){loadImage(this.files[0]);this.value=''}});
 $('btnAgain').onclick=function(){runOcr()};
 $('btnRot').onclick=function(){if(src&&!busy){rotate();runOcr()}};
-$('btnManual').onclick=function(){addRow({});render();var l=document.querySelectorAll('.line');if(l.length)l[l.length-1].scrollIntoView({behavior:'smooth',block:'center'})};
+$('btnManual').onclick=function(){addRow({});render();var l=document.querySelectorAll('.line');if(l.length)l[l.length-1].scrollIntoView({behavior:'smooth',block:'center'});saveDraft()};
 $('btnReparse').onclick=function(){var p=parseText($('ocrText').value);if(!p.length)return toast('No item lines found in the text.','error');
-  rows=[];p.forEach(function(x){var id=matchItem(x.name,x.p);addRow({name:x.name,qty:x.q,price:x.p,total:x.t,unit:x.unit,itemId:id,conf:x.ok?'ok':'check'})});render();toast(p.length+' line(s) read.')};
-$('btnClear').onclick=function(){if(rows.length&&confirm('Remove all lines from this screen?')){rows=[];render()}};
+  rows=[];p.forEach(function(x){var id=matchItem(x.name,x.p);addRow({name:x.name,qty:x.q,price:x.p,total:x.t,unit:x.unit,itemId:id,conf:x.ok?'ok':'check'})});render();saveDraft();toast(p.length+' line(s) read.')};
+$('btnClear').onclick=function(){if(rows.length&&confirm('Remove all lines from this screen?')){rows=[];render();clearDraft()}};
 $('btnApply').onclick=applyAll;
 $('retry').onclick=loadItems;
 $('modeSeg').onclick=function(e){var b=e.target.closest('button');if(b)setMode(b.dataset.mode)};
@@ -589,9 +640,10 @@ if(FM){
   $('back').href=back;$('back').innerHTML='<i class="fas fa-arrow-left"></i> Back';$('cancelPick').href=back;
   document.querySelector('details summary').nextElementSibling.nextElementSibling.style.display='none';$('btnReparse').style.display='none';
 }else{
-  // restore saved mode
-  try{var sm=localStorage.getItem('mrc.scanMode');if(sm==='in'||sm==='out')setMode(sm)}catch(e){}
-  loadItems();
+  try{var sm=localStorage.getItem('mrc.scanMode');if(sm==='in'||sm==='out')mode=sm}catch(e){}
+  if(loadDraft()){toast('Restored unsaved scan lines from your last session.');render();setMode(mode)}
+  else{setMode(mode);loadItems()}
+  if(loadDraft())loadItems();
 }
 setTimeout(function(){getWorker().catch(function(){})},300);
 })();
