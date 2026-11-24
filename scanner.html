@@ -433,13 +433,20 @@ function autoMatch(name,price){
     const p=num(it.price);if(price>0&&p>0&&Math.abs(price-p)/p<0.02)s+=0.15;
     if(s>best){best=s;bid=it.id}
   });
-  return best>=0.5?bid:'';
+  return best>=0.4?bid:'';
+}
+const CATUNIT={'Cement':'bags','Ready-mix':'m³','Aggregates':'tons','Steel':'pcs','Precast':'pcs','Chemicals':'litres','Other':'pcs'};
+/* unit comes from the matched inventory item; otherwise from the scan; otherwise guessed from the product type */
+function fillUnit(l){
+  const it=l.itemId&&l.itemId!=='__new'?inv.find(i=>i.id===l.itemId):null;
+  if(it&&it.unit)l.unit=it.unit;else if(!l.unit)l.unit=CATUNIT[l.category]||'pcs';
+  return l;
 }
 function makeLine(o){
-  return{id:++uid,include:true,name:o.name||'',qty:o.qty===''?'':o.qty,unit:o.unit||'',price:o.price,total:o.total,verified:!!o.verified,
-    itemId:autoMatch(o.name,num(o.price)),category:guessCat(o.name||'')};
+  return fillUnit({id:++uid,include:true,name:o.name||'',qty:o.qty===''?'':o.qty,unit:o.unit||'',price:o.price,total:o.total,verified:!!o.verified,
+    itemId:autoMatch(o.name,num(o.price)),category:guessCat(o.name||'')});
 }
-function rematch(){let ch=false;lines.forEach(l=>{if(!l.itemId){const id=autoMatch(l.name,num(l.price));if(id){l.itemId=id;ch=true}}});if(ch||lines.length)renderLines()}
+function rematch(){let ch=false;lines.forEach(l=>{if(!l.itemId){const id=autoMatch(l.name,num(l.price));if(id){l.itemId=id;ch=true}}fillUnit(l)});if(ch||lines.length)renderLines()}
 const lineOk=l=>{const q=num(l.qty),p=num(l.price),t=num(l.total);return q>0&&p>0&&t>0&&near(q,p,t)};
 
 /* ================= Review UI ================= */
@@ -489,7 +496,7 @@ $('lines').addEventListener('input',e=>{
 $('lines').addEventListener('change',e=>{
   const t=e.target,f=t.dataset.f,w=t.closest('.line');if(!w||f!=='itemId')return;
   const l=lines[+w.dataset.i];l.itemId=t.value;
-  const it=inv.find(i=>i.id===t.value);if(it&&!l.unit)l.unit=it.unit||'';
+  const it=inv.find(i=>i.id===t.value);if(it&&it.unit)l.unit=it.unit;
   renderLines();
 });
 $('lines').addEventListener('click',e=>{const b=e.target.closest('[data-del]');if(!b)return;lines.splice(+b.dataset.del,1);renderLines();showReview()});
