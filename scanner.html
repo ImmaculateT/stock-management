@@ -132,7 +132,7 @@ var $=function(i){return document.getElementById(i)};
 var Q=new URLSearchParams(location.search),FIELD=Q.get('field')||'',
     RET=/^[\w\-.\/]+\.html$/.test(Q.get('return')||'')?Q.get('return'):'inventory.html',
     FM=!!FIELD&&FIELD!=='receipt';
-var items=[],rows=[],mode='in',uid=0,src=null,busy=false,aliases={},dirty=false;
+var items=[],rows=[],mode='in',uid=0,src=null,busy=false,aliases={},dirty=false,itemsReady=false,itemsLoading=false;
 var toastQ=[],toastActive=false,tT=null;
 try{aliases=JSON.parse(localStorage.getItem('mrc.aliases')||'{}')}catch(e){}
 
@@ -141,7 +141,6 @@ function num(n){return Number(n||0).toLocaleString('en-KE')}
 function r2(n){return Math.round(n*100)/100}
 function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
 
-/* ---- toast queue: never swallow a message ---- */
 function toast(m,t){
   toastQ.push({m:m,t:t});drainToasts();
 }
@@ -164,10 +163,22 @@ function api(path,opt,ms){
   },function(){clearTimeout(t);throw new Error('Server not reachable')});
 }
 function banner(show,msg,info){var b=$('banner');b.className='banner'+(show?' show':'')+(info?' info':'');if(msg)$('bannerMsg').textContent=msg;$('retry').style.display=info?'none':''}
+
+/* ================= load inventory ================= */
 function loadItems(){
-  banner(true,'Connecting to the server… it can take up to a minute to wake up.',true);
-  return api('/inventory').then(function(d){items=Array.isArray(d)?d:[];banner(false);render()})
-  .catch(function(e){banner(true,'Cannot load inventory: '+e.message+'. Check your connection and retry.')});
+  if(itemsLoading)return Promise.resolve(items);
+  itemsLoading=true;
+  banner(true,'Loading stock items…',true);
+  return api('/inventory').then(function(d){
+    items=Array.isArray(d)?d:[];itemsReady=true;banner(false);
+    render();
+    return items;
+  }).catch(function(e){
+    itemsReady=true; // even if it fails, allow manual selection
+    banner(true,'Cannot load inventory: '+e.message+'. Check your connection and retry.');
+    render();
+    return items;
+  }).then(function(v){itemsLoading=false;return v});
 }
 
 /* ================= matching ================= */
@@ -200,13 +211,11 @@ function toNum(t){
   else t=t.replace(/,/g,'');
   return /^\d+(\.\d+)?$/.test(t)?parseFloat(t):null;
 }
-// Plausibility: no real receipt has qty>10k or unit price>1M or total<qty*price/100
 function plausible(q,p,t){
   if(q>10000||p>1000000||t>100000000)return false;
   if(q>0&&p>0&&t>0&&t<q*p/100)return false;
   return true;
 }
-// Brute-force: try every triple of trailing numbers to find q × p = t
 function assign(n,lead){
   if(!n.length)return null;
   var tail=n.slice(-4),best=null,i,j,k;
@@ -223,7 +232,6 @@ function assign(n,lead){
   if(best)return best;
   if(lead!=null&&n.length>=2&&near(lead*n[n.length-2],n[n.length-1]))
     return{q:lead,p:n[n.length-2],t:n[n.length-1],ok:1,lead:1};
-  // P0 FIX: two numbers means qty,total (NOT price,total)
   if(n.length>=2){
     var q0=n[n.length-2],t0=n[n.length-1];
     if(q0>0&&t0>0)return{q:q0,p:r2(t0/q0),t:t0,ok:0,derived:1};
@@ -276,9 +284,7 @@ function parseData(data){
       pend=null;return}
     var p=parseTokens(tk);
     if(!p){
-      // P0 FIX: preserve numeric-only lines as "(line N)" instead of dropping them
       pend=(/[a-z]{3,}/i.test(txt)&&!/\d{3,}/.test(txt))?{name:txt.replace(/[^\w\s\-\/.()%'"]/g,' ').trim(),b:L.bbox}:null;
-      // If this line has numbers but no letters, still try to keep it
       if(!pend&&/\d/.test(txt)&&!/[a-z]/i.test(txt)){
         var nums=txt.match(/\d[\d.,]*/g)||[];
         if(nums.length>=1)unnamed++;
@@ -287,10 +293,9 @@ function parseData(data){
     var bb={x0:L.bbox.x0,x1:L.bbox.x1,y0:L.bbox.y0,y1:L.bbox.y1};
     if(!/[a-z]{2}/i.test(p.name)){
       if(pend){p.name=pend.name;bb.y0=Math.min(bb.y0,pend.b.y0);bb.x0=Math.min(bb.x0,pend.b.x0)}
-      else{p.name='(line '+(++unnamed)+')'}  // keep it
+      else{p.name='(line '+(++unnamed)+')'}
     }
     pend=null;
-    // P0 FIX: only reject if name has no letters AND no placeholder — keep unnamed numeric lines
     if(p.name.length<2&&!/[a-z]/i.test(p.name))return;
     p.bb=bb;out.push(p);
   });
@@ -334,7 +339,6 @@ async function reread(w,r,pre){
   return false;
 }
 function repair(r){
-  // Never overwrite a verified read
   if(r.ok||r.conf==='verified')return;
   var it=itemOf(r.itemId);if(!it)return;
   var P=Number(it.price),q=r.q,t=r.t;if(!(P>0)||!(t>0))return;
@@ -421,7 +425,7 @@ async function runOcr(){
   if(busy||!src)return;busy=true;summary();stage=0;
   try{
     prog(.03,'Preparing the photo…');
-    var wp=getWorker(),ip=(!FM&&!items.length)?loadItems():null;
+    var wp=getWorker(),ip=(!FM&&!itemsReady)?loadItems():null;
     var pre=await new Promise(function(r){setTimeout(function(){r(preprocess(src))},20)});
     prog(.08,'Starting the reader…');
     var w=await wp;
@@ -433,7 +437,6 @@ async function runOcr(){
     var pa=parseData(ra.data),pb=null,list=pair(pa.rows,[]);
     list.forEach(decide);
     var weak1=list.filter(function(r){return !r.ok}).length;
-    // P1 FIX: only re-OCR if zero lines OR more than one weak line
     if(!list.length||weak1>1){
       stage=1;prog(.7,'Double-checking doubtful lines…');
       var rb=await w.recognize(getB(pre));pb=parseData(rb.data);
@@ -462,12 +465,12 @@ async function runOcr(){
 }
 function addRow(o){
   var r={id:++uid,name:o.name||'',qty:o.qty==null?'':o.qty,price:o.price==null?'':o.price,total:o.total==null?'':o.total,unit:o.unit||'',
-    itemId:o.itemId!==undefined?o.itemId:'',include:true,updPrice:false,conf:o.conf||'',why:o.why||'',notes:o.notes||[],img:''};
+    itemId:o.itemId!==undefined?o.itemId:'',include:true,updPrice:false,conf:o.conf||'',why:o.why||'',notes:o.notes||[],img:'',applyErr:''};
   if(o.itemId===undefined)r.itemId=o.name?matchItem(o.name,+o.price):'';
   rows.push(r);return r;
 }
 function parseText(text){
-  var data={lines:text.split(/\r?\n/).map(function(l){return{text:l,bbox:{x0:0,y0:0,x1:0,y1:0},words:l.split(/\s+/).filter(Boolean).map(function(w){return{text:w,bbox:null}})}})};  
+  var data={lines:text.split(/\r?\n/).map(function(l){return{text:l,bbox:{x0:0,y0:0,x1:0,y1:0},words:l.split(/\s+/).filter(Boolean).map(function(w){return{text:w,bbox:null}})}})};
   return parseData(data).rows;
 }
 
@@ -521,18 +524,28 @@ function summary(){
   $('btnApply').innerHTML='<i class="fas fa-check"></i> Apply '+sel.length+' line'+(sel.length===1?'':'s');
   $('btnApply').disabled=busy||!sel.length;
 }
+
+/* ============ BUILD ITEM DROPDOWN ============ */
+function buildItemOptions(selectedId){
+  var sorted=items.slice().sort(function(a,b){return String(a.name).localeCompare(b.name)});
+  var out='<option value="">'+(itemsReady?'— Pick stock item —':'Loading stock items…')+'</option>';
+  sorted.forEach(function(i){
+    var q=Number(i.quantity)||0;
+    var label=i.name+' · '+i.sku+' · '+num(q)+' '+(i.unit||'')+' · '+money(i.price);
+    out+='<option value="'+esc(i.id)+'"'+(i.id===selectedId?' selected':'')+'>'+esc(label)+'</option>';
+  });
+  return out;
+}
+
 function render(){
   if(FM)return;
   $('review').style.display=rows.length?'block':'none';
   $('modeTag').textContent=mode==='in'?'· Stock in (adds to quantity)':'· Stock out (subtracts from quantity)';
-  var sorted=items.slice().sort(function(a,b){return String(a.name).localeCompare(b.name)});
   $('lines').innerHTML=rows.map(function(r){
-    var opts='<option value="">— Pick stock item —</option>'+sorted.map(function(i){
-      return '<option value="'+esc(i.id)+'"'+(i.id===r.itemId?' selected':'')+'>'+esc(i.name)+' · '+esc(i.sku)+'</option>'}).join('');
     return '<div class="line" data-id="'+r.id+'">'+(r.img?'<img class="crop" src="'+r.img+'" alt="Receipt line as photographed">':'')+
     '<div class="l-top"><input type="checkbox" data-f="include"'+(r.include?' checked':'')+' aria-label="Include line">'+
     '<input class="nm" data-f="name" value="'+esc(r.name)+'" placeholder="Receipt item name"><button class="icon-btn" data-act="del" aria-label="Remove line"><i class="fas fa-trash"></i></button></div>'+
-    '<select data-f="itemId">'+opts+'</select><div class="nums">'+
+    '<select data-f="itemId">'+buildItemOptions(r.itemId)+'</select><div class="nums">'+
     '<label>Qty<input type="number" inputmode="decimal" step="any" data-f="qty" value="'+esc(r.qty)+'"></label>'+
     '<label>Unit price<input type="number" inputmode="decimal" step="any" data-f="price" value="'+esc(r.price)+'"></label>'+
     '<label>Total<input type="number" inputmode="decimal" step="any" data-f="total" value="'+esc(r.total)+'"></label></div><div class="st"></div></div>';
@@ -554,7 +567,7 @@ $('lines').addEventListener('click',function(e){
 });
 $('rcptTotal').addEventListener('input',function(){summary();saveDraft()});
 
-/* ---- draft persistence (crash / refresh recovery) ---- */
+/* ---- draft persistence ---- */
 function saveDraft(){
   if(FM)return;
   try{
@@ -623,7 +636,7 @@ $('btnReparse').onclick=function(){var p=parseText($('ocrText').value);if(!p.len
   rows=[];p.forEach(function(x){var id=matchItem(x.name,x.p);addRow({name:x.name,qty:x.q,price:x.p,total:x.t,unit:x.unit,itemId:id,conf:x.ok?'ok':'check'})});render();saveDraft();toast(p.length+' line(s) read.')};
 $('btnClear').onclick=function(){if(rows.length&&confirm('Remove all lines from this screen?')){rows=[];render();clearDraft()}};
 $('btnApply').onclick=applyAll;
-$('retry').onclick=loadItems;
+$('retry').onclick=function(){itemsReady=false;itemsLoading=false;loadItems().then(function(){banner(false)})};
 $('modeSeg').onclick=function(e){var b=e.target.closest('button');if(b)setMode(b.dataset.mode)};
 $('chips').onclick=function(e){var c=e.target.closest('.chip');if(!c)return;
   [].forEach.call($('chips').children,function(x){x.classList.toggle('on',x===c)});$('pickVal').value=c.dataset.v;$('pickVal').focus()};
@@ -641,9 +654,9 @@ if(FM){
   document.querySelector('details summary').nextElementSibling.nextElementSibling.style.display='none';$('btnReparse').style.display='none';
 }else{
   try{var sm=localStorage.getItem('mrc.scanMode');if(sm==='in'||sm==='out')mode=sm}catch(e){}
-  if(loadDraft()){toast('Restored unsaved scan lines from your last session.');render();setMode(mode)}
-  else{setMode(mode);loadItems()}
-  if(loadDraft())loadItems();
+  setMode(mode);
+  loadItems(); // load stock items unconditionally so the dropdown is populated before scanning
+  if(loadDraft()){toast('Restored unsaved scan lines from your last session.');render()}
 }
 setTimeout(function(){getWorker().catch(function(){})},300);
 })();
