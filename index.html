@@ -4,22 +4,19 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Maricopa Concrete · Loading</title>
-  <!-- PWA Manifest with proper name and icons (inline for single-file demo) -->
-  <link rel="manifest" href='data:application/manifest+json,{"name":"Maricopa Concrete","short_name":"Maricopa","start_url":"./home.html","display":"standalone","background_color":"#1e1e1e","theme_color":"#2a2a2a","icons":[{"src":"data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 100 100\'%3E%3Crect width=\'100\' height=\'100\' fill=\'%232a2a2a\'/%3E%3Ccircle cx=\'50\' cy=\'50\' r=\'40\' fill=\'%23d4af37\'/%3E%3Ctext x=\'50\' y=\'70\' font-size=\'60\' text-anchor=\'middle\' fill=\'%232a2a2a\' font-family=\'Arial Black\' font-weight=\'bold\'%3EC%3C/text%3E%3C/svg%3E","sizes":"192x192","type":"image/svg+xml"},{"src":"data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 100 100\'%3E%3Crect width=\'100\' height=\'100\' fill=\'%232a2a2a\'/%3E%3Ccircle cx=\'50\' cy=\'50\' r=\'40\' fill=\'%23d4af37\'/%3E%3Ctext x=\'50\' y=\'70\' font-size=\'60\' text-anchor=\'middle\' fill=\'%232a2a2a\' font-family=\'Arial Black\' font-weight=\'bold\'%3EC%3C/text%3E%3C/svg%3E","sizes":"512x512","type":"image/svg+xml"}]}'>
-  
-  <!-- Apple Touch Icon for iOS -->
+
+  <!-- External manifest (make sure manifest.json is in the same folder) -->
+  <link rel="manifest" href="manifest.json">
+
+  <!-- Apple Touch Icon for iOS (using an inline SVG for demo) -->
   <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%232a2a2a'/%3E%3Ccircle cx='50' cy='50' r='40' fill='%23d4af37'/%3E%3Ctext x='50' y='70' font-size='60' text-anchor='middle' fill='%232a2a2a' font-family='Arial Black' font-weight='bold'%3EC%3C/text%3E%3C/svg%3E">
-  
+
   <!-- Favicon -->
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%232a2a2a'/%3E%3Ccircle cx='50' cy='50' r='40' fill='%23d4af37'/%3E%3Ctext x='50' y='70' font-size='60' text-anchor='middle' fill='%232a2a2a' font-family='Arial Black' font-weight='bold'%3EC%3C/text%3E%3C/svg%3E">
 
   <style>
     /* ----- RESET & BASE ----- */
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
 
     body {
       background: #1e1e1e;
@@ -30,27 +27,30 @@
       align-items: center;
       justify-content: center;
       overflow: hidden;
-      background-image: 
+      background-image:
         radial-gradient(circle at 20% 30%, rgba(120, 120, 120, 0.08) 0%, transparent 25%),
         radial-gradient(circle at 90% 70%, rgba(160, 160, 160, 0.06) 0%, transparent 35%),
-        repeating-linear-gradient(45deg, rgba(80, 80, 80, 0.02) 0px, rgba(80, 80, 80, 0.02) 2px, 
+        repeating-linear-gradient(45deg, rgba(80, 80, 80, 0.02) 0px, rgba(80, 80, 80, 0.02) 2px,
                                   rgba(40, 40, 40, 0.02) 2px, rgba(40, 40, 40, 0.02) 6px);
     }
 
-    /* ----- INSTALL BUTTON ----- */
-    #installBtn {
+    /* ----- INSTALLED INDICATOR (bottom-left, only shown after install) ----- */
+    #installedBadge {
       position: fixed;
-      top: 24px;
-      right: 24px;
+      bottom: 24px;
+      left: 24px;
       z-index: 9999;
-      padding: 12px 28px;
+      display: none; /* hidden until we know the app is installed */
+      align-items: center;
+      gap: 10px;
+      padding: 10px 20px;
       background: #2a2a2a;
       color: #d4af37;
       border: 2px solid #4a4a4a;
       border-radius: 40px;
       font-weight: 700;
-      font-size: 1rem;
-      letter-spacing: 2px;
+      font-size: 0.9rem;
+      letter-spacing: 1.5px;
       text-transform: uppercase;
       cursor: pointer;
       box-shadow: 0 8px 16px rgba(0,0,0,0.6), inset 0 1px 3px rgba(255,255,255,0.1);
@@ -59,14 +59,14 @@
       background-image: linear-gradient(145deg, #333, #1e1e1e);
     }
 
-    #installBtn:hover {
+    #installedBadge:hover {
       background: #3a3a3a;
       border-color: #d4af37;
       box-shadow: 0 12px 20px rgba(0,0,0,0.8), 0 0 20px rgba(212,175,55,0.3);
       transform: scale(1.02);
     }
 
-    #installBtn:active {
+    #installedBadge:active {
       transform: scale(0.98);
       box-shadow: inset 0 2px 8px black;
     }
@@ -76,7 +76,7 @@
       background: #2a2a2a;
       padding: 2.5rem 3rem 3rem 3rem;
       border-radius: 2rem;
-      box-shadow: 
+      box-shadow:
         0 25px 40px -10px rgba(0, 0, 0, 0.8),
         inset 0 2px 4px rgba(255, 255, 255, 0.05),
         inset 0 -4px 8px rgba(0, 0, 0, 0.6);
@@ -84,7 +84,7 @@
       max-width: 650px;
       width: 90vw;
       transition: box-shadow 0.2s;
-      background-image: 
+      background-image:
         linear-gradient(145deg, #2e2e2e, #232323),
         repeating-linear-gradient(45deg, #3a3a3a 0px, #3a3a3a 1px, #2c2c2c 1px, #2c2c2c 5px);
       background-blend-mode: overlay;
@@ -93,10 +93,7 @@
     }
 
     /* ----- HEADER ----- */
-    .company-header {
-      text-align: center;
-      margin-bottom: 2.5rem;
-    }
+    .company-header { text-align: center; margin-bottom: 2.5rem; }
 
     .company-name {
       font-size: 1.9rem;
@@ -104,7 +101,7 @@
       letter-spacing: 2px;
       text-transform: uppercase;
       color: #d6d6d6;
-      text-shadow: 
+      text-shadow:
         0 2px 0 #0a0a0a,
         0 4px 6px rgba(0, 0, 0, 0.8),
         0 0 10px rgba(180, 180, 180, 0.3);
@@ -149,7 +146,7 @@
         #6e6e6e 240deg 300deg,
         #7a7a7a 300deg 360deg
       );
-      box-shadow: 
+      box-shadow:
         inset 0 0 20px #000000cc,
         inset 0 0 40px #1e1e1e,
         0 0 0 4px #353535,
@@ -167,7 +164,7 @@
       height: calc(100% - 40px);
       border-radius: 50%;
       background: radial-gradient(circle at 30% 30%, #9b9b9b, #4d4d4d 80%);
-      box-shadow: 
+      box-shadow:
         inset 0 0 20px #000000,
         inset 0 0 5px #ffffff30;
       display: flex;
@@ -213,7 +210,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      box-shadow: 
+      box-shadow:
         0 0 0 6px #4a4a4a,
         0 0 0 10px #1e1e1e,
         inset 0 0 8px black;
@@ -237,21 +234,15 @@
       margin-bottom: 0.75rem;
     }
 
-    .loading-label span:first-child {
-      color: #e0e0e0;
-    }
-
-    .loading-label span:last-child {
-      color: #d4af37;
-      font-weight: 700;
-    }
+    .loading-label span:first-child { color: #e0e0e0; }
+    .loading-label span:last-child { color: #d4af37; font-weight: 700; }
 
     .progress-bar-bg {
       width: 100%;
       height: 18px;
       background: #1a1a1a;
       border-radius: 30px;
-      box-shadow: 
+      box-shadow:
         inset 0 4px 8px #000000,
         0 1px 0 #4a4a4a;
       padding: 2px;
@@ -265,7 +256,7 @@
       width: 0%;
       background: linear-gradient(90deg, #7e7e7e, #c0c0c0, #e0e0e0);
       border-radius: 30px;
-      box-shadow: 
+      box-shadow:
         0 0 12px #cccccc90,
         inset 0 1px 4px white;
       transition: width 0.1s ease;
@@ -277,10 +268,7 @@
     .progress-fill::after {
       content: '';
       position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
+      top: 0; left: 0; right: 0; bottom: 0;
       background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
       animation: shimmer 1.5s infinite;
     }
@@ -332,33 +320,18 @@
 
     /* Responsive */
     @media (max-width: 500px) {
-      .loader-container {
-        padding: 2rem 1.5rem;
-      }
-      .company-name {
-        font-size: 1.4rem;
-      }
-      .company-sub {
-        font-size: 0.7rem;
-        letter-spacing: 3px;
-      }
-      .cement-mixer {
-        width: 130px;
-        height: 130px;
-      }
-      #installBtn {
-        top: 12px;
-        right: 12px;
-        padding: 8px 18px;
-        font-size: 0.8rem;
-      }
+      .loader-container { padding: 2rem 1.5rem; }
+      .company-name { font-size: 1.4rem; }
+      .company-sub { font-size: 0.7rem; letter-spacing: 3px; }
+      .cement-mixer { width: 130px; height: 130px; }
+      #installedBadge { bottom: 12px; left: 12px; padding: 8px 14px; font-size: 0.75rem; }
     }
   </style>
 </head>
 <body>
 
-  <!-- Install PWA button (hidden by default) -->
-  <button id="installBtn" hidden>📲 Install App</button>
+  <!-- Installed indicator (bottom-left, only shown after install) -->
+  <button id="installedBadge" title="App is installed">✅ Maricopa Installed</button>
 
   <!-- Decorative background particles -->
   <div class="bg-particle" style="width: 4px; height: 4px; left: 10%; animation-duration: 25s; animation-delay: 0s;"></div>
@@ -402,41 +375,39 @@
 
   <script>
     // ============================================================
-    // 1. PWA INSTALL PROMPT
+    // 1. INSTALLED STATE DETECTION
     // ============================================================
-    let deferredPrompt;
-    const installBtn = document.getElementById('installBtn');
+    const installedBadge = document.getElementById('installedBadge');
 
-    window.addEventListener('beforeinstallprompt', (e) => {
-      // Prevent the default mini-infobar
-      e.preventDefault();
-      // Save the event
-      deferredPrompt = e;
-      // Show the install button
-      installBtn.hidden = false;
-      console.log('✅ beforeinstallprompt fired – install button shown');
-    });
-
-    installBtn.addEventListener('click', async () => {
-      if (!deferredPrompt) {
-        console.warn('No deferred prompt available');
-        return;
+    // Check if the app is running in standalone mode (installed)
+    function checkInstalledState() {
+      const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
+      const isIOSStandalone = window.navigator.standalone === true;
+      if (isStandalone || isIOSStandalone) {
+        installedBadge.style.display = 'flex';
+        console.log('✅ Running in standalone mode – installed badge shown');
+      } else {
+        installedBadge.style.display = 'none';
       }
-      // Show the browser install prompt
-      deferredPrompt.prompt();
-      // Wait for user choice
-      const { outcome } = await deferredPrompt.userChoice;
-      console.log(`👤 User choice: ${outcome}`);
-      // Clear the prompt – can only be used once
-      deferredPrompt = null;
-      // Hide the button
-      installBtn.hidden = true;
+    }
+
+    // Run once on load
+    checkInstalledState();
+
+    // Listen for changes in display mode
+    window.matchMedia('(display-mode: standalone)').addEventListener('change', (e) => {
+      checkInstalledState();
     });
 
+    // Optional: if the app is installed from this page, show the badge
     window.addEventListener('appinstalled', () => {
       console.log('🎉 App installed successfully');
-      installBtn.hidden = true;
-      deferredPrompt = null;
+      installedBadge.style.display = 'flex';
+    });
+
+    // Clicking the badge gives a friendly confirmation
+    installedBadge.addEventListener('click', () => {
+      alert('Maricopa Concrete is installed on your device. Launch it from your home screen or app drawer.');
     });
 
     // ============================================================
