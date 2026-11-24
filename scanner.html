@@ -168,6 +168,11 @@ textarea{min-height:140px;margin:10px 0;font-family:ui-monospace,Menlo,monospace
       <img id="prevImg" alt="Scanned document">
       <div class="busy" id="busy" hidden><i class="fas fa-spinner fa-spin"></i><span id="progTxt">Working…</span><div class="prog"><i id="progBar"></i></div></div>
     </div>
+    <div class="seg" id="modeSeg">
+      <label><input type="radio" name="mode" value="in"><i class="fas fa-arrow-down"></i> Stock in (receive)</label>
+      <label><input type="radio" name="mode" value="out"><i class="fas fa-arrow-up"></i> Stock out (issue)</label>
+    </div>
+    <label class="switch" id="autoSwitch"><input type="checkbox" id="autoSend" checked> Send to inventory automatically when the table is clear</label>
     <div class="src-btns">
       <button class="btn btn-scan" id="btnCam" type="button"><i class="fas fa-camera"></i> Open camera</button>
       <button class="btn btn-outline" id="btnNative" type="button"><i class="fas fa-image"></i> Take photo</button>
@@ -187,11 +192,7 @@ textarea{min-height:140px;margin:10px 0;font-family:ui-monospace,Menlo,monospace
 
   <section class="card" id="reviewPanel" hidden>
     <h2><i class="fas fa-receipt"></i> Review scanned lines</h2>
-    <p class="hint" style="margin-bottom:14px">Check each line, match it to an inventory item, then apply.</p>
-    <div class="seg" id="modeSeg">
-      <label><input type="radio" name="mode" value="in"><i class="fas fa-arrow-down"></i> Stock in (receive)</label>
-      <label><input type="radio" name="mode" value="out"><i class="fas fa-arrow-up"></i> Stock out (issue)</label>
-    </div>
+    <p class="hint" style="margin-bottom:14px">Check each line, then apply. Clear tables are sent automatically.</p>
     <div class="grid2">
       <div class="fg"><label for="docCustomer">Customer name</label><input type="text" id="docCustomer" placeholder="Not found: type it" autocomplete="off"></div>
       <div class="fg"><label for="docRef">Reference / invoice no.</label><input type="text" id="docRef" placeholder="Optional" autocomplete="off"></div>
@@ -580,7 +581,7 @@ $('btnApply').onclick=applyNow;$('btnHandoff').onclick=handoff;
 
 /* ================= Image + OCR ================= */
 const video=$('video');
-let stream=null,raf=0,torchOn=false,worker=null,progressCb=null,working=false;
+let stream=null,raf=0,torchOn=false,worker=null,progressCb=null,working=false,part='';
 function setBusy(on,txt){
   working=on;$('busy').hidden=!on;if(txt)$('progTxt').textContent=txt;
   ['btnCam','btnNative','btnUpload','shutter'].forEach(id=>$(id).disabled=on);
@@ -596,7 +597,7 @@ async function toCanvas(src){
     catch(_){bmp=await new Promise((res,rej)=>{const im=new Image(),u=URL.createObjectURL(src);im.onload=()=>{URL.revokeObjectURL(u);res(im)};im.onerror=rej;im.src=u})}
     w=bmp.width;h=bmp.height;draw=(c)=>c.drawImage(bmp,0,0,c.canvas.width,c.canvas.height);
   }
-  const big=Math.max(w,h),s=big<1200?1600/big:Math.min(1,3000/big);
+  const big=Math.max(w,h);let s=Math.min(3,Math.max(.3,1800/Math.min(w,h)));if(big*s>7000)s=7000/big;
   const cv=document.createElement('canvas');cv.width=Math.round(w*s);cv.height=Math.round(h*s);
   draw(cv.getContext('2d'));return cv;
 }
@@ -626,7 +627,7 @@ function adaptive(src){
 async function getWorker(){
   if(worker)return worker;
   worker=await Tesseract.createWorker('eng',1,{logger:m=>{
-    if(m.status==='recognizing text')setProg(m.progress,'Reading text… '+Math.round(m.progress*100)+'%');
+    if(m.status==='recognizing text')setProg(m.progress,part+'Reading text… '+Math.round(m.progress*100)+'%');
     else if(/load|init/i.test(m.status))setProg(null,'Preparing text engine (first time only)…')}});
   return worker;
 }
@@ -636,14 +637,14 @@ function getWords(data){
   return o;
 }
 /* Rebuild table rows from word boxes: words at the same height form one row, ordered left to right */
-function buildRows(words){
+function buildRows(words,slope){
   const W=[];
   words.forEach(w=>{
     if(!w||!w.bbox)return;
     const t=String(w.text||'').replace(/[|¦_~\[\]{}]/g,'').replace(/[—–]/g,'-').replace(/\s+/g,'').trim();
     if(!t)return;
     if((w.confidence||0)<25&&t.length<=2&&!/\d/.test(t))return;
-    W.push({t,x:(w.bbox.x0+w.bbox.x1)/2,yc:(w.bbox.y0+w.bbox.y1)/2,h:w.bbox.y1-w.bbox.y0});
+    const x=(w.bbox.x0+w.bbox.x1)/2;W.push({t,x,yc:(w.bbox.y0+w.bbox.y1)/2-(slope||0)*x,h:w.bbox.y1-w.bbox.y0});
   });
   if(!W.length)return[];
   const hs=W.map(w=>w.h).sort((a,b)=>a-b),mh=hs[hs.length>>1]||20;
@@ -653,24 +654,59 @@ function buildRows(words){
     if(r&&Math.abs(w.yc-r.yc)<=mh*.6){r.w.push(w);r.yc=r.w.reduce((a,x)=>a+x.yc,0)/r.w.length}else R.push({yc:w.yc,w:[w]})});
   return R.map(r=>{r.w.sort((a,b)=>a.x-b.x);return{s:r.w.map(w=>w.t).join(' '),p:r.w.map(w=>w.x)}});
 }
+/* Tall receipts are read in overlapping strips so the engine never gives up halfway down the page */
+async function recog(w,cv,kind,psm){
+  const H=cv.height,SH=1500,OV=160,words=[],slopes=[];let text='';
+  const n=H<=SH+300?1:Math.ceil((H-SH)/(SH-OV))+1;
+  await w.setParameters({tessedit_pageseg_mode:psm,preserve_interword_spaces:'1'});
+  for(let k=0;k<n;k++){
+    const top=k*(SH-OV),bot=k===n-1?H:Math.min(H,top+SH);
+    let st=cv;
+    if(n>1||kind==='b'){st=document.createElement('canvas');st.width=cv.width;st.height=bot-top;
+      st.getContext('2d').drawImage(cv,0,top,cv.width,bot-top,0,0,cv.width,bot-top);if(kind==='b')st=adaptive(st)}
+    part=n>1?'Part '+(k+1)+' of '+n+' · ':'';
+    const d=(await w.recognize(st)).data||{};
+    const from=k?top+OV/2:0,to=k===n-1?H+1:bot-OV/2;
+    getWords(d).forEach(x=>{if(!x.bbox)return;const yc=(x.bbox.y0+x.bbox.y1)/2+top;
+      if(yc>=from&&yc<to)words.push({text:x.text,confidence:x.confidence,bbox:{x0:x.bbox.x0,x1:x.bbox.x1,y0:x.bbox.y0+top,y1:x.bbox.y1+top}})});
+    (d.lines||[]).forEach(l=>{const b=l.baseline;if(b&&b.x1-b.x0>150)slopes.push((b.y1-b.y0)/(b.x1-b.x0))});
+    text+=(d.text||'')+'\n';
+  }
+  part='';slopes.sort((x,y)=>x-y);
+  return{words,text,slope:slopes.length?slopes[slopes.length>>1]:0};
+}
 async function ocr(cv){
   if(typeof Tesseract==='undefined')throw new Error('Text engine could not load. Check your connection, or paste the text into "Text the scanner read".');
   setProg(0,'Preparing text engine (first time only)…');
-  const w=await getWorker();let best=null,bin=null;
-  const passes=[['g','6'],['g','4'],['b','6'],['g','11']];
+  const w=await getWorker();let best=null;
+  const passes=[['g','6'],['b','6'],['g','4']];
   for(let n=0;n<passes.length;n++){
     const[kind,psm]=passes[n];
-    let img=cv;if(kind==='b'){if(!bin)bin=adaptive(cv);img=bin}
     if(n)setProg(0,'Reading again to be sure ('+(n+1)+'/'+passes.length+')…');
-    await w.setParameters({tessedit_pageseg_mode:psm,preserve_interword_spaces:'1'});
-    const r=await w.recognize(img),data=r.data||{};
-    if(FIELD)return{text:data.text||'',rows:[]};
-    const rows=buildRows(getWords(data)),text=rows.length?rows.map(x=>x.s).join('\n'):(data.text||'');
-    const d=parseDoc(rows.length?rows:text),ok=d.lines.filter(l=>l.verified).length,score=d.lines.length+ok*.5;
+    const rr=await recog(w,cv,kind,psm);
+    if(FIELD)return{text:rr.text,rows:[]};
+    const rows=buildRows(rr.words,rr.slope),text=rows.length?rows.map(x=>x.s).join('\n'):rr.text;
+    const d=parseDoc(rows.length?rows:text),ok=d.lines.filter(l=>l.verified).length,sum=d.lines.reduce((a,l)=>a+num(l.total),0);
+    const tot=d.total!=null&&Math.abs(sum-d.total)<=Math.max(1,d.total*.01);
+    const score=d.lines.length+ok*.5+(tot?3:0);
     if(!best||score>best.score)best={text,rows:rows.length?rows:null,score};
-    if(d.lines.length&&ok===d.lines.length)break;
+    if(d.lines.length&&ok===d.lines.length&&(d.total==null||tot))break;
   }
   return best;
+}
+/* Automatic send: only when every line's numbers check out and the lines add up to the document total */
+async function tryAuto(){
+  if(FIELD||!$('autoSend').checked||!lines.length)return;
+  await loadP;rematch();
+  const sel=lines.filter(l=>l.include),sum=sel.reduce((a,l)=>a+num(l.total),0);
+  const bad=sel.filter(l=>!l.verified||!(num(l.qty)>0)||!l.name.trim());
+  const unm=mode==='out'?sel.filter(l=>!l.itemId):[];
+  const miss=doc.total!=null&&Math.abs(sum-doc.total)>Math.max(1,doc.total*.01);
+  const off=!inv.length&&$('conn').classList.contains('off');
+  if(!sel.length||bad.length||unm.length||miss||off){
+    toast(off?'Server not reachable yet. Tap Connected/Offline at the top, then press Add.':miss?'The lines do not add up to the document total: some products may be missing. Scan the rest or check the lines.':bad.length?'Please check the marked lines, then press the button below.':'Pick the inventory item for the unmatched lines.','error');return}
+  toast('Table clear: sending '+sel.length+' product'+(sel.length>1?'s':'')+'…');
+  applyNow();
 }
 async function scanSource(src){
   if(working)return;
@@ -684,7 +720,7 @@ async function scanSource(src){
   }catch(e){console.error(e);toast(e.message||'Could not read that image.','error');if(!FIELD){$('rawBox').open=true;showReview()}}
   finally{setBusy(false)}
 }
-async function scanFiles(files){for(const f of files)await scanSource(f)}
+async function scanFiles(files){for(const f of files)await scanSource(f);await tryAuto()}
 $('btnNative').onclick=()=>$('fileCam').click();
 $('btnUpload').onclick=()=>$('fileUp').click();
 $('fileCam').onchange=e=>{const f=[...e.target.files];e.target.value='';closeCam();scanFiles(f)};
@@ -712,7 +748,7 @@ $('shutter').onclick=()=>{
   if(!stream||!video.videoWidth)return;
   const cv=document.createElement('canvas');cv.width=video.videoWidth;cv.height=video.videoHeight;cv.getContext('2d').drawImage(video,0,0);
   if(navigator.vibrate)navigator.vibrate(30);
-  closeCam();scanSource(cv);
+  closeCam();scanSource(cv).then(tryAuto);
 };
 function startDetect(){
   if(!('BarcodeDetector' in window))return;
@@ -753,12 +789,14 @@ $('fieldInput').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefa
 
 /* ================= Boot ================= */
 $('backBtn').href=RETURN;
+$('autoSend').checked=localStorage.getItem('mrc.autoSend')!=='0';
+$('autoSend').onchange=e=>{try{localStorage.setItem('mrc.autoSend',e.target.checked?'1':'0')}catch(_){}};
 if(FIELD){
   $('pageTitle').textContent='Scan '+FIELDS[FIELD];
   $('pageSub').textContent=['sku','lookup','search'].includes(FIELD)?'Point at a barcode, or photograph the label':'Photograph the label, then tap the text you want';
   $('fieldPanel').hidden=false;$('fieldTitle').textContent='Read '+FIELDS[FIELD];
   $('fieldHint').textContent=['sku','lookup','search'].includes(FIELD)?('BarcodeDetector' in window?'Barcodes are read automatically while the camera is open.':'This browser cannot read barcodes live. Take a photo and tap the code, or type it.'):'After the photo is read, tap the text that fits.';
-  $('tip').hidden=true;$('btnUpload').hidden=true;
+  $('tip').hidden=true;$('btnUpload').hidden=true;$('modeSeg').hidden=true;$('autoSwitch').hidden=true;
   setConn('wait');$('conn').hidden=true;
   setTimeout(openCam,200);
 }else{
