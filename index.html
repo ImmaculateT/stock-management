@@ -1,9 +1,8 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 
   <title>Maricopa Concrete · Loading</title>
 
@@ -17,12 +16,17 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Maricopa">
+  <meta name="mobile-web-app-capable" content="yes">
 
-  <link rel="apple-touch-icon"
-    href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%232a2a2a'/%3E%3Ccircle cx='50' cy='50' r='40' fill='%23d4af37'/%3E%3Ctext x='50' y='70' font-size='60' text-anchor='middle' fill='%232a2a2a' font-family='Arial Black' font-weight='bold'%3EC%3C/text%3E%3C/svg%3E">
+  <!-- ⚠️ REQUIRED: real PNG icons (data-URI SVG is ignored by iOS) -->
+  <link rel="apple-touch-icon" sizes="180x180" href="./icons/icon-180.png">
+  <link rel="apple-touch-icon" sizes="167x167" href="./icons/icon-167.png">
+  <link rel="apple-touch-icon" sizes="152x152" href="./icons/icon-152.png">
 
-  <!-- Favicon -->
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%232a2a2a'/%3E%3Ccircle cx='50' cy='50' r='40' fill='%23d4af37'/%3E%3Ctext x='50' y='70' font-size='60' text-anchor='middle' fill='%232a2a2a' font-family='Arial Black' font-weight='bold'%3EC%3C/text%3E%3C/svg%3E">
+  <!-- Favicon (PNG fallback for browsers that don't render SVG) -->
+  <link rel="icon" type="image/png" sizes="32x32" href="./icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="./icons/favicon-16.png">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%232a2a2a'/%3E%3Ccircle cx='50' cy='50' r='40' fill='%23d4af37'/%3E%3Ctext x='50' y='70' font-size='60' text-anchor='middle' fill='%232a2a2a' font-family='Arial Black' font-weight='bold'%3EC%3C/text%3E%3C/svg%3E">
 
   <style>
 
@@ -47,7 +51,11 @@
       justify-content: center;
       overflow-x: hidden;
       overflow-y: auto;
-      padding: 25px 0;
+      padding:
+        calc(25px + env(safe-area-inset-top))
+        env(safe-area-inset-right)
+        calc(25px + env(safe-area-inset-bottom))
+        env(safe-area-inset-left);
 
       background-image:
         radial-gradient(circle at 20% 30%, rgba(120,120,120,0.08) 0%, transparent 25%),
@@ -67,8 +75,8 @@
 
     #installedBadge {
       position: fixed;
-      bottom: 24px;
-      left: 24px;
+      bottom: calc(24px + env(safe-area-inset-bottom));
+      left: calc(24px + env(safe-area-inset-left));
       z-index: 9999;
 
       display: none;
@@ -90,12 +98,43 @@
       cursor: pointer;
 
       box-shadow: 0 8px 16px rgba(0,0,0,0.6);
+      transition: transform 0.2s ease, border-color 0.2s ease;
     }
 
     #installedBadge:hover {
       border-color: #d4af37;
       transform: scale(1.03);
     }
+
+    /* ==============================
+       IN-APP BROWSER WARNING
+    ============================== */
+
+    #inAppWarning {
+      display: none;
+
+      max-width: 650px;
+      width: 90%;
+
+      margin-bottom: 1rem;
+      padding: 12px 16px;
+
+      background: #3a2a1a;
+      color: #f0c060;
+
+      border: 1px solid #8a6a2a;
+      border-left: 5px solid #d4af37;
+      border-radius: 10px;
+
+      font-size: 0.8rem;
+      line-height: 1.5;
+      letter-spacing: 0.3px;
+
+      position: relative;
+      z-index: 10;
+    }
+
+    #inAppWarning strong { color: #ffd966; }
 
     /* ==============================
        MAIN CARD
@@ -244,45 +283,16 @@
       opacity: 0.9;
     }
 
-    .aggregate span:nth-child(1) {
-      width:14px;height:14px;top:20%;left:15%;
-    }
-
-    .aggregate span:nth-child(2) {
-      width:10px;height:10px;top:70%;left:25%;
-    }
-
-    .aggregate span:nth-child(3) {
-      width:18px;height:18px;top:40%;left:70%;
-    }
-
-    .aggregate span:nth-child(4) {
-      width:8px;height:8px;top:80%;left:60%;
-    }
-
-    .aggregate span:nth-child(5) {
-      width:12px;height:12px;top:15%;left:80%;
-    }
-
-    .aggregate span:nth-child(6) {
-      width:16px;height:16px;top:55%;left:10%;
-    }
-
-    .aggregate span:nth-child(7) {
-      width:9px;height:9px;top:35%;left:45%;
-    }
-
-    .aggregate span:nth-child(8) {
-      width:20px;height:20px;top:65%;left:75%;
-    }
-
-    .aggregate span:nth-child(9) {
-      width:11px;height:11px;top:50%;left:55%;
-    }
-
-    .aggregate span:nth-child(10) {
-      width:13px;height:13px;top:10%;left:45%;
-    }
+    .aggregate span:nth-child(1) { width:14px;height:14px;top:20%;left:15%; }
+    .aggregate span:nth-child(2) { width:10px;height:10px;top:70%;left:25%; }
+    .aggregate span:nth-child(3) { width:18px;height:18px;top:40%;left:70%; }
+    .aggregate span:nth-child(4) { width:8px;height:8px;top:80%;left:60%; }
+    .aggregate span:nth-child(5) { width:12px;height:12px;top:15%;left:80%; }
+    .aggregate span:nth-child(6) { width:16px;height:16px;top:55%;left:10%; }
+    .aggregate span:nth-child(7) { width:9px;height:9px;top:35%;left:45%; }
+    .aggregate span:nth-child(8) { width:20px;height:20px;top:65%;left:75%; }
+    .aggregate span:nth-child(9) { width:11px;height:11px;top:50%;left:55%; }
+    .aggregate span:nth-child(10) { width:13px;height:13px;top:10%;left:45%; }
 
     .center-badge {
       position: absolute;
@@ -423,16 +433,36 @@
       transition: all 0.25s ease;
     }
 
+    /* Waiting for browser to be ready (Android before beforeinstallprompt) */
+    #installButton[data-state="waiting"] {
+      opacity: 0.6;
+      filter: grayscale(0.4);
+    }
+
+    /* Ready to trigger native prompt */
+    #installButton[data-state="ready"] {
+      opacity: 1;
+      filter: none;
+    }
+
+    /* iOS / fallback: button is informational */
+    #installButton[data-state="manual"] {
+      background: linear-gradient(145deg,#4a4a4a,#2a2a2a);
+      color: #d4af37;
+      border-color: #666;
+    }
+
     #installButton:hover {
       background: #edca58;
       transform: translateY(-3px);
-
       box-shadow: 0 10px 25px rgba(212,175,55,0.3);
     }
 
-    #installButton:active {
-      transform: scale(0.97);
+    #installButton[data-state="manual"]:hover {
+      background: linear-gradient(145deg,#5a5a5a,#3a3a3a);
     }
+
+    #installButton:active { transform: scale(0.97); }
 
     #installButton:focus-visible {
       outline: 3px solid white;
@@ -451,6 +481,8 @@
 
       min-height: 20px;
     }
+
+    .install-description strong { color: #d4af37; }
 
     /* ==============================
        FOOTER
@@ -497,13 +529,8 @@
     }
 
     @keyframes pulseBadge {
-      0%,100% {
-        transform: scale(1);
-      }
-
-      50% {
-        transform: scale(1.08);
-      }
+      0%,100% { transform: scale(1); }
+      50% { transform: scale(1.08); }
     }
 
     @keyframes shimmer {
@@ -516,11 +543,7 @@
         transform: translateY(0) rotate(0deg);
         opacity: 0;
       }
-
-      10%,90% {
-        opacity: 0.6;
-      }
-
+      10%,90% { opacity: 0.6; }
       100% {
         transform: translateY(-100vh) rotate(720deg);
         opacity: 0;
@@ -532,37 +555,17 @@
     ============================== */
 
     @media(max-width:500px) {
-
-      .loader-container {
-        padding: 2rem 1.5rem;
-      }
-
-      .company-name {
-        font-size: 1.4rem;
-      }
-
-      .company-sub {
-        font-size: 0.7rem;
-        letter-spacing: 3px;
-      }
-
-      .cement-mixer {
-        width: 130px;
-        height: 130px;
-      }
-
+      .loader-container { padding: 2rem 1.5rem; }
+      .company-name { font-size: 1.4rem; }
+      .company-sub { font-size: 0.7rem; letter-spacing: 3px; }
+      .cement-mixer { width: 130px; height: 130px; }
       #installedBadge {
-        bottom: 12px;
-        left: 12px;
+        bottom: calc(12px + env(safe-area-inset-bottom));
+        left: calc(12px + env(safe-area-inset-left));
         padding: 8px 14px;
         font-size: 0.7rem;
       }
-
-      #installButton {
-        font-size: 0.85rem;
-        padding: 13px;
-      }
-
+      #installButton { font-size: 0.85rem; padding: 13px; }
     }
 
     @media(prefers-reduced-motion:reduce) {
@@ -579,14 +582,18 @@
 <body>
 
   <!-- INSTALLED BADGE -->
-
   <button id="installedBadge" type="button">
     ✅ MARICOPA INSTALLED
   </button>
 
+  <!-- IN-APP BROWSER WARNING -->
+  <div id="inAppWarning" role="alert">
+    <strong>Heads up:</strong> You're viewing this inside an in-app browser
+    (Instagram / Facebook / TikTok / etc.). To install Maricopa, open this
+    page in <strong>Safari</strong> (iOS) or <strong>Chrome</strong> (Android) using the menu.
+  </div>
 
   <!-- BACKGROUND PARTICLES -->
-
   <div class="bg-particle" style="width:4px;height:4px;left:10%;animation-duration:25s;"></div>
   <div class="bg-particle" style="width:6px;height:6px;left:25%;animation-duration:18s;animation-delay:2s;"></div>
   <div class="bg-particle" style="width:3px;height:3px;left:40%;animation-duration:30s;animation-delay:5s;"></div>
@@ -596,421 +603,289 @@
   <div class="bg-particle" style="width:4px;height:4px;left:15%;animation-duration:35s;animation-delay:10s;"></div>
   <div class="bg-particle" style="width:9px;height:9px;left:60%;animation-duration:26s;animation-delay:4s;"></div>
 
-
   <!-- MAIN LOADER -->
-
   <main class="loader-container">
 
     <div class="company-header">
-
-      <div class="company-name">
-        MARICOPA
-      </div>
-
-      <div class="company-sub">
-        CONCRETE & ALLIED CO.
-      </div>
-
+      <div class="company-name">MARICOPA</div>
+      <div class="company-sub">CONCRETE &amp; ALLIED CO.</div>
     </div>
 
-
     <!-- CEMENT MIXER -->
-
     <div class="cement-mixer">
-
       <div class="drum-ring"></div>
-
       <div class="drum-inner">
-
         <div class="aggregate">
           <span></span><span></span><span></span><span></span><span></span>
           <span></span><span></span><span></span><span></span><span></span>
         </div>
-
       </div>
-
-      <div class="center-badge">
-        C
-      </div>
-
+      <div class="center-badge">C</div>
     </div>
 
-
     <!-- PROGRESS -->
-
     <div class="loading-label">
-
       <span>⚙️ POURING CEMENT</span>
-
-      <span id="percentageDisplay">
-        0%
-      </span>
-
+      <span id="percentageDisplay">0%</span>
     </div>
 
     <div class="progress-bar-bg">
-
       <div class="progress-fill" id="progressFill"></div>
-
     </div>
 
-
     <!-- INSTALL APPLICATION BUTTON -->
-
-    <button id="installButton" type="button">
-      <span>⬇</span>
-      INSTALL MARICOPA APP
+    <button id="installButton" type="button" data-state="waiting" aria-describedby="installDescription">
+      <span aria-hidden="true">⬇</span>
+      <span id="installButtonLabel">INSTALL MARICOPA APP</span>
     </button>
 
     <p class="install-description" id="installDescription" aria-live="polite">
       Install Maricopa Concrete for quick and easy access.
     </p>
 
-
     <!-- FOOTER -->
-
     <div class="cement-note">
       ⚡ AGGREGATE · WATER · CEMENT · STRENGTH ⚡
     </div>
 
   </main>
 
-
-  <!-- JAVASCRIPT -->
-
   <script>
+    /* ==============================================================
+       PLATFORM DETECTION (runs first — used everywhere below)
+    ============================================================== */
 
-    // ==========================================
-    // 1. INSTALLATION SYSTEM
-    // ==========================================
+    const ua = navigator.userAgent;
+    const isIOS = /iPhone|iPad|iPod/i.test(ua) ||
+      (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+    const isAndroid = /Android/i.test(ua);
+    const isStandalone = window.matchMedia('(display-mode: standalone)').matches ||
+      window.matchMedia('(display-mode: fullscreen)').matches ||
+      window.navigator.standalone === true;
 
-    const installButton =
-      document.getElementById('installButton');
+    // In-app browsers (Instagram, Facebook, TikTok, etc.) block PWA install
+    const isInAppBrowser = /FBAN|FBAV|Instagram|Line\/|Twitter|TikTok|Snapchat|MicroMessenger/i.test(ua);
 
-    const installDescription =
-      document.getElementById('installDescription');
+    if (isInAppBrowser && !isStandalone) {
+      document.getElementById('inAppWarning').style.display = 'block';
+    }
 
-    const installedBadge =
-      document.getElementById('installedBadge');
+    /* ==============================================================
+       1. INSTALLATION SYSTEM
+    ============================================================== */
+
+    const installButton = document.getElementById('installButton');
+    const installButtonLabel = document.getElementById('installButtonLabel');
+    const installDescription = document.getElementById('installDescription');
+    const installedBadge = document.getElementById('installedBadge');
 
     let deferredInstallPrompt = null;
 
-
-    // Check installation state
-
     function isAppInstalled() {
-
-      return (
-        window.matchMedia('(display-mode: standalone)').matches ||
-        window.matchMedia('(display-mode: fullscreen)').matches ||
-        window.navigator.standalone === true
-      );
-
+      return window.matchMedia('(display-mode: standalone)').matches ||
+             window.matchMedia('(display-mode: fullscreen)').matches ||
+             window.navigator.standalone === true;
     }
 
-
-    // Update installation interface
+    function setButtonState(state, label) {
+      installButton.dataset.state = state;
+      if (label) installButtonLabel.textContent = label;
+    }
 
     function updateInstallUI() {
-
       if (isAppInstalled()) {
-
         installButton.style.display = 'none';
-
         installDescription.style.display = 'none';
-
         installedBadge.style.display = 'flex';
-
-      } else {
-
-        installButton.style.display = 'flex';
-
-        installedBadge.style.display = 'none';
-
-        installDescription.style.display = 'block';
-
+        return;
       }
 
-    }
+      installButton.style.display = 'flex';
+      installDescription.style.display = 'block';
+      installedBadge.style.display = 'none';
 
+      // Choose the right state + label based on platform + prompt availability
+      if (deferredInstallPrompt) {
+        setButtonState('ready', 'INSTALL MARICOPA APP');
+        installDescription.textContent = 'Your device is ready to install Maricopa Concrete.';
+        return;
+      }
+
+      if (isIOS) {
+        setButtonState('manual', 'HOW TO INSTALL');
+        installDescription.innerHTML =
+          'Tap <strong>Share</strong> <span aria-hidden="true">⬆️</span> at the bottom of Safari, then <strong>Add to Home Screen</strong>.';
+        return;
+      }
+
+      if (isAndroid) {
+        setButtonState('manual', 'HOW TO INSTALL');
+        installDescription.innerHTML =
+          'Open Chrome\u2019s <strong>⋮</strong> menu → <strong>Install app</strong> (or <strong>Add to Home screen</strong>).';
+        return;
+      }
+
+      setButtonState('waiting', 'INSTALL MARICOPA APP');
+      installDescription.textContent = 'Install Maricopa Concrete for quick and easy access.';
+    }
 
     updateInstallUI();
 
-
-    // Browser announces that installation is available
-
+    // Browser announces install availability
     window.addEventListener('beforeinstallprompt', (event) => {
-
       event.preventDefault();
-
       deferredInstallPrompt = event;
-
-      installButton.style.display = 'flex';
-
-      installButton.innerHTML =
-        '<span>⬇</span> INSTALL MARICOPA APP';
-
-      installDescription.textContent =
-        'Your device is ready to install Maricopa Concrete.';
-
+      updateInstallUI();
     });
 
-
-    // Install button
-
+    // Install button click
     installButton.addEventListener('click', async () => {
+      // Cancel the loader redirect so the user isn't bounced mid-install
+      cancelLoaderRedirect();
 
       if (isAppInstalled()) {
-
         updateInstallUI();
-
         return;
-
       }
 
-
-      // Native installation prompt
-
+      // Native prompt (Android / Edge / desktop Chrome)
       if (deferredInstallPrompt) {
-
         const promptEvent = deferredInstallPrompt;
-
         deferredInstallPrompt = null;
-
         installButton.disabled = true;
 
         try {
-
           await promptEvent.prompt();
-
           const result = await promptEvent.userChoice;
 
           if (result.outcome === 'accepted') {
-
-            installButton.style.display = 'none';
-
-            installDescription.textContent =
-              'Maricopa installation accepted.';
-
+            installDescription.textContent = 'Maricopa installation accepted.';
           } else {
-
-            installDescription.textContent =
-              'Installation cancelled. You can try again anytime.';
-
+            installDescription.textContent = 'Installation cancelled. You can try again anytime.';
           }
-
         } catch (error) {
-
           console.error('Installation error:', error);
-
-          installDescription.textContent =
-            'Unable to start installation. Please try again.';
-
+          installDescription.textContent = 'Unable to start installation. Please try again.';
         } finally {
-
           installButton.disabled = false;
-
+          updateInstallUI();
         }
-
         return;
-
       }
 
-
-      // Manual installation instructions
-
-      const userAgent = navigator.userAgent;
-
-      if (/iPhone|iPad|iPod/i.test(userAgent) ||
-          (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)) {
-
-        alert(
-          'INSTALL MARICOPA CONCRETE\n\n' +
-          '1. Open this website in Safari.\n' +
-          '2. Tap the Share button.\n' +
-          '3. Select "Add to Home Screen".\n' +
-          '4. Tap Add.'
-        );
-
-      } else if (/Android/i.test(userAgent)) {
-
-        alert(
-          'INSTALL MARICOPA CONCRETE\n\n' +
-          '1. Open this website in Chrome.\n' +
-          '2. Tap the three-dot menu.\n' +
-          '3. Select "Install app" or "Add to Home screen".\n' +
-          '4. Confirm installation.'
-        );
-
-      } else {
-
-        alert(
-          'INSTALL MARICOPA CONCRETE\n\n' +
-          '1. Open this website using Chrome or Edge.\n' +
-          '2. Look for the install icon in the address bar.\n' +
-          '3. Select "Install Maricopa Concrete".\n\n' +
-          'If installation is unavailable, check your PWA configuration.'
-        );
-
+      // iOS — scroll to instructions and highlight them
+      if (isIOS) {
+        installDescription.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        installDescription.innerHTML =
+          'Tap <strong>Share</strong> <span aria-hidden="true">⬆️</span> at the bottom of Safari, then <strong>Add to Home Screen</strong>.';
+        return;
       }
 
+      // Android without a captured prompt
+      if (isAndroid) {
+        installDescription.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        installDescription.innerHTML =
+          'Open Chrome\u2019s <strong>⋮</strong> menu → <strong>Install app</strong> (or <strong>Add to Home screen</strong>).';
+        return;
+      }
+
+      // Desktop fallback
+      installDescription.textContent =
+        'Look for the install icon in your browser\u2019s address bar, or use the ⋮ menu.';
     });
-
 
     // Installation completed
-
     window.addEventListener('appinstalled', () => {
-
       deferredInstallPrompt = null;
-
       updateInstallUI();
-
-      installDescription.textContent =
-        'Maricopa Concrete installed successfully!';
-
+      installDescription.textContent = 'Maricopa Concrete installed successfully!';
       console.log('Maricopa application installed.');
-
     });
 
-
-    // Detect standalone changes
-
-    const standaloneQuery =
-      window.matchMedia('(display-mode: standalone)');
-
+    // Detect standalone-mode changes
+    const standaloneQuery = window.matchMedia('(display-mode: standalone)');
     if (standaloneQuery.addEventListener) {
-
       standaloneQuery.addEventListener('change', updateInstallUI);
-
     } else {
-
       standaloneQuery.addListener(updateInstallUI);
-
     }
 
-
-    // Installed badge
-
+    // Installed badge click
     installedBadge.addEventListener('click', () => {
-
-      alert(
-        'Maricopa Concrete is installed on your device.\n\n' +
-        'Launch it from your home screen or application menu.'
-      );
-
+      installDescription.style.display = 'block';
+      installDescription.textContent =
+        'Maricopa Concrete is installed. Launch it from your home screen or app menu.';
     });
 
-
-    // ==========================================
-    // 2. SERVICE WORKER REGISTRATION
-    // ==========================================
+    /* ==============================================================
+       2. SERVICE WORKER REGISTRATION
+    ============================================================== */
 
     if ('serviceWorker' in navigator) {
-
       window.addEventListener('load', async () => {
-
         try {
-
-          const registration =
-            await navigator.serviceWorker.register('./sw.js');
-
-          console.log(
-            'Maricopa Service Worker registered:',
-            registration.scope
-          );
-
+          const registration = await navigator.serviceWorker.register('./sw.js');
+          console.log('Maricopa Service Worker registered:', registration.scope);
         } catch (error) {
-
-          console.error(
-            'Service Worker registration failed:',
-            error
-          );
-
+          console.error('Service Worker registration failed:', error);
         }
-
       });
-
     }
 
+    /* ==============================================================
+       3. LOADING ANIMATION
+    ============================================================== */
 
-    // ==========================================
-    // 3. LOADING ANIMATION
-    // ==========================================
+    // Exposed so the install handler can abort the redirect
+    let cancelLoaderRedirect = () => {};
 
-    (function() {
-
+    (function () {
       const REDIRECT_URL = './home.html';
-
       const LOAD_DURATION = 30000;
 
-      const progressFill =
-        document.getElementById('progressFill');
-
-      const percentageDisplay =
-        document.getElementById('percentageDisplay');
+      const progressFill = document.getElementById('progressFill');
+      const percentageDisplay = document.getElementById('percentageDisplay');
 
       let startTime = null;
-
       let animationFrame = null;
+      let cancelled = false;
+
+      cancelLoaderRedirect = () => {
+        if (cancelled) return;
+        cancelled = true;
+        if (animationFrame) cancelAnimationFrame(animationFrame);
+        progressFill.style.width = '0%';
+        percentageDisplay.textContent = '—';
+      };
 
       function updateProgress(timestamp) {
+        if (cancelled) return;
 
-        if (!startTime) {
-
-          startTime = timestamp;
-
-        }
+        if (!startTime) startTime = timestamp;
 
         const elapsed = timestamp - startTime;
-
-        const progress =
-          Math.min(elapsed / LOAD_DURATION, 1);
-
-        const percent =
-          Math.floor(progress * 100);
+        const progress = Math.min(elapsed / LOAD_DURATION, 1);
+        const percent = Math.floor(progress * 100);
 
         progressFill.style.width = percent + '%';
-
-        percentageDisplay.textContent =
-          percent + '%';
-
+        percentageDisplay.textContent = percent + '%';
 
         if (progress < 1) {
-
-          animationFrame =
-            requestAnimationFrame(updateProgress);
-
+          animationFrame = requestAnimationFrame(updateProgress);
         } else {
-
-          cancelAnimationFrame(animationFrame);
-
+          animationFrame = null;
           setTimeout(() => {
-
-            window.location.href = REDIRECT_URL;
-
+            if (!cancelled) window.location.href = REDIRECT_URL;
           }, 300);
-
         }
-
       }
 
-
-      animationFrame =
-        requestAnimationFrame(updateProgress);
-
+      animationFrame = requestAnimationFrame(updateProgress);
 
       window.addEventListener('beforeunload', () => {
-
-        if (animationFrame) {
-
-          cancelAnimationFrame(animationFrame);
-
-        }
-
+        if (animationFrame) cancelAnimationFrame(animationFrame);
       });
-
     })();
-
   </script>
 
 </body>
