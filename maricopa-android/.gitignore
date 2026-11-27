@@ -1,0 +1,15 @@
+# Signing keys - never commit
+*.keystore
+*.jks
+
+# Local Android SDK configuration
+local.properties
+
+# Gradle generated files
+.gradle/
+**/.gradle/
+**/build/
+
+# IDE files
+.idea/
+*.iml
