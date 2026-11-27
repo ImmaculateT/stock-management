@@ -1,0 +1,14 @@
+[
+  {
+    "relation": [
+      "delegate_permission/common.handle_all_urls"
+    ],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.onrender.stock_management_zime.twa",
+      "sha256_cert_fingerprints": [
+        "A5:69:59:65:50:36:7D:B6:5E:A4:A1:A3:61:54:A7:44:5F:98:95:BB:65:E1:10:20:35:BE:E4:9F:29:E1:02:EC"
+      ]
+    }
+  }
+]
