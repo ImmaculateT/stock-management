@@ -3,283 +3,337 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <meta name="theme-color" content="#2a2a2a">
-  <meta name="description" content="Maricopa Concrete Stock Management System">
+  <meta name="theme-color" content="#1e2a36">
+  <meta name="description" content="Maricopa Concrete & Allied Company Stock Management System">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Maricopa">
 
-  <title>Maricopa Concrete · Loading</title>
+  <title>Maricopa Concrete · Stock Management</title>
 
- 
   <link rel="manifest" href="/manifest.json">
   <link rel="icon" type="image/png" sizes="192x192" href="/download.png">
   <link rel="icon" type="image/png" sizes="512x512" href="/download.png">
   <link rel="apple-touch-icon" href="/icon-192.png">
 
-  <!-- No-JS fallback: if scripting is disabled, still reach home.html -->
-  <noscript>
-    <meta http-equiv="refresh" content="2; url=/home.html">
-  </noscript>
-
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      color-scheme: dark;
+      --page: #1e2a36;
+      --panel: #3e4e5e;
+      --panel-dark: #2e3e4e;
+      --edge: #5e7180;
+      --text: #f0f4fa;
+      --muted: #b0c4d9;
+      --green: #3b6e4b;
+      --green-shadow: #1e432c;
+      --gold: #b88643;
+      --gold-shadow: #765326;
+      --focus: #f4d18a;
+    }
 
-    html, body {
-      height: 100%;
+    *, *::before, *::after { box-sizing: border-box; }
+
+    html {
+      min-height: 100%;
+      background: var(--page);
+      -webkit-text-size-adjust: 100%;
     }
 
     body {
-      background: #1e2a36;
       min-height: 100vh;
       min-height: 100dvh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
-      padding: 16px;
-      padding-bottom: max(16px, env(safe-area-inset-bottom));
+      margin: 0;
+      padding: 22px 16px max(22px, env(safe-area-inset-bottom));
+      display: grid;
+      place-items: center;
+      color: var(--text);
+      background:
+        radial-gradient(ellipse at 50% 8%, rgba(154, 177, 198, .15), transparent 43%),
+        linear-gradient(145deg, #1a2530, var(--page) 55%, #202f3d);
+      font-family: "Segoe UI", Roboto, system-ui, -apple-system, sans-serif;
       -webkit-tap-highlight-color: transparent;
     }
 
     .loader-container {
-      background: #3e4e5e;
-      padding: 2rem 2.5rem;
-      border-radius: 40px 40px 20px 20px;
-      box-shadow: 0 30px 30px -10px rgba(0,0,0,0.7),
-                  inset 0 2px 5px rgba(255,255,255,0.1);
+      width: min(100%, 490px);
+      padding: 2rem 2.35rem 1.8rem;
+      overflow: hidden;
       text-align: center;
-      max-width: 480px;
-      width: 100%;
+      background: linear-gradient(155deg, #46596b 0%, var(--panel) 58%, #354554 100%);
+      border: 1px solid rgba(255,255,255,.09);
       border-bottom: 8px solid #2c3a48;
+      border-radius: 40px 40px 20px 20px;
+      box-shadow: 0 30px 55px rgba(0,0,0,.43), inset 0 2px 5px rgba(255,255,255,.10);
+    }
+
+    .brand-kicker {
+      margin: 0 0 7px;
+      color: #c4d2df;
+      font-size: .68rem;
+      font-weight: 800;
+      letter-spacing: .22em;
+      text-transform: uppercase;
     }
 
     h1 {
-      font-size: 1.9rem;
-      letter-spacing: 1px;
-      font-weight: 700;
-      color: #f0f4fa;
-      text-shadow: 3px 3px 0 #1e2a36;
-      margin-bottom: 8px;
+      margin: 0 0 8px;
+      color: var(--text);
+      font-size: clamp(1.55rem, 6vw, 2rem);
+      font-weight: 850;
+      line-height: 1.12;
+      letter-spacing: .055em;
+      text-shadow: 3px 3px 0 var(--page);
       text-transform: uppercase;
     }
 
     .subhead {
-      color: #b0c4d9;
-      font-size: 1rem;
-      letter-spacing: 2px;
-      margin-bottom: 30px;
-      text-transform: uppercase;
-      border-bottom: 2px dashed #5e7180;
-      padding-bottom: 12px;
       display: inline-block;
+      margin-bottom: 15px;
+      padding: 0 5px 12px;
+      border-bottom: 2px dashed var(--edge);
+      color: var(--muted);
+      font-size: .88rem;
+      letter-spacing: .19em;
+      text-transform: uppercase;
     }
 
     .mixer-stage {
       display: flex;
-      flex-direction: column;
-      align-items: center;
-      margin: 10px 0 20px;
+      justify-content: center;
+      margin: 3px 0 17px;
     }
 
     .drum-wrapper {
       position: relative;
-      width: 180px;
-      height: 180px;
-      margin-bottom: 10px;
-      filter: drop-shadow(0 15px 10px rgba(0,0,0,0.5));
+      width: 178px;
+      height: 178px;
+      filter: drop-shadow(0 15px 10px rgba(0,0,0,.48));
     }
 
     .drum {
+      position: relative;
       width: 100%;
       height: 100%;
-      background: radial-gradient(circle at 30% 30%, #8a9aa8, #4a5a6a);
-      border-radius: 50%;
-      border: 8px solid #2e3e4e;
-      box-shadow: inset 0 -15px 15px rgba(0,0,0,0.4),
-                  inset 0 15px 15px rgba(255,255,255,0.1);
-      animation: rotateDrum 6s infinite linear;
-      position: relative;
       overflow: hidden;
+      border: 8px solid #2e3e4e;
+      border-radius: 50%;
+      background: radial-gradient(circle at 30% 30%, #9aa9b6, #4a5a6a 70%);
+      box-shadow: inset 0 -15px 15px rgba(0,0,0,.4), inset 0 15px 15px rgba(255,255,255,.1);
+      animation: rotateDrum 7s linear infinite;
     }
 
     .drum::after {
-      content: "";
       position: absolute;
       top: 20%;
       left: 15%;
       width: 70%;
       height: 70%;
-      background: radial-gradient(circle at 40% 40%, #b0b8c0, #6c7a88);
+      content: "";
       border-radius: 40% 60% 50% 50% / 45% 50% 50% 55%;
-      opacity: 0.55;
+      background: radial-gradient(circle at 40% 40%, #b0b8c0, #6c7a88);
+      opacity: .55;
       filter: blur(3px);
-      animation: slosh 2.4s infinite alternate ease-in-out;
+      animation: slosh 2.4s ease-in-out infinite alternate;
     }
 
     .fin, .fin2 {
       position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
+      z-index: 1;
+      inset: 0;
       border-radius: 50%;
       pointer-events: none;
     }
 
-    .fin::before, .fin::after,
-    .fin2::before, .fin2::after {
-      content: "";
+    .fin::before, .fin::after, .fin2::before, .fin2::after {
       position: absolute;
-      background: #2e3e4e;
-      width: 6px;
-      height: 48%;
       top: 0;
       left: 50%;
+      width: 6px;
+      height: 48%;
+      content: "";
       transform-origin: bottom center;
       border-radius: 4px 4px 0 0;
-      box-shadow: 0 0 5px rgba(0,0,0,0.3);
+      background: #2e3e4e;
+      box-shadow: 0 0 5px rgba(0,0,0,.3);
     }
 
-    .fin::before  { transform: translateX(-50%) rotate(25deg); }
-    .fin::after   { transform: translateX(-50%) rotate(-25deg); }
+    .fin::before { transform: translateX(-50%) rotate(25deg); }
+    .fin::after { transform: translateX(-50%) rotate(-25deg); }
     .fin2::before { transform: translateX(-50%) rotate(65deg); }
-    .fin2::after  { transform: translateX(-50%) rotate(-65deg); }
+    .fin2::after { transform: translateX(-50%) rotate(-65deg); }
 
     .chunk {
       position: absolute;
-      background: #c0c8d0;
+      z-index: 2;
       border-radius: 40% 60% 40% 60% / 60% 40% 60% 40%;
-      opacity: 0.8;
+      background: #c0c8d0;
+      opacity: .82;
       box-shadow: 0 0 5px #a0a8b0;
-      animation: chunkFloat 2.8s infinite alternate ease-in-out;
       pointer-events: none;
+      animation: chunkFloat 2.8s ease-in-out infinite alternate;
     }
 
-    .chunk:nth-child(1) { top: 15%;    left: 10%;  width: 18px; height: 18px; animation-delay: 0s;   }
-    .chunk:nth-child(2) { bottom: 20%; right: 12%; width: 12px; height: 12px; animation-delay: 0.4s; }
-    .chunk:nth-child(3) { top: 45%;    right: 8%;  width: 20px; height: 16px; animation-delay: 0.9s; }
-    .chunk:nth-child(4) { bottom: 30%; left: 18%;  width: 10px; height: 10px; animation-delay: 1.3s; }
+    /* The chunks are children 3–6 in the mixer markup. */
+    .chunk:nth-child(3) { top: 15%; left: 10%; width: 18px; height: 18px; }
+    .chunk:nth-child(4) { right: 12%; bottom: 20%; width: 12px; height: 12px; animation-delay: .4s; }
+    .chunk:nth-child(5) { top: 45%; right: 8%; width: 20px; height: 16px; animation-delay: .9s; }
+    .chunk:nth-child(6) { bottom: 30%; left: 18%; width: 10px; height: 10px; animation-delay: 1.3s; }
 
     .progress-section {
       width: 100%;
-      margin: 25px 0 20px;
+      margin: 17px 0 18px;
+      text-align: left;
     }
 
     .progress-label {
       display: flex;
       justify-content: space-between;
-      color: #d0dae6;
-      font-size: 0.9rem;
-      font-weight: 600;
+      gap: 12px;
       margin-bottom: 8px;
+      color: #d0dae6;
+      font-size: .83rem;
+      font-weight: 750;
+      letter-spacing: .055em;
     }
 
     .progress-track {
-      background: #1e2a36;
-      height: 20px;
-      border-radius: 30px;
-      box-shadow: inset 0 3px 8px rgba(0,0,0,0.6);
+      height: 17px;
       overflow: hidden;
       border: 1px solid #2e3e4e;
+      border-radius: 30px;
+      background: var(--page);
+      box-shadow: inset 0 3px 8px rgba(0,0,0,.6);
     }
 
     .progress-fill {
-      height: 100%;
       width: 0%;
-      background: linear-gradient(90deg, #cfd9e3, #9aacbc, #cfd9e3);
-      border-radius: 30px;
+      height: 100%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, #cfd9e3, #9aacbc, #e0e7ed);
       box-shadow: 0 0 12px #b0c8e0;
-      animation: fillProgress 2.8s ease-in-out forwards;
-    }
-
-    @keyframes fillProgress {
-      0%   { width: 0%;   }
-      15%  { width: 18%;  }
-      40%  { width: 45%;  }
-      70%  { width: 80%;  }
-      100% { width: 100%; }
+      transition: width .38s ease;
     }
 
     .status-text {
-      color: #ced9e3;
-      font-size: 1rem;
-      font-weight: 500;
-      margin-top: 10px;
-      background: #2e3e4e;
-      padding: 10px 16px;
+      display: block;
+      width: fit-content;
+      max-width: 100%;
+      margin: 11px auto 0;
+      padding: 9px 16px;
       border-radius: 40px;
-      display: inline-block;
-      box-shadow: inset 0 -2px 0 #1e2a36;
+      background: var(--panel-dark);
+      color: #d5e0e9;
+      font-size: .91rem;
+      line-height: 1.35;
+      text-align: center;
+      box-shadow: inset 0 -2px 0 var(--page);
     }
 
     .install-section {
-      margin-top: 30px;
+      display: grid;
+      gap: 11px;
+      margin-top: 25px;
       padding-top: 20px;
       border-top: 3px solid #5a6a7a;
     }
 
-    .btn-install {
-      background: #3b6e4b;
-      border: none;
-      color: white;
-      padding: 14px 28px;
-      border-radius: 60px;
-      font-size: 1.1rem;
-      font-weight: 700;
-      cursor: pointer;
+    .action {
+      display: flex;
       width: 100%;
-      box-shadow: 0 8px 0 #1e2a36, 0 5px 15px rgba(0,0,0,0.4);
-      transition: transform 0.08s, background 0.15s;
+      min-height: 49px;
+      align-items: center;
+      justify-content: center;
+      padding: 13px 19px;
+      border: 0;
+      border-radius: 60px;
+      color: #fff;
+      font: inherit;
+      font-size: 1rem;
+      font-weight: 800;
+      line-height: 1.25;
+      text-decoration: none;
+      cursor: pointer;
+      touch-action: manipulation;
+      transition: transform .12s ease, filter .15s ease, opacity .15s ease;
     }
 
-    .btn-install:active {
-      transform: translateY(5px);
-      box-shadow: 0 3px 0 #1e2a36;
+    .action:hover { filter: brightness(1.08); }
+    .action:active { transform: translateY(2px); }
+    .action:focus-visible { outline: 3px solid var(--focus); outline-offset: 3px; }
+    .action:disabled { opacity: .55; cursor: not-allowed; }
+
+    .btn-install {
+      background: var(--green);
+      box-shadow: 0 5px 0 var(--green-shadow), 0 7px 15px rgba(0,0,0,.28);
     }
 
-    .btn-install:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-      transform: none;
-      box-shadow: 0 8px 0 #1e2a36;
+    .btn-open {
+      background: #263746;
+      border: 1px solid #71869a;
+      box-shadow: 0 4px 0 #192631;
+    }
+
+    .btn-download {
+      background: var(--gold);
+      box-shadow: 0 5px 0 var(--gold-shadow), 0 7px 15px rgba(0,0,0,.22);
     }
 
     .hint {
-      color: #a8bccc;
-      font-size: 0.8rem;
-      margin-top: 10px;
-      font-style: italic;
-      line-height: 1.4;
+      margin: 2px 2px 0;
+      color: #c0cede;
+      font-size: .79rem;
+      line-height: 1.55;
+    }
+
+    .hint.secondary { color: #a8bccc; }
+    .hidden { display: none !important; }
+
+    .footer-note {
+      margin: 18px 0 0;
+      color: #9fb1c1;
+      font-size: .69rem;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+
+    .noscript {
+      margin-top: 14px;
+      color: #f4d7a0;
+      font-size: .85rem;
+      line-height: 1.5;
     }
 
     @keyframes rotateDrum { to { transform: rotate(360deg); } }
-    @keyframes slosh      { to { transform: translate(5px, 10px) scale(1.05); } }
+    @keyframes slosh { to { transform: translate(5px, 10px) scale(1.05); } }
     @keyframes chunkFloat { to { transform: translateY(-12px) rotate(15deg); } }
 
     @media (max-width: 400px) {
-      .loader-container { padding: 1.5rem 1rem; }
-      h1 { font-size: 1.5rem; }
-      .drum-wrapper { width: 140px; height: 140px; }
+      body { padding-inline: 12px; }
+      .loader-container { padding: 1.5rem 1rem 1.35rem; border-radius: 30px 30px 18px 18px; }
+      .drum-wrapper { width: 145px; height: 145px; }
+      .subhead { margin-bottom: 12px; font-size: .78rem; }
     }
 
     @media (prefers-reduced-motion: reduce) {
-      .drum, .drum::after, .chunk, .progress-fill {
-        animation-duration: 0.01ms !important;
+      *, *::before, *::after {
+        animation-duration: .01ms !important;
         animation-iteration-count: 1 !important;
+        scroll-behavior: auto !important;
       }
-      .progress-fill { width: 100%; }
+      .progress-fill { transition: none; }
     }
   </style>
 </head>
-<body>
 
-  <div class="loader-container">
-    <h1>Maricopa Concrete</h1>
+<body>
+  <main class="loader-container" aria-labelledby="pageTitle">
+    <p class="brand-kicker">Stock Management System</p>
+    <h1 id="pageTitle">Maricopa Concrete</h1>
     <div class="subhead">&amp; Allied Company</div>
 
-    <div class="mixer-stage">
+    <div class="mixer-stage" aria-hidden="true">
       <div class="drum-wrapper">
         <div class="drum">
           <div class="fin"></div>
@@ -292,135 +346,272 @@
       </div>
     </div>
 
-    <div class="progress-section">
+    <section class="progress-section" aria-label="Application startup">
       <div class="progress-label">
-        <span>MIXING CONCRETE</span>
+        <span id="progressLabel">PREPARING YOUR WORKSPACE</span>
         <span id="percentDisplay">0%</span>
       </div>
-      <div class="progress-track">
+      <div class="progress-track" id="progressBar" role="progressbar"
+           aria-label="Application startup" aria-valuemin="0"
+           aria-valuemax="100" aria-valuenow="0">
         <div class="progress-fill" id="progressFill"></div>
       </div>
-      <div class="status-text" id="statusText">Pouring foundation...</div>
-    </div>
-
-    <div class="install-section">
-      <button class="btn-install" id="installBtn" disabled>Install App</button>
-      <div class="hint" id="installHint">
-        On Android Chrome: menu → "Install app". On iOS Safari: Share → "Add to Home Screen".
+      <div class="status-text" id="statusText" role="status" aria-live="polite">
+        Preparing Maricopa...
       </div>
-    </div>
-  </div>
+    </section>
 
-<script>
-(function () {
+    <section class="install-section" aria-label="Application options">
+      <button class="action btn-install" id="installBtn" type="button" disabled>
+        Checking installation options...
+      </button>
+
+      <a class="action btn-open" id="openBtn" href="/home.html">
+        Open Stock Management System
+      </a>
+
+      <a class="action btn-download hidden" id="downloadBtn" href="#" download>
+        Download Maricopa Android App
+      </a>
+
+      <p class="hint" id="installHint">
+        You can open the stock management system now. If this browser supports app installation, the install option will appear here.
+      </p>
+      <p class="hint secondary" id="downloadHint">
+        Android APK downloads will appear here once the official signed APK link has been configured.
+      </p>
+    </section>
+
+    <p class="footer-note">Built for Maricopa Concrete &amp; Allied Company</p>
+
+    <noscript>
+      <p class="noscript">
+        JavaScript is disabled. You can still
+        <a href="/home.html">open the Maricopa stock management system</a>.
+      </p>
+    </noscript>
+  </main>
+
+  <script>
+  
+(() => {
   "use strict";
 
-  
-  const isStandalone =
-    window.matchMedia('(display-mode: standalone)').matches ||
-    window.matchMedia('(display-mode: fullscreen)').matches ||
-    window.matchMedia('(display-mode: minimal-ui)').matches ||
-    window.navigator.standalone === true; 
+  /*
+   * NATIVE ANDROID APP DOWNLOAD
+   * Add the public HTTPS URL of the signed APK after publishing it.
+   * Do not use the website URL here.
+   */
+  const APK_DOWNLOAD_URL = "";
 
- 
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', function () {
-      navigator.serviceWorker.register('/sw.js').catch(function (err) {
-        console.warn('[Maricopa] SW registration failed:', err);
-      });
-    });
+  const el = (id) => document.getElementById(id);
+
+  const installBtn = el("installBtn");
+  const installHint = el("installHint");
+  const downloadBtn = el("downloadBtn");
+  const downloadHint = el("downloadHint");
+  const statusText = el("statusText");
+  const progressFill = el("progressFill");
+  const percentDisplay = el("percentDisplay");
+  const progressBar = el("progressBar");
+  const progressLabel = el("progressLabel");
+
+  let deferredInstallPrompt = null;
+
+  const isAndroid = /Android/i.test(navigator.userAgent || "");
+  const isApple = /iPhone|iPad|iPod/i.test(navigator.userAgent || "");
+
+  function setProgress(value, message, label) {
+    const percent = Math.max(0, Math.min(100, Math.round(value)));
+
+    progressFill.style.width = percent + "%";
+    percentDisplay.textContent = percent + "%";
+    progressBar.setAttribute("aria-valuenow", String(percent));
+
+    if (message) statusText.textContent = message;
+    if (label) progressLabel.textContent = label;
   }
 
-  
-  const LOAD_DURATION_MS = 3200;
-  const percentDisplay = document.getElementById('percentDisplay');
-  const statusText     = document.getElementById('statusText');
-  const progressFill   = document.getElementById('progressFill');
-
-  let redirected = false;
-  function goHome() {
-    if (redirected) return;
-    redirected = true;
-    window.location.replace('/home.html');
+  function isInstalled() {
+    return (
+      window.matchMedia("(display-mode: standalone)").matches ||
+      window.matchMedia("(display-mode: fullscreen)").matches ||
+      window.matchMedia("(display-mode: minimal-ui)").matches ||
+      window.navigator.standalone === true
+    );
   }
 
- 
-  const redirectTimer = setTimeout(goHome, LOAD_DURATION_MS + 800);
+  function showInstalled() {
+    installBtn.disabled = true;
+    installBtn.textContent = "Maricopa Is Installed";
 
-  
-  let percent = 0;
-  const tick = setInterval(function () {
-    percent += 3.6; 
-    if (percent > 100) percent = 100;
-
-    percentDisplay.textContent = Math.floor(percent) + '%';
-
-    if (percent < 30)      statusText.textContent = 'Mixing gravel & cement...';
-    else if (percent < 60) statusText.textContent = 'Adding water & additives...';
-    else if (percent < 90) statusText.textContent = 'Pouring concrete...';
-    else                   statusText.textContent = 'Finishing & curing...';
-
-    if (percent >= 100) {
-      clearInterval(tick);
-      statusText.textContent = 'Ready! Redirecting...';
-      clearTimeout(redirectTimer);
-      // Small buffer so the user sees "Ready!"
-      setTimeout(goHome, 400);
-    }
-  }, 100);
-
-
-  const installBtn  = document.getElementById('installBtn');
-  const installHint = document.getElementById('installHint');
-
-  function markInstalled() {
-    installBtn.disabled   = true;
-    installBtn.textContent = 'Already Installed';
-    installHint.textContent = 'You are running the installed Maricopa Concrete app.';
+    installHint.textContent =
+      "Maricopa is installed on this device. Open the stock management system to continue.";
   }
 
-  if (isStandalone) {
-    markInstalled();
-  }
-
-  let deferredPrompt = null;
-
-  window.addEventListener('beforeinstallprompt', function (e) {
-    e.preventDefault();         
-    deferredPrompt = e;
-
-    if (isStandalone) {
-      
-      markInstalled();
+  function configureInstallation() {
+    if (isInstalled()) {
+      showInstalled();
       return;
     }
 
-    installBtn.disabled    = false;
-    installBtn.textContent = 'Install Maricopa Concrete';
-    installHint.textContent = 'Tap to install the app on this device.';
-  });
+    if (isAndroid) {
+      installBtn.disabled = true;
+      installBtn.textContent = "Android Installation";
 
-  installBtn.addEventListener('click', async function () {
-    if (!deferredPrompt) return;
+      installHint.textContent =
+        "For the native Maricopa Android app, use the official APK download button below once it is available. You can also open the web version now.";
 
-    deferredPrompt.prompt();
-    const choiceResult = await deferredPrompt.userChoice;
+    } else if (isApple) {
+      installBtn.disabled = true;
+      installBtn.textContent = "Install Using Safari";
 
-    if (choiceResult.outcome === 'accepted') {
-      installBtn.textContent = 'Installing…';
-      installBtn.disabled    = true;
+      installHint.textContent =
+        'On iPhone or iPad, open this page in Safari, tap Share, then select "Add to Home Screen".';
+
     } else {
-     
-      installBtn.textContent = 'Install Maricopa Concrete';
+      installBtn.disabled = true;
+      installBtn.textContent = "Checking Web Installation";
+
+      installHint.textContent =
+        "You can open the stock management system now. A browser installation option will appear if supported.";
+    }
+  }
+
+  function configureApkDownload() {
+    if (!APK_DOWNLOAD_URL.trim()) {
+      downloadBtn.classList.add("hidden");
+
+      downloadHint.textContent = isAndroid
+        ? "The official signed Maricopa Android app download will appear here once published. You can use the web version in the meantime."
+        : "The official Android application is being prepared for download.";
+
+      return;
     }
 
-    deferredPrompt = null;
+    try {
+      const apkUrl = new URL(APK_DOWNLOAD_URL);
+
+      if (apkUrl.protocol !== "https:") {
+        throw new Error("APK download must use HTTPS.");
+      }
+
+      downloadBtn.href = apkUrl.href;
+      downloadBtn.classList.remove("hidden");
+
+      downloadHint.textContent =
+        "Download the official signed Maricopa Android application. After downloading, open the APK and follow Android's installation instructions.";
+
+    } catch (error) {
+      console.warn("[Maricopa] APK download configuration error:", error);
+
+      downloadBtn.classList.add("hidden");
+
+      downloadHint.textContent =
+        "The Android download link is not configured correctly. Please contact the administrator.";
+    }
+  }
+
+  window.addEventListener("beforeinstallprompt", (event) => {
+    event.preventDefault();
+    deferredInstallPrompt = event;
+
+    if (isInstalled()) return;
+
+    installBtn.disabled = false;
+    installBtn.textContent = "Install Web App";
+
+    installHint.textContent =
+      "This installs the browser-based web app. For the native Android application, use the official APK download option.";
   });
 
-  window.addEventListener('appinstalled', function () {
-    markInstalled();
+  installBtn.addEventListener("click", async () => {
+    if (!deferredInstallPrompt) return;
+
+    const promptEvent = deferredInstallPrompt;
+    deferredInstallPrompt = null;
+
+    installBtn.disabled = true;
+    installBtn.textContent = "Waiting for Confirmation...";
+
+    try {
+      await promptEvent.prompt();
+      const result = await promptEvent.userChoice;
+
+      if (result && result.outcome === "accepted") {
+        installBtn.textContent = "Installation Accepted";
+
+        installHint.textContent =
+          "Complete the installation prompt from your browser.";
+      } else {
+        installBtn.disabled = false;
+        installBtn.textContent = "Try Installing Again";
+
+        installHint.textContent =
+          "Installation was cancelled. You can try again.";
+      }
+    } catch (error) {
+      console.warn("[Maricopa] Web installation error:", error);
+
+      installBtn.disabled = false;
+      installBtn.textContent = "Install Web App";
+
+      installHint.textContent =
+        "The browser could not open the installation prompt. Try again later.";
+    }
   });
+
+  window.addEventListener("appinstalled", () => {
+    showInstalled();
+    statusText.textContent = "Maricopa has been installed successfully.";
+  });
+
+  async function registerServiceWorker() {
+    if (!("serviceWorker" in navigator) || !window.isSecureContext) {
+      setProgress(
+        100,
+        "Maricopa is ready.",
+        "WORKSPACE READY"
+      );
+      return;
+    }
+
+    try {
+      await navigator.serviceWorker.register("/sw.js");
+
+      setProgress(
+        100,
+        "Maricopa is ready.",
+        "WORKSPACE READY"
+      );
+    } catch (error) {
+      console.warn("[Maricopa] Service worker registration failed:", error);
+
+      setProgress(
+        100,
+        "Maricopa is ready. Offline support could not be confirmed.",
+        "WORKSPACE READY"
+      );
+    }
+  }
+
+  configureInstallation();
+  configureApkDownload();
+
+  setProgress(12, "Starting Maricopa...", "STARTING APPLICATION");
+
+  window.addEventListener("load", () => {
+    setProgress(
+      58,
+      "Checking application resources...",
+      "CHECKING RESOURCES"
+    );
+
+    registerServiceWorker();
+  });
+
 })();
-</script>
+
+  </script>
 </body>
 </html>
