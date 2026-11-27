@@ -394,15 +394,15 @@
 
   <script>
   
+
 (() => {
   "use strict";
 
-  /*
-   * NATIVE ANDROID APP DOWNLOAD
-   * Add the public HTTPS URL of the signed APK after publishing it.
-   * Do not use the website URL here.
-   */
-  const APK_DOWNLOAD_URL = "https://github.com/ImmaculateT/stock-management/releases/download/v1.0.0/app-release.apk";
+  const APK_DOWNLOAD_URL =
+    "https://github.com/ImmaculateT/stock-management/releases/download/v1.0.0/app-release.apk";
+
+  const MIN_LOADING_TIME = 11000;
+  const startTime = performance.now();
 
   const el = (id) => document.getElementById(id);
 
@@ -417,6 +417,8 @@
   const progressLabel = el("progressLabel");
 
   let deferredInstallPrompt = null;
+  let resourcesReady = false;
+  let loadingComplete = false;
 
   const isAndroid = /Android/i.test(navigator.userAgent || "");
   const isApple = /iPhone|iPad|iPod/i.test(navigator.userAgent || "");
@@ -460,7 +462,7 @@
       installBtn.textContent = "Android Installation";
 
       installHint.textContent =
-        "For the native Maricopa Android app, use the official APK download button below once it is available. You can also open the web version now.";
+        "Download the official Android application below, or open the web version.";
 
     } else if (isApple) {
       installBtn.disabled = true;
@@ -482,9 +484,8 @@
     if (!APK_DOWNLOAD_URL.trim()) {
       downloadBtn.classList.add("hidden");
 
-      downloadHint.textContent = isAndroid
-        ? "The official signed Maricopa Android app download will appear here once published. You can use the web version in the meantime."
-        : "The official Android application is being prepared for download.";
+      downloadHint.textContent =
+        "The official Maricopa Android application is being prepared.";
 
       return;
     }
@@ -500,15 +501,15 @@
       downloadBtn.classList.remove("hidden");
 
       downloadHint.textContent =
-        "Download the official signed Maricopa Android application. After downloading, open the APK and follow Android's installation instructions.";
+        "Download the official signed Maricopa Android application. Open the downloaded APK to install it.";
 
     } catch (error) {
-      console.warn("[Maricopa] APK download configuration error:", error);
+      console.warn("[Maricopa] APK configuration error:", error);
 
       downloadBtn.classList.add("hidden");
 
       downloadHint.textContent =
-        "The Android download link is not configured correctly. Please contact the administrator.";
+        "The Android download link is not configured correctly.";
     }
   }
 
@@ -522,7 +523,7 @@
     installBtn.textContent = "Install Web App";
 
     installHint.textContent =
-      "This installs the browser-based web app. For the native Android application, use the official APK download option.";
+      "Install the browser-based Maricopa web app. Use the APK download option for the native Android application.";
   });
 
   installBtn.addEventListener("click", async () => {
@@ -540,75 +541,100 @@
 
       if (result && result.outcome === "accepted") {
         installBtn.textContent = "Installation Accepted";
-
-        installHint.textContent =
-          "Complete the installation prompt from your browser.";
+        installHint.textContent = "Complete the installation prompt.";
       } else {
         installBtn.disabled = false;
         installBtn.textContent = "Try Installing Again";
-
-        installHint.textContent =
-          "Installation was cancelled. You can try again.";
+        installHint.textContent = "You can try installing again.";
       }
     } catch (error) {
-      console.warn("[Maricopa] Web installation error:", error);
+      console.warn("[Maricopa] Installation error:", error);
 
       installBtn.disabled = false;
       installBtn.textContent = "Install Web App";
-
-      installHint.textContent =
-        "The browser could not open the installation prompt. Try again later.";
     }
   });
 
-  window.addEventListener("appinstalled", () => {
-    showInstalled();
-    statusText.textContent = "Maricopa has been installed successfully.";
-  });
+  window.addEventListener("appinstalled", showInstalled);
 
   async function registerServiceWorker() {
     if (!("serviceWorker" in navigator) || !window.isSecureContext) {
-      setProgress(
-        100,
-        "Maricopa is ready.",
-        "WORKSPACE READY"
-      );
       return;
     }
 
     try {
       await navigator.serviceWorker.register("/sw.js");
-
-      setProgress(
-        100,
-        "Maricopa is ready.",
-        "WORKSPACE READY"
-      );
     } catch (error) {
       console.warn("[Maricopa] Service worker registration failed:", error);
-
-      setProgress(
-        100,
-        "Maricopa is ready. Offline support could not be confirmed.",
-        "WORKSPACE READY"
-      );
     }
+  }
+
+  async function prepareApplication() {
+    setProgress(
+      12,
+      "Starting Maricopa...",
+      "STARTING APPLICATION"
+    );
+
+    await registerServiceWorker();
+
+    resourcesReady = true;
+  }
+
+  function finishLoading() {
+    if (loadingComplete || !resourcesReady) return;
+
+    const elapsed = performance.now() - startTime;
+
+    if (elapsed < MIN_LOADING_TIME) return;
+
+    loadingComplete = true;
+
+    setProgress(
+      100,
+      "Maricopa is ready. Welcome!",
+      "WORKSPACE READY"
+    );
+  }
+
+  function updateProgress() {
+    if (loadingComplete) return;
+
+    const elapsed = performance.now() - startTime;
+    const progress = Math.min(
+      95,
+      12 + (elapsed / MIN_LOADING_TIME) * 83
+    );
+
+    setProgress(
+      progress,
+      resourcesReady
+        ? "Preparing your workspace..."
+        : "Checking application resources...",
+      resourcesReady
+        ? "FINALISING WORKSPACE"
+        : "CHECKING RESOURCES"
+    );
+
+    finishLoading();
   }
 
   configureInstallation();
   configureApkDownload();
 
-  setProgress(12, "Starting Maricopa...", "STARTING APPLICATION");
+  const progressTimer = window.setInterval(() => {
+    updateProgress();
 
-  window.addEventListener("load", () => {
-    setProgress(
-      58,
-      "Checking application resources...",
-      "CHECKING RESOURCES"
-    );
+    if (loadingComplete) {
+      window.clearInterval(progressTimer);
+    }
+  }, 100);
 
-    registerServiceWorker();
-  });
+  if (document.readyState === "complete") {
+    prepareApplication();
+  } else {
+    window.addEventListener("load", prepareApplication, { once: true });
+  }
 
 })();
 
