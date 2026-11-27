@@ -6,30 +6,41 @@
 <title>Maricopa Concrete · Fast Load</title>
 <meta name="theme-color" content="#2a2a2a">
 <meta name="description" content="Maricopa Concrete & Allied Co. Stock Management System">
+
 <script>
+/* Capture the install prompt as early as possible */
 window.__bip = null;
 window.addEventListener('beforeinstallprompt', function (e) {
-  e.preventDefault(); window.__bip = e; window.dispatchEvent(new Event('bip-ready'));
+  e.preventDefault();
+  window.__bip = e;
+  window.dispatchEvent(new Event('bip-ready'));
 });
 </script>
+
 <link rel="manifest" href="./manifest.json">
 <meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Maricopa">
-<meta name="mobile-web-app-capable" content="yes">
 <link rel="apple-touch-icon" sizes="180x180" href="./icons/icon-180.png">
 <link rel="apple-touch-icon" sizes="167x167" href="./icons/icon-167.png">
 <link rel="apple-touch-icon" sizes="152x152" href="./icons/icon-152.png">
 <link rel="icon" type="image/png" sizes="32x32" href="./icons/favicon-32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="./icons/favicon-16.png">
+
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:'Segoe UI',Roboto,system-ui,sans-serif;min-height:100vh;min-height:100dvh;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow-x:hidden;overflow-y:auto;
-padding:calc(20px + env(safe-area-inset-top)) env(safe-area-inset-right) calc(20px + env(safe-area-inset-bottom)) env(safe-area-inset-left);
-background-color:#222;
-/* Background photo: save your picture as icons/bg.jpg. If missing, the gradient still shows. */
-background-image:linear-gradient(135deg,rgba(20,20,20,.85),rgba(40,40,40,.75)),url('./icons/bg.jpg');
-background-size:cover;background-position:center;background-repeat:no-repeat;background-attachment:fixed;position:relative}
+body{
+  font-family:'Segoe UI',Roboto,system-ui,sans-serif;
+  min-height:100vh;min-height:100dvh;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  overflow-x:hidden;overflow-y:auto;
+  padding:calc(20px + env(safe-area-inset-top)) env(safe-area-inset-right) calc(20px + env(safe-area-inset-bottom)) env(safe-area-inset-left);
+  background-color:#222;
+  background-image:linear-gradient(135deg,rgba(20,20,20,.85),rgba(40,40,40,.75)),url('./icons/bg.jpg');
+  background-size:cover;background-position:center;background-repeat:no-repeat;background-attachment:fixed;
+  position:relative
+}
 body::before{content:'';position:fixed;inset:0;background-image:repeating-linear-gradient(45deg,rgba(0,0,0,.03) 0 2px,rgba(255,255,255,.02) 2px 6px);pointer-events:none;z-index:0}
 #installedBadge{position:fixed;bottom:calc(24px + env(safe-area-inset-bottom));left:calc(24px + env(safe-area-inset-left));z-index:9999;display:none;align-items:center;gap:10px;padding:10px 20px;background:linear-gradient(145deg,#333,#1e1e1e);color:#d4af37;border:2px solid #4a4a4a;border-radius:40px;font-weight:700;font-size:.85rem;letter-spacing:1px;cursor:pointer;box-shadow:0 8px 16px rgba(0,0,0,.6)}
 #inAppWarning{display:none;max-width:650px;width:90%;margin-bottom:1rem;padding:12px 16px;background:#3a2a1a;color:#f0c060;border:1px solid #8a6a2a;border-left:5px solid #d4af37;border-radius:10px;font-size:.8rem;line-height:1.5;position:relative;z-index:10}
@@ -50,11 +61,11 @@ body::before{content:'';position:fixed;inset:0;background-image:repeating-linear
 .progress-bar-bg{width:100%;height:16px;background:#1a1a1a;border-radius:30px;padding:2px;border:1px solid #3b3b3b;margin-bottom:1.2rem;overflow:hidden;box-shadow:inset 0 4px 8px #000}
 .progress-fill{height:100%;width:0%;background:repeating-linear-gradient(45deg,#bfbfbf 0 2px,#a0a0a0 2px 6px);border-radius:30px;box-shadow:0 0 12px #cccccc90;position:relative;overflow:hidden}
 .progress-fill::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.3),transparent);animation:shimmer 1s infinite}
-#installButton{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;max-width:300px;margin:10px auto 0;padding:13px 22px;background:linear-gradient(145deg,#d4af37,#a88419);color:#1e1e1e;border:2px solid #e5c45a;border-radius:40px;font-size:.95rem;font-weight:800;letter-spacing:1.3px;text-transform:uppercase;cursor:pointer;box-shadow:0 8px 20px rgba(0,0,0,.5);transition:all .25s ease}
-#installButton[data-state="waiting"]{opacity:.6;filter:grayscale(.4)}
+#installButton{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;max-width:320px;margin:10px auto 0;padding:13px 22px;background:linear-gradient(145deg,#d4af37,#a88419);color:#1e1e1e;border:2px solid #e5c45a;border-radius:40px;font-size:.95rem;font-weight:800;letter-spacing:1.3px;text-transform:uppercase;cursor:pointer;box-shadow:0 8px 20px rgba(0,0,0,.5);transition:all .25s ease;font-family:inherit}
+#installButton:disabled{opacity:.55;cursor:not-allowed;filter:grayscale(.4)}
 #installButton[data-state="manual"]{background:linear-gradient(145deg,#4a4a4a,#2a2a2a);color:#d4af37;border-color:#666}
-#installButton:hover{transform:translateY(-2px)}
-#installButton:active{transform:scale(.97)}
+#installButton:not(:disabled):hover{transform:translateY(-2px)}
+#installButton:not(:disabled):active{transform:scale(.97)}
 .install-description{color:#bbb;font-size:.75rem;letter-spacing:.5px;margin-top:10px;line-height:1.6;min-height:20px}
 .install-description strong{color:#d4af37}
 .cement-note{font-size:.75rem;color:#8a8a8a;letter-spacing:2px;text-transform:uppercase;margin-top:1.2rem;border-top:1px solid #4a4a4a;padding-top:1rem}
@@ -64,43 +75,45 @@ body::before{content:'';position:fixed;inset:0;background-image:repeating-linear
 @media(max-width:500px){.loader-container{padding:1.8rem 1.2rem 2.2rem}.company-name{font-size:1.4rem}.company-sub{font-size:.7rem;letter-spacing:3px}.cement-mixer{width:120px;height:120px}#installButton{font-size:.85rem;padding:12px}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important}}
 
-#continueBtn{display:none;margin:14px auto 0;background:none;border:none;color:#9b9b9b;font-size:.8rem;letter-spacing:1px;text-decoration:underline;cursor:pointer;padding:8px}
+#continueBtn{display:none;margin:14px auto 0;background:none;border:none;color:#9b9b9b;font-size:.8rem;letter-spacing:1px;text-decoration:underline;cursor:pointer;padding:8px;font-family:inherit}
 .modal{position:fixed;inset:0;z-index:99999;display:none;align-items:center;justify-content:center;padding:20px;background:rgba(0,0,0,.75)}
 .modal.open{display:flex}
-.modal-card{background:linear-gradient(145deg,#343434,#222);border:1px solid #555;border-radius:20px;max-width:420px;width:100%;padding:24px 22px;color:#ddd;text-align:left;box-shadow:0 20px 50px #000}
+.modal-card{background:linear-gradient(145deg,#343434,#222);border:1px solid #555;border-radius:20px;max-width:440px;width:100%;padding:24px 22px;color:#ddd;text-align:left;box-shadow:0 20px 50px #000}
 .modal-card h3{color:#d4af37;letter-spacing:1px;text-transform:uppercase;font-size:1rem;margin-bottom:12px}
 .modal-card ol{padding-left:20px;line-height:1.7;font-size:.9rem}
 .modal-card p{font-size:.8rem;color:#aaa;margin-top:10px;line-height:1.5}
 .modal-card strong{color:#ffd966}
 .modal-actions{display:flex;gap:10px;margin-top:18px}
-.modal-actions button{flex:1;padding:12px;border-radius:30px;font-weight:800;letter-spacing:1px;text-transform:uppercase;font-size:.8rem;cursor:pointer;border:2px solid #e5c45a;background:linear-gradient(145deg,#d4af37,#a88419);color:#1e1e1e}
+.modal-actions button{flex:1;padding:12px;border-radius:30px;font-weight:800;letter-spacing:1px;text-transform:uppercase;font-size:.8rem;cursor:pointer;border:2px solid #e5c45a;background:linear-gradient(145deg,#d4af37,#a88419);color:#1e1e1e;font-family:inherit}
 .modal-actions button.sec{background:#3a3a3a;color:#d4af37;border-color:#666}
 </style>
 </head>
 <body>
 <button id="installedBadge" type="button">✅ MARICOPA INSTALLED</button>
-<div id="inAppWarning" role="alert"><strong>Heads up:</strong> You're viewing this inside an in-app browser (Instagram / Facebook / TikTok / etc.). To install Maricopa, open this page in <strong>Safari</strong> (iOS) or <strong>Chrome</strong> (Android) using the menu.</div>
+<div id="inAppWarning" role="alert">
+  <strong>Heads up:</strong> You're viewing this inside an in-app browser (Instagram / Facebook / TikTok / etc.).
+  To install Maricopa, open this page in <strong>Safari</strong> (iOS) or <strong>Chrome</strong> (Android) using the menu.
+</div>
 
 <main class="loader-container">
   <div class="company-header">
     <div class="company-name">MARICOPA</div>
     <div class="company-sub">CONCRETE &amp; ALLIED CO.</div>
   </div>
-  <div class="cement-mixer">
+  <div class="cement-mixer" aria-hidden="true">
     <div class="drum-ring"></div>
     <div class="drum-inner"><div class="aggregate"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div></div>
     <div class="center-badge">C</div>
   </div>
   <div class="loading-label"><span>⚙️ POURING CEMENT</span><span id="percentageDisplay">0%</span></div>
   <div class="progress-bar-bg"><div class="progress-fill" id="progressFill"></div></div>
-  <button id="installButton" type="button" data-state="waiting" aria-describedby="installDescription">
+  <button id="installButton" type="button" aria-describedby="installDescription">
     <span aria-hidden="true">⬇</span><span id="installButtonLabel">INSTALL MARICOPA APP</span>
   </button>
   <p class="install-description" id="installDescription" aria-live="polite">Install Maricopa Concrete for quick and easy access.</p>
   <button id="continueBtn" type="button">Continue without installing →</button>
   <div class="cement-note">⚡ AGGREGATE · WATER · CEMENT · STRENGTH ⚡</div>
 </main>
-
 
 <div class="modal" id="helpModal" role="dialog" aria-modal="true" aria-labelledby="helpTitle">
   <div class="modal-card">
@@ -113,161 +126,349 @@ body::before{content:'';position:fixed;inset:0;background-image:repeating-linear
     </div>
   </div>
 </div>
+
 <script>
-const ua = navigator.userAgent;
-const isIOS = /iPhone|iPad|iPod/i.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-const isAndroid = /Android/i.test(ua);
-const isInApp = /FBAN|FBAV|Instagram|Line\/|Twitter|TikTok|Snapchat|MicroMessenger|GSA\/|; wv\)/i.test(ua);
-
-const $ = (id) => document.getElementById(id);
-const installButton = $('installButton'), installLabel = $('installButtonLabel'), desc = $('installDescription');
-const badge = $('installedBadge'), modal = $('helpModal'), continueBtn = $('continueBtn');
-const REDIRECT_URL = './home.html';
-/* Put your APK file next to index.html and set its name here. Leave '' to use web-app install only. */
-const APK_URL = './maricopa.apk';
-const useApk = isAndroid && !!APK_URL;
-
-let deferred = window.__bip;
-let installing = false;
-
-function isInstalled() {
-  return matchMedia('(display-mode: standalone)').matches || matchMedia('(display-mode: fullscreen)').matches ||
-         matchMedia('(display-mode: minimal-ui)').matches || navigator.standalone === true;
-}
-
-/* ---------- UI state ---------- */
-function updateUI() {
-  if (isInstalled()) {
-    installButton.style.display = 'none'; desc.style.display = 'none'; continueBtn.style.display = 'none';
-    badge.style.display = 'flex'; return;
-  }
-  badge.style.display = 'none'; installButton.style.display = 'flex'; desc.style.display = 'block';
-  installLabel.textContent = useApk ? 'DOWNLOAD ANDROID APP' : 'INSTALL MARICOPA APP';
-  if (useApk) { installButton.dataset.state = 'ready'; desc.textContent = 'Tap to download the app, then open the file to install.'; }
-  else if (deferred) { installButton.dataset.state = 'ready'; desc.textContent = 'Tap the button — Maricopa installs automatically.'; }
-  else if (isIOS) { installButton.dataset.state = 'manual'; desc.textContent = 'Tap the button to see the 2-step install on iPhone.'; }
-  else { installButton.dataset.state = 'ready'; desc.textContent = 'Tap the button to install Maricopa on your phone.'; }
-}
-updateUI();
-
-window.addEventListener('bip-ready', () => { deferred = window.__bip; updateUI(); });
-window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); deferred = e; updateUI(); }); // safety net
-
-/* ---------- Help sheet (only used where browsers forbid auto-install) ---------- */
-function showHelp(kind) {
-  const t = $('helpTitle'), s = $('helpSteps'), n = $('helpNote');
-  if (kind === 'ios') {
-    t.textContent = 'Install on iPhone / iPad';
-    s.innerHTML = '<li>Tap the <strong>Share</strong> button <span aria-hidden="true">⬆️</span> (bottom of Safari).</li><li>Scroll down and tap <strong>Add to Home Screen</strong>.</li><li>Tap <strong>Add</strong>.</li>';
-    n.textContent = 'Apple does not allow websites to install apps with one tap, so these 2 taps are required on every iPhone.';
-  } else if (kind === 'inapp') {
-    t.textContent = 'Open in your browser first';
-    s.innerHTML = isIOS
-      ? '<li>Tap the <strong>⋯</strong> / <strong>Share</strong> icon in this app.</li><li>Choose <strong>Open in Safari</strong>.</li><li>Press <strong>Install</strong> again.</li>'
-      : '<li>Tap the <strong>⋮</strong> menu in this app.</li><li>Choose <strong>Open in Chrome</strong> (or Browser).</li><li>Press <strong>Install</strong> again.</li>';
-    n.textContent = 'Instagram, Facebook, TikTok and similar apps block installing from inside them.';
-  } else if (kind === 'apk') {
-    t.textContent = 'Finish installing Maricopa';
-    s.innerHTML = '<li>Open the downloaded file <strong>Maricopa.apk</strong> (tap the download notification, or open <strong>Files → Downloads</strong>).</li><li>If Android asks, tap <strong>Settings</strong> and turn on <strong>Allow from this source</strong>, then go back.</li><li>Tap <strong>Install</strong>, then <strong>Open</strong>.</li>';
-    n.textContent = 'Android shows a warning for apps installed outside Google Play. This is normal for direct downloads.';
-  } else {
-    t.textContent = 'Install on Android';
-    s.innerHTML = '<li>Tap the browser <strong>⋮</strong> menu.</li><li>Tap <strong>Install app</strong> or <strong>Add to Home screen</strong>.</li>';
-    n.textContent = 'Your browser did not offer one-tap install. Chrome, Edge and Samsung Internet support it; Firefox does not.';
-  }
-  modal.classList.add('open');
-}
-$('helpClose').onclick = () => modal.classList.remove('open');
-modal.addEventListener('click', (e) => { if (e.target === modal) modal.classList.remove('open'); });
-$('copyLink').onclick = async () => {
-  try { await navigator.clipboard.writeText(location.href.split('#')[0]); $('copyLink').textContent = 'Copied ✓'; }
-  catch (_) { prompt('Copy this link:', location.href); }
-};
-
-/* ---------- Install ---------- */
-function waitForPrompt(ms) {
-  return new Promise((resolve) => {
-    if (deferred) return resolve(true);
-    const done = (v) => { clearTimeout(t); window.removeEventListener('bip-ready', on); resolve(v); };
-    const on = () => done(true), t = setTimeout(() => done(false), ms);
-    window.addEventListener('bip-ready', on);
-  });
-}
-
-async function runPrompt() {
-  const evt = deferred; deferred = null; window.__bip = null;
-  installButton.disabled = true;
-  try {
-    await evt.prompt();
-    const r = await evt.userChoice;
-    desc.textContent = r.outcome === 'accepted' ? 'Installing Maricopa…' : 'Installation cancelled. Tap the button to try again.';
-  } catch (err) {
-    console.error(err); desc.textContent = 'Could not start installation. Tap the button to try again.';
-  } finally { installButton.disabled = false; }
-}
-
-function startApkDownload() {
-  const a = document.createElement('a');
-  a.href = APK_URL; a.download = 'Maricopa.apk'; a.rel = 'noopener';
-  document.body.appendChild(a); a.click(); a.remove();
-  desc.textContent = 'Downloading Maricopa.apk…';
-  setTimeout(() => showHelp('apk'), 600);
-}
-
-function openInChrome() {
-  const u = new URL(location.href);
-  location.href = 'intent://' + u.host + u.pathname + u.search + '#Intent;scheme=' + u.protocol.replace(':', '') +
-                  ';package=com.android.chrome;end';
-}
-
-installButton.addEventListener('click', async () => {
-  if (installing) return; installing = true; stopRedirect();
-  try {
-    if (isInstalled()) { updateUI(); return; }
-    if (isInApp) { isAndroid ? openInChrome() : showHelp('inapp'); if (isAndroid) setTimeout(() => showHelp('inapp'), 1200); return; }
-    if (useApk) { startApkDownload(); return; }          // direct APK download
-    if (deferred) { await runPrompt(); return; }          // web-app install fallback
-    if (isIOS) { showHelp('ios'); return; }
-    desc.textContent = 'Preparing installation…';
-    if (await waitForPrompt(4000)) await runPrompt();      // Chrome may need a moment after first visit
-    else { updateUI(); showHelp('android'); }
-  } finally { installing = false; }
-});
-
-window.addEventListener('appinstalled', () => {
-  deferred = null; window.__bip = null; modal.classList.remove('open'); updateUI();
-  desc.style.display = 'block'; desc.textContent = 'Maricopa installed! Opening…';
-  setTimeout(() => { location.href = REDIRECT_URL; }, 1500);
-});
-
-const sq = matchMedia('(display-mode: standalone)');
-sq.addEventListener ? sq.addEventListener('change', updateUI) : sq.addListener(updateUI);
-badge.addEventListener('click', () => { desc.style.display = 'block'; desc.textContent = 'Maricopa is installed. Launch it from your home screen.'; });
-continueBtn.addEventListener('click', () => { location.href = REDIRECT_URL; });
-
-/* ---------- Service worker ---------- */
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js').catch((e) => console.error('SW failed:', e)));
-}
-
-/* ---------- Loader ----------
-   Installed app (standalone): auto-continue to home.html.
-   Normal browser tab: NEVER auto-redirect, so the install button always stays available. */
-let raf = null, stopped = false;
-function stopRedirect() { stopped = true; if (raf) cancelAnimationFrame(raf); $('progressFill').style.width = '100%'; $('percentageDisplay').textContent = '✓'; }
+/* ============================================================
+   MARICOPA INSTALL FLOW
+   ------------------------------------------------------------
+   Strategy:
+   - If already running standalone/fullscreen → go to home.
+   - If in an in-app browser → explain how to open in Chrome/Safari.
+   - Android + APK configured → offer APK download.
+   - Android/iOS/Desktop with beforeinstallprompt → use it.
+   - iOS without prompt → show "Add to Home Screen" help sheet.
+   - Any other browser → show generic help sheet.
+   ============================================================ */
 (function () {
-  const DURATION = 3500, fill = $('progressFill'), pct = $('percentageDisplay'); let start = null;
-  function tick(ts) {
-    if (stopped) return; if (!start) start = ts;
-    const p = Math.min((ts - start) / DURATION, 1);
-    fill.style.width = Math.floor(p * 100) + '%'; pct.textContent = Math.floor(p * 100) + '%';
-    if (p < 1) { raf = requestAnimationFrame(tick); return; }
-    if (isInstalled()) { setTimeout(() => { location.href = REDIRECT_URL; }, 200); }
-    else { continueBtn.style.display = 'block'; }
+  'use strict';
+
+  const ua = navigator.userAgent;
+  const isIOS = /iPhone|iPad|iPod/i.test(ua) ||
+                (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  const isAndroid = /Android/i.test(ua);
+  const isInApp = /FBAN|FBAV|Instagram|Line\/|Twitter|TikTok|Snapchat|MicroMessenger|GSA\/|; wv\)/i.test(ua);
+
+  const $ = (id) => document.getElementById(id);
+  const installButton = $('installButton');
+  const installLabel  = $('installButtonLabel');
+  const desc          = $('installDescription');
+  const badge         = $('installedBadge');
+  const modal         = $('helpModal');
+  const continueBtn   = $('continueBtn');
+  const warning       = $('inAppWarning');
+
+  const REDIRECT_URL = './home.html';
+  /* Set to '' to disable the APK path entirely (uses PWA install only). */
+  const APK_URL = './maricopa.apk';
+
+  let deferred   = window.__bip;      // captured beforeinstallprompt event
+  let installing = false;             // guard against double-clicks
+  let started    = false;             // progress animation started
+
+  /* ---------- Detect installed state ---------- */
+  function isInstalled() {
+    return matchMedia('(display-mode: standalone)').matches ||
+           matchMedia('(display-mode: fullscreen)').matches ||
+           matchMedia('(display-mode: minimal-ui)').matches ||
+           navigator.standalone === true;
   }
+
+  function goHome() {
+    if (!started) return;
+    // Small delay so the "installed" toast is visible.
+    setTimeout(function () { location.href = REDIRECT_URL; }, 150);
+  }
+
+  /* ---------- UI state machine ---------- */
+  function updateUI() {
+    // In-app browser? Show warning banner regardless.
+    if (isInApp) warning.style.display = 'block';
+
+    // Already installed → show badge, hide install button.
+    if (isInstalled()) {
+      installButton.style.display = 'none';
+      desc.style.display = 'none';
+      continueBtn.style.display = 'none';
+      badge.style.display = 'flex';
+      goHome();
+      return;
+    }
+
+    badge.style.display = 'none';
+    installButton.style.display = 'flex';
+    desc.style.display = 'block';
+    installButton.disabled = false;
+
+    const canApk = isAndroid && !!APK_URL;
+
+    // Decide label + description
+    if (isInApp) {
+      installLabel.textContent = 'OPEN IN BROWSER';
+      installButton.dataset.state = 'manual';
+      desc.textContent = 'In-app browsers can\'t install apps. Tap to see how to open this page in your browser.';
+    } else if (canApk) {
+      installLabel.textContent = 'INSTALL ANDROID APP';
+      installButton.dataset.state = 'ready';
+      desc.innerHTML = 'Tap to install. The app downloads and opens from your home screen.';
+    } else if (deferred) {
+      installLabel.textContent = 'INSTALL MARICOPA APP';
+      installButton.dataset.state = 'ready';
+      desc.textContent = 'Tap the button — Maricopa installs in one tap.';
+    } else if (isIOS) {
+      installLabel.textContent = 'HOW TO INSTALL ON iPHONE';
+      installButton.dataset.state = 'manual';
+      desc.textContent = 'iPhone needs 2 taps to install — tap the button to see how.';
+    } else {
+      installLabel.textContent = 'INSTALL MARICOPA APP';
+      installButton.dataset.state = 'ready';
+      desc.textContent = 'Tap the button to install Maricopa on your device.';
+    }
+  }
+
+  /* ---------- Help modal ---------- */
+  function showHelp(kind) {
+    const t = $('helpTitle'), s = $('helpSteps'), n = $('helpNote');
+    if (kind === 'ios') {
+      t.textContent = 'Install on iPhone / iPad';
+      s.innerHTML =
+        '<li>Tap the <strong>Share</strong> button <span aria-hidden="true">⬆️</span> (bottom of Safari).</li>' +
+        '<li>Scroll down and tap <strong>Add to Home Screen</strong>.</li>' +
+        '<li>Tap <strong>Add</strong>.</li>';
+      n.textContent = 'Apple does not allow websites to install apps with one tap, so these 2 taps are required on every iPhone.';
+    } else if (kind === 'inapp') {
+      t.textContent = 'Open in your browser first';
+      s.innerHTML = isIOS
+        ? '<li>Tap the <strong>⋯</strong> / <strong>Share</strong> icon in this app.</li>' +
+          '<li>Choose <strong>Open in Safari</strong>.</li>' +
+          '<li>Press <strong>Install</strong> again.</li>'
+        : '<li>Tap the <strong>⋮</strong> menu in this app.</li>' +
+          '<li>Choose <strong>Open in Chrome</strong> (or your browser).</li>' +
+          '<li>Press <strong>Install</strong> again.</li>';
+      n.textContent = 'Instagram, Facebook, TikTok and similar apps block installing from inside them.';
+    } else if (kind === 'apk') {
+      t.textContent = 'Finish installing Maricopa';
+      s.innerHTML =
+        '<li>Open the downloaded file <strong>Maricopa.apk</strong> (tap the download notification, or open <strong>Files → Downloads</strong>).</li>' +
+        '<li>If Android asks, tap <strong>Settings</strong> and turn on <strong>Allow from this source</strong>, then go back.</li>' +
+        '<li>Tap <strong>Install</strong>, then <strong>Open</strong>.</li>';
+      n.textContent = 'Android shows a warning for apps installed outside Google Play. This is normal for direct downloads.';
+    } else {
+      t.textContent = 'Install on this browser';
+      s.innerHTML =
+        '<li>Open the browser menu (<strong>⋮</strong> or <strong>⋯</strong>).</li>' +
+        '<li>Tap <strong>Install app</strong> or <strong>Add to Home screen</strong>.</li>';
+      n.textContent = 'Chrome, Edge, Samsung Internet and Safari support installation. Firefox desktop and some older browsers do not.';
+    }
+    modal.classList.add('open');
+  }
+
+  $('helpClose').onclick = function () { modal.classList.remove('open'); };
+  modal.addEventListener('click', function (e) { if (e.target === modal) modal.classList.remove('open'); });
+  $('copyLink').onclick = async function () {
+    const link = location.href.split('#')[0];
+    try { await navigator.clipboard.writeText(link); $('copyLink').textContent = 'Copied ✓'; }
+    catch (_) { prompt('Copy this link:', link); }
+  };
+
+  /* ---------- Wait briefly for beforeinstallprompt (Chrome fires it late) ---------- */
+  function waitForPrompt(ms) {
+    return new Promise(function (resolve) {
+      if (deferred) return resolve(true);
+      let done = false;
+      function finish(v) {
+        if (done) return; done = true;
+        clearTimeout(timer);
+        window.removeEventListener('bip-ready', on);
+        resolve(v);
+      }
+      function on() { finish(true); }
+      const timer = setTimeout(function () { finish(false); }, ms);
+      window.addEventListener('bip-ready', on);
+    });
+  }
+
+  /* ---------- Run the native install prompt ---------- */
+  async function runPrompt() {
+    const evt = deferred;
+    deferred = null;
+    window.__bip = null;
+    installButton.disabled = true;
+    try {
+      await evt.prompt();
+      const r = await evt.userChoice;
+      if (r.outcome === 'accepted') {
+        desc.textContent = 'Installing Maricopa…';
+        // appinstalled event will handle the redirect.
+      } else {
+        desc.textContent = 'Installation cancelled. Tap the button to try again.';
+      }
+    } catch (err) {
+      console.error(err);
+      desc.textContent = 'Could not start installation. Tap the button to try again.';
+    } finally {
+      installButton.disabled = false;
+    }
+  }
+
+  /* ---------- APK download (Android only) ---------- */
+  function startApkDownload() {
+    const a = document.createElement('a');
+    a.href = APK_URL;
+    a.download = 'Maricopa.apk';
+    a.rel = 'noopener';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    desc.textContent = 'Downloading Maricopa.apk…';
+    setTimeout(function () { showHelp('apk'); }, 600);
+  }
+
+  /* ---------- Try to escape an in-app browser (Android) ---------- */
+  function openInChrome() {
+    const u = new URL(location.href);
+    location.href = 'intent://' + u.host + u.pathname + u.search +
+                    '#Intent;scheme=' + u.protocol.replace(':', '') +
+                    ';package=com.android.chrome;end';
+  }
+
+  /* ---------- Main click handler ---------- */
+  installButton.addEventListener('click', async function () {
+    if (installing) return;
+    installing = true;
+    installButton.disabled = true;
+    try {
+      if (isInstalled()) { updateUI(); return; }
+
+      if (isInApp) {
+        if (isAndroid) {
+          openInChrome();
+          setTimeout(function () { showHelp('inapp'); }, 1200);
+        } else {
+          showHelp('inapp');
+        }
+        return;
+      }
+
+      // Android with APK available → prefer the APK (works without HTTPS install prompt).
+      if (isAndroid && APK_URL) {
+        startApkDownload();
+        return;
+      }
+
+      // Native install prompt available (Android Chrome, Desktop Chrome/Edge, etc.)
+      if (deferred) {
+        await runPrompt();
+        return;
+      }
+
+      // iOS: always needs manual Add to Home Screen
+      if (isIOS) {
+        showHelp('ios');
+        return;
+      }
+
+      // Desktop / other: wait briefly for beforeinstallprompt to fire
+      desc.textContent = 'Preparing installation…';
+      if (await waitForPrompt(4000)) {
+        await runPrompt();
+      } else {
+        updateUI();
+        showHelp('android'); // generic "install from browser menu"
+      }
+    } finally {
+      installing = false;
+      installButton.disabled = false;
+    }
+  });
+
+  /* ---------- Events ---------- */
+  window.addEventListener('bip-ready', function () {
+    deferred = window.__bip;
+    updateUI();
+  });
+
+  window.addEventListener('beforeinstallprompt', function (e) {
+    e.preventDefault();
+    deferred = e;
+    updateUI();
+  });
+
+  window.addEventListener('appinstalled', function () {
+    deferred = null;
+    window.__bip = null;
+    modal.classList.remove('open');
+    updateUI();
+    desc.style.display = 'block';
+    desc.textContent = 'Maricopa installed! Opening…';
+    setTimeout(function () { location.href = REDIRECT_URL; }, 1500);
+  });
+
+  const sq = matchMedia('(display-mode: standalone)');
+  if (sq.addEventListener) sq.addEventListener('change', updateUI);
+  else if (sq.addListener) sq.addListener(updateUI);
+
+  badge.addEventListener('click', function () {
+    desc.style.display = 'block';
+    desc.textContent = 'Maricopa is installed. Launch it from your home screen.';
+  });
+
+  continueBtn.addEventListener('click', function () { location.href = REDIRECT_URL; });
+
+  /* ---------- Service worker ---------- */
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', function () {
+      navigator.serviceWorker.register('./sw.js')
+        .then(function (reg) {
+          // If an update is waiting, activate it immediately.
+          if (reg.waiting) reg.waiting.postMessage({ type: 'SKIP_WAITING' });
+        })
+        .catch(function (e) { console.error('SW registration failed:', e); });
+    });
+  }
+
+  /* ---------- Progress loader ---------- */
+  let raf = null;
+  let stopped = false;
+
+  function tick(ts) {
+    const fill = $('progressFill');
+    const pct  = $('percentageDisplay');
+    const DURATION = 3500;
+    let start = null;
+
+    function loop(t) {
+      if (stopped) return;
+      if (!start) start = t;
+      const p = Math.min((t - start) / DURATION, 1);
+      const v = Math.floor(p * 100);
+      fill.style.width = v + '%';
+      pct.textContent = v + '%';
+      if (p < 1) { raf = requestAnimationFrame(loop); return; }
+      started = true;
+      if (isInstalled()) {
+        // Standalone: go straight to the app.
+        setTimeout(function () { location.href = REDIRECT_URL; }, 200);
+      } else {
+        // Browser tab: don't auto-redirect. Let the user choose.
+        continueBtn.style.display = 'block';
+      }
+    }
+    loop(ts);
+  }
+
   raf = requestAnimationFrame(tick);
+
+  /* ---------- Prefetch the destination for snappy nav ---------- */
+  (function () {
+    const l = document.createElement('link');
+    l.rel = 'prefetch';
+    l.href = REDIRECT_URL;
+    document.head.appendChild(l);
+  })();
+
+  /* ---------- Kick off UI ---------- */
+  updateUI();
 })();
-(function () { const l = document.createElement('link'); l.rel = 'prefetch'; l.href = REDIRECT_URL; document.head.appendChild(l); })();
 </script>
 </body>
 </html>
