@@ -123,6 +123,9 @@ const $ = (id) => document.getElementById(id);
 const installButton = $('installButton'), installLabel = $('installButtonLabel'), desc = $('installDescription');
 const badge = $('installedBadge'), modal = $('helpModal'), continueBtn = $('continueBtn');
 const REDIRECT_URL = './home.html';
+/* Put your APK file next to index.html and set its name here. Leave '' to use web-app install only. */
+const APK_URL = './maricopa.apk';
+const useApk = isAndroid && !!APK_URL;
 
 let deferred = window.__bip;
 let installing = false;
@@ -139,8 +142,9 @@ function updateUI() {
     badge.style.display = 'flex'; return;
   }
   badge.style.display = 'none'; installButton.style.display = 'flex'; desc.style.display = 'block';
-  installLabel.textContent = 'INSTALL MARICOPA APP';
-  if (deferred) { installButton.dataset.state = 'ready'; desc.textContent = 'Tap the button — Maricopa installs automatically.'; }
+  installLabel.textContent = useApk ? 'DOWNLOAD ANDROID APP' : 'INSTALL MARICOPA APP';
+  if (useApk) { installButton.dataset.state = 'ready'; desc.textContent = 'Tap to download the app, then open the file to install.'; }
+  else if (deferred) { installButton.dataset.state = 'ready'; desc.textContent = 'Tap the button — Maricopa installs automatically.'; }
   else if (isIOS) { installButton.dataset.state = 'manual'; desc.textContent = 'Tap the button to see the 2-step install on iPhone.'; }
   else { installButton.dataset.state = 'ready'; desc.textContent = 'Tap the button to install Maricopa on your phone.'; }
 }
@@ -162,6 +166,10 @@ function showHelp(kind) {
       ? '<li>Tap the <strong>⋯</strong> / <strong>Share</strong> icon in this app.</li><li>Choose <strong>Open in Safari</strong>.</li><li>Press <strong>Install</strong> again.</li>'
       : '<li>Tap the <strong>⋮</strong> menu in this app.</li><li>Choose <strong>Open in Chrome</strong> (or Browser).</li><li>Press <strong>Install</strong> again.</li>';
     n.textContent = 'Instagram, Facebook, TikTok and similar apps block installing from inside them.';
+  } else if (kind === 'apk') {
+    t.textContent = 'Finish installing Maricopa';
+    s.innerHTML = '<li>Open the downloaded file <strong>Maricopa.apk</strong> (tap the download notification, or open <strong>Files → Downloads</strong>).</li><li>If Android asks, tap <strong>Settings</strong> and turn on <strong>Allow from this source</strong>, then go back.</li><li>Tap <strong>Install</strong>, then <strong>Open</strong>.</li>';
+    n.textContent = 'Android shows a warning for apps installed outside Google Play. This is normal for direct downloads.';
   } else {
     t.textContent = 'Install on Android';
     s.innerHTML = '<li>Tap the browser <strong>⋮</strong> menu.</li><li>Tap <strong>Install app</strong> or <strong>Add to Home screen</strong>.</li>';
@@ -198,6 +206,14 @@ async function runPrompt() {
   } finally { installButton.disabled = false; }
 }
 
+function startApkDownload() {
+  const a = document.createElement('a');
+  a.href = APK_URL; a.download = 'Maricopa.apk'; a.rel = 'noopener';
+  document.body.appendChild(a); a.click(); a.remove();
+  desc.textContent = 'Downloading Maricopa.apk…';
+  setTimeout(() => showHelp('apk'), 600);
+}
+
 function openInChrome() {
   const u = new URL(location.href);
   location.href = 'intent://' + u.host + u.pathname + u.search + '#Intent;scheme=' + u.protocol.replace(':', '') +
@@ -208,8 +224,9 @@ installButton.addEventListener('click', async () => {
   if (installing) return; installing = true; stopRedirect();
   try {
     if (isInstalled()) { updateUI(); return; }
-    if (deferred) { await runPrompt(); return; }          // one tap → system install dialog
     if (isInApp) { isAndroid ? openInChrome() : showHelp('inapp'); if (isAndroid) setTimeout(() => showHelp('inapp'), 1200); return; }
+    if (useApk) { startApkDownload(); return; }          // direct APK download
+    if (deferred) { await runPrompt(); return; }          // web-app install fallback
     if (isIOS) { showHelp('ios'); return; }
     desc.textContent = 'Preparing installation…';
     if (await waitForPrompt(4000)) await runPrompt();      // Chrome may need a moment after first visit
