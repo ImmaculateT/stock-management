@@ -175,7 +175,6 @@
       animation: chunkFloat 2.8s ease-in-out infinite alternate;
     }
 
-    /* The chunks are children 3–6 in the mixer markup. */
     .chunk:nth-child(3) { top: 15%; left: 10%; width: 18px; height: 18px; }
     .chunk:nth-child(4) { right: 12%; bottom: 20%; width: 12px; height: 12px; animation-delay: .4s; }
     .chunk:nth-child(5) { top: 45%; right: 8%; width: 20px; height: 16px; animation-delay: .9s; }
@@ -393,251 +392,252 @@
   </main>
 
   <script>
-  
+  (() => {
+    "use strict";
 
-(() => {
-  "use strict";
+    const APK_DOWNLOAD_URL =
+      "https://github.com/ImmaculateT/stock-management/releases/download/v1.0.0/app-release.apk";
 
-  const APK_DOWNLOAD_URL =
-    "https://github.com/ImmaculateT/stock-management/releases/download/v1.0.0/app-release.apk";
+    // 30-second loading screen (fixed: was 30000;; before)
+    const MIN_LOADING_TIME = 30000;
+    const startTime = performance.now();
 
- const MIN_LOADING_TIME = 30000;;
-  const startTime = performance.now();
+    const el = (id) => document.getElementById(id);
 
-  const el = (id) => document.getElementById(id);
+    const installBtn = el("installBtn");
+    const installHint = el("installHint");
+    const downloadBtn = el("downloadBtn");
+    const downloadHint = el("downloadHint");
+    const statusText = el("statusText");
+    const progressFill = el("progressFill");
+    const percentDisplay = el("percentDisplay");
+    const progressBar = el("progressBar");
+    const progressLabel = el("progressLabel");
 
-  const installBtn = el("installBtn");
-  const installHint = el("installHint");
-  const downloadBtn = el("downloadBtn");
-  const downloadHint = el("downloadHint");
-  const statusText = el("statusText");
-  const progressFill = el("progressFill");
-  const percentDisplay = el("percentDisplay");
-  const progressBar = el("progressBar");
-  const progressLabel = el("progressLabel");
+    let deferredInstallPrompt = null;
+    let resourcesReady = false;
+    let loadingComplete = false;
 
-  let deferredInstallPrompt = null;
-  let resourcesReady = false;
-  let loadingComplete = false;
+    const isAndroid = /Android/i.test(navigator.userAgent || "");
+    const isApple = /iPhone|iPad|iPod/i.test(navigator.userAgent || "");
 
-  const isAndroid = /Android/i.test(navigator.userAgent || "");
-  const isApple = /iPhone|iPad|iPod/i.test(navigator.userAgent || "");
+    function setProgress(value, message, label) {
+      const percent = Math.max(0, Math.min(100, Math.round(value)));
 
-  function setProgress(value, message, label) {
-    const percent = Math.max(0, Math.min(100, Math.round(value)));
+      progressFill.style.width = percent + "%";
+      percentDisplay.textContent = percent + "%";
+      progressBar.setAttribute("aria-valuenow", String(percent));
 
-    progressFill.style.width = percent + "%";
-    percentDisplay.textContent = percent + "%";
-    progressBar.setAttribute("aria-valuenow", String(percent));
-
-    if (message) statusText.textContent = message;
-    if (label) progressLabel.textContent = label;
-  }
-
-  function isInstalled() {
-    return (
-      window.matchMedia("(display-mode: standalone)").matches ||
-      window.matchMedia("(display-mode: fullscreen)").matches ||
-      window.matchMedia("(display-mode: minimal-ui)").matches ||
-      window.navigator.standalone === true
-    );
-  }
-
-  function showInstalled() {
-    installBtn.disabled = true;
-    installBtn.textContent = "Maricopa Is Installed";
-
-    installHint.textContent =
-      "Maricopa is installed on this device. Open the stock management system to continue.";
-  }
-
-  function configureInstallation() {
-    if (isInstalled()) {
-      showInstalled();
-      return;
+      if (message) statusText.textContent = message;
+      if (label) progressLabel.textContent = label;
     }
 
-    if (isAndroid) {
-      installBtn.disabled = true;
-      installBtn.textContent = "Android Installation";
-
-      installHint.textContent =
-        "Download the official Android application below, or open the web version.";
-
-    } else if (isApple) {
-      installBtn.disabled = true;
-      installBtn.textContent = "Install Using Safari";
-
-      installHint.textContent =
-        'On iPhone or iPad, open this page in Safari, tap Share, then select "Add to Home Screen".';
-
-    } else {
-      installBtn.disabled = true;
-      installBtn.textContent = "Checking Web Installation";
-
-      installHint.textContent =
-        "You can open the stock management system now. A browser installation option will appear if supported.";
-    }
-  }
-
-  function configureApkDownload() {
-    if (!APK_DOWNLOAD_URL.trim()) {
-      downloadBtn.classList.add("hidden");
-
-      downloadHint.textContent =
-        "The official Maricopa Android application is being prepared.";
-
-      return;
+    function isInstalled() {
+      return (
+        window.matchMedia("(display-mode: standalone)").matches ||
+        window.matchMedia("(display-mode: fullscreen)").matches ||
+        window.matchMedia("(display-mode: minimal-ui)").matches ||
+        window.navigator.standalone === true
+      );
     }
 
-    try {
-      const apkUrl = new URL(APK_DOWNLOAD_URL);
+    function showInstalled() {
+      installBtn.disabled = true;
+      installBtn.textContent = "Maricopa Is Installed";
 
-      if (apkUrl.protocol !== "https:") {
-        throw new Error("APK download must use HTTPS.");
+      installHint.textContent =
+        "Maricopa is installed on this device. Open the stock management system to continue.";
+    }
+
+    function configureInstallation() {
+      if (isInstalled()) {
+        showInstalled();
+        return;
       }
 
-      downloadBtn.href = apkUrl.href;
-      downloadBtn.classList.remove("hidden");
+      if (isAndroid) {
+        installBtn.disabled = true;
+        installBtn.textContent = "Android Installation";
 
-      downloadHint.textContent =
-        "Download the official signed Maricopa Android application. Open the downloaded APK to install it.";
+        installHint.textContent =
+          "Download the official Android application below, or open the web version.";
 
-    } catch (error) {
-      console.warn("[Maricopa] APK configuration error:", error);
+      } else if (isApple) {
+        installBtn.disabled = true;
+        installBtn.textContent = "Install Using Safari";
 
-      downloadBtn.classList.add("hidden");
+        installHint.textContent =
+          'On iPhone or iPad, open this page in Safari, tap Share, then select "Add to Home Screen".';
 
-      downloadHint.textContent =
-        "The Android download link is not configured correctly.";
-    }
-  }
-
-  window.addEventListener("beforeinstallprompt", (event) => {
-    event.preventDefault();
-    deferredInstallPrompt = event;
-
-    if (isInstalled()) return;
-
-    installBtn.disabled = false;
-    installBtn.textContent = "Install Web App";
-
-    installHint.textContent =
-      "Install the browser-based Maricopa web app. Use the APK download option for the native Android application.";
-  });
-
-  installBtn.addEventListener("click", async () => {
-    if (!deferredInstallPrompt) return;
-
-    const promptEvent = deferredInstallPrompt;
-    deferredInstallPrompt = null;
-
-    installBtn.disabled = true;
-    installBtn.textContent = "Waiting for Confirmation...";
-
-    try {
-      await promptEvent.prompt();
-      const result = await promptEvent.userChoice;
-
-      if (result && result.outcome === "accepted") {
-        installBtn.textContent = "Installation Accepted";
-        installHint.textContent = "Complete the installation prompt.";
       } else {
-        installBtn.disabled = false;
-        installBtn.textContent = "Try Installing Again";
-        installHint.textContent = "You can try installing again.";
+        installBtn.disabled = true;
+        installBtn.textContent = "Checking Web Installation";
+
+        installHint.textContent =
+          "You can open the stock management system now. A browser installation option will appear if supported.";
       }
-    } catch (error) {
-      console.warn("[Maricopa] Installation error:", error);
+    }
+
+    function configureApkDownload() {
+      if (!APK_DOWNLOAD_URL.trim()) {
+        downloadBtn.classList.add("hidden");
+
+        downloadHint.textContent =
+          "The official Maricopa Android application is being prepared.";
+
+        return;
+      }
+
+      try {
+        const apkUrl = new URL(APK_DOWNLOAD_URL);
+
+        if (apkUrl.protocol !== "https:") {
+          throw new Error("APK download must use HTTPS.");
+        }
+
+        downloadBtn.href = apkUrl.href;
+        downloadBtn.classList.remove("hidden");
+
+        downloadHint.textContent =
+          "Download the official signed Maricopa Android application. Open the downloaded APK to install it.";
+
+      } catch (error) {
+        console.warn("[Maricopa] APK configuration error:", error);
+
+        downloadBtn.classList.add("hidden");
+
+        downloadHint.textContent =
+          "The Android download link is not configured correctly.";
+      }
+    }
+
+    window.addEventListener("beforeinstallprompt", (event) => {
+      event.preventDefault();
+      deferredInstallPrompt = event;
+
+      if (isInstalled()) return;
 
       installBtn.disabled = false;
       installBtn.textContent = "Install Web App";
+
+      installHint.textContent =
+        "Install the browser-based Maricopa web app. Use the APK download option for the native Android application.";
+    });
+
+    installBtn.addEventListener("click", async () => {
+      if (!deferredInstallPrompt) return;
+
+      const promptEvent = deferredInstallPrompt;
+      deferredInstallPrompt = null;
+
+      installBtn.disabled = true;
+      installBtn.textContent = "Waiting for Confirmation...";
+
+      try {
+        await promptEvent.prompt();
+        const result = await promptEvent.userChoice;
+
+        if (result && result.outcome === "accepted") {
+          installBtn.textContent = "Installation Accepted";
+          installHint.textContent = "Complete the installation prompt.";
+        } else {
+          installBtn.disabled = false;
+          installBtn.textContent = "Try Installing Again";
+          installHint.textContent = "You can try installing again.";
+        }
+      } catch (error) {
+        console.warn("[Maricopa] Installation error:", error);
+
+        installBtn.disabled = false;
+        installBtn.textContent = "Install Web App";
+      }
+    });
+
+    window.addEventListener("appinstalled", showInstalled);
+
+    async function registerServiceWorker() {
+      if (!("serviceWorker" in navigator) || !window.isSecureContext) {
+        return;
+      }
+
+      try {
+        await navigator.serviceWorker.register("/sw.js");
+      } catch (error) {
+        console.warn("[Maricopa] Service worker registration failed:", error);
+      }
     }
-  });
 
-  window.addEventListener("appinstalled", showInstalled);
+    async function prepareApplication() {
+      setProgress(
+        12,
+        "Starting Maricopa...",
+        "STARTING APPLICATION"
+      );
 
-  async function registerServiceWorker() {
-    if (!("serviceWorker" in navigator) || !window.isSecureContext) {
-      return;
+      await registerServiceWorker();
+
+      resourcesReady = true;
     }
 
-    try {
-      await navigator.serviceWorker.register("/sw.js");
-    } catch (error) {
-      console.warn("[Maricopa] Service worker registration failed:", error);
+    // No longer bails out early — the 30-second timer always wins.
+    function finishLoading() {
+      if (loadingComplete) return;
+
+      const elapsed = performance.now() - startTime;
+
+      if (elapsed < MIN_LOADING_TIME) return;
+
+      loadingComplete = true;
+
+      setProgress(
+        100,
+        "Maricopa is ready. Welcome!",
+        "WORKSPACE READY"
+      );
     }
-  }
 
-  async function prepareApplication() {
-    setProgress(
-      12,
-      "Starting Maricopa...",
-      "STARTING APPLICATION"
-    );
+    function updateProgress() {
+      if (loadingComplete) return;
 
-    await registerServiceWorker();
+      const elapsed = performance.now() - startTime;
+      const progress = Math.min(
+        95,
+        12 + (elapsed / MIN_LOADING_TIME) * 83
+      );
 
-    resourcesReady = true;
-  }
+      setProgress(
+        progress,
+        resourcesReady
+          ? "Preparing your workspace..."
+          : "Checking application resources...",
+        resourcesReady
+          ? "FINALISING WORKSPACE"
+          : "CHECKING RESOURCES"
+      );
 
-  function finishLoading() {
-    if (loadingComplete || !resourcesReady) return;
-
-    const elapsed = performance.now() - startTime;
-
-    if (elapsed < MIN_LOADING_TIME) return;
-
-    loadingComplete = true;
-
-    setProgress(
-      100,
-      "Maricopa is ready. Welcome!",
-      "WORKSPACE READY"
-    );
-  }
-
-  function updateProgress() {
-    if (loadingComplete) return;
-
-    const elapsed = performance.now() - startTime;
-    const progress = Math.min(
-      95,
-      12 + (elapsed / MIN_LOADING_TIME) * 83
-    );
-
-    setProgress(
-      progress,
-      resourcesReady
-        ? "Preparing your workspace..."
-        : "Checking application resources...",
-      resourcesReady
-        ? "FINALISING WORKSPACE"
-        : "CHECKING RESOURCES"
-    );
-
-    finishLoading();
-  }
-
-  configureInstallation();
-  configureApkDownload();
-
-  const progressTimer = window.setInterval(() => {
-    updateProgress();
-
-    if (loadingComplete) {
-      window.clearInterval(progressTimer);
+      finishLoading();
     }
-  }, 100);
 
-  if (document.readyState === "complete") {
-    prepareApplication();
-  } else {
-    window.addEventListener("load", prepareApplication, { once: true });
-  }
+    configureInstallation();
+    configureApkDownload();
 
-})();
+    const progressTimer = window.setInterval(() => {
+      updateProgress();
 
+      if (loadingComplete) {
+        window.clearInterval(progressTimer);
+      }
+    }, 100);
+
+    if (document.readyState === "complete") {
+      prepareApplication();
+    } else {
+      window.addEventListener("load", prepareApplication, { once: true });
+      // Fallback in case the load event already fired before the listener attached.
+      setTimeout(prepareApplication, 2000);
+    }
+
+  })();
   </script>
 </body>
 </html>
