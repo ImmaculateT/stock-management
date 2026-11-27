@@ -182,7 +182,7 @@
 </div>
 
 <script>
-  // Redirect after loading animation
+  
   let percent = 0;
   const percentDisplay = document.getElementById('percentDisplay');
   const statusText = document.getElementById('statusText');
@@ -205,7 +205,11 @@
     window.location.href = 'home.html';
   }, 3200);
 
-  // PWA install prompt handling
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/sw.js');
+  }
+
+  
   let deferredPrompt = null;
   const installBtn = document.getElementById('installBtn');
 
