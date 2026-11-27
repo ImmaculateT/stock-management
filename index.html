@@ -2,41 +2,31 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#2c3e50">
   <title>Maricopa Concrete · Loading</title>
+  <link rel="manifest" href="manifest.json">
   <style>
-    /* GLOBAL RESET & FONTS */
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
+    * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
-      background: #1e2a36; /* deep asphalt */
+      background: #1e2a36;
       min-height: 100vh;
       display: flex;
       align-items: center;
       justify-content: center;
       font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
       padding: 16px;
-      margin: 0;
     }
-
-    /* main concrete card – like a cement mixer drum */
     .loader-container {
       background: #3e4e5e;
       padding: 2rem 2.5rem;
       border-radius: 40px 40px 20px 20px;
-      box-shadow: 0 30px 30px -10px rgba(0, 0, 0, 0.7), inset 0 2px 5px rgba(255, 255, 255, 0.1);
+      box-shadow: 0 30px 30px -10px rgba(0,0,0,0.7), inset 0 2px 5px rgba(255,255,255,0.1);
       text-align: center;
       max-width: 480px;
       width: 100%;
       border-bottom: 8px solid #2c3a48;
-      transition: box-shadow 0.2s;
     }
-
     h1 {
       font-size: 1.9rem;
       letter-spacing: 1px;
@@ -45,13 +35,10 @@
       text-shadow: 3px 3px 0 #1e2a36;
       margin-bottom: 8px;
       text-transform: uppercase;
-      font-family: 'Segoe UI', 'Arial Black', sans-serif;
     }
-
     .subhead {
       color: #b0c4d9;
       font-size: 1rem;
-      font-weight: 400;
       letter-spacing: 2px;
       margin-bottom: 30px;
       text-transform: uppercase;
@@ -59,615 +46,186 @@
       padding-bottom: 12px;
       display: inline-block;
     }
-
-    /* ===== CONCRETE MIXER ANIMATION ===== */
-    .mixer-stage {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      margin: 10px 0 20px;
-    }
-
+    .mixer-stage { display: flex; flex-direction: column; align-items: center; margin: 10px 0 20px; }
     .drum-wrapper {
       position: relative;
       width: 180px;
       height: 180px;
       margin-bottom: 10px;
-      filter: drop-shadow(0 15px 10px rgba(0, 0, 0, 0.5));
+      filter: drop-shadow(0 15px 10px rgba(0,0,0,0.5));
     }
-
-    /* rotating concrete drum */
     .drum {
-      width: 100%;
-      height: 100%;
+      width: 100%; height: 100%;
       background: radial-gradient(circle at 30% 30%, #8a9aa8, #4a5a6a);
       border-radius: 50%;
       border: 8px solid #2e3e4e;
-      box-shadow: inset 0 -15px 15px rgba(0, 0, 0, 0.4), inset 0 15px 15px rgba(255, 255, 255, 0.1);
+      box-shadow: inset 0 -15px 15px rgba(0,0,0,0.4), inset 0 15px 15px rgba(255,255,255,0.1);
       animation: rotateDrum 6s infinite linear;
       position: relative;
       overflow: hidden;
     }
-
-    /* concrete splash inside drum */
     .drum::after {
       content: "";
       position: absolute;
-      top: 20%;
-      left: 15%;
-      width: 70%;
-      height: 70%;
+      top: 20%; left: 15%;
+      width: 70%; height: 70%;
       background: radial-gradient(circle at 40% 40%, #b0b8c0, #6c7a88);
       border-radius: 40% 60% 50% 50% / 45% 50% 50% 55%;
       opacity: 0.55;
       filter: blur(3px);
       animation: slosh 2.4s infinite alternate ease-in-out;
     }
-
-    /* drum fins */
-    .fin {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      border-radius: 50%;
-      box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.2);
-      pointer-events: none;
+    .fin, .fin2 {
+      position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+      border-radius: 50%; pointer-events: none;
     }
-
-    .fin::before,
-    .fin::after {
-      content: "";
-      position: absolute;
-      background: #2e3e4e;
-      width: 6px;
-      height: 50%;
-      top: 0;
-      left: 50%;
-      transform-origin: bottom center;
-      border-radius: 4px 4px 0 0;
-      box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+    .fin::before, .fin::after, .fin2::before, .fin2::after {
+      content: ""; position: absolute; background: #2e3e4e;
+      width: 6px; height: 48%; top: 0; left: 50%;
+      transform-origin: bottom center; border-radius: 4px 4px 0 0;
+      box-shadow: 0 0 5px rgba(0,0,0,0.3);
     }
-
-    .fin::before {
-      transform: translateX(-50%) rotate(25deg);
-      height: 48%;
-    }
-
-    .fin::after {
-      transform: translateX(-50%) rotate(-25deg);
-      height: 48%;
-    }
-
-    /* extra fins */
-    .fin2 {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      border-radius: 50%;
-      pointer-events: none;
-    }
-
-    .fin2::before,
-    .fin2::after {
-      content: "";
-      position: absolute;
-      background: #2e3e4e;
-      width: 6px;
-      height: 48%;
-      top: 0;
-      left: 50%;
-      transform-origin: bottom center;
-      border-radius: 4px 4px 0 0;
-      box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
-    }
-
-    .fin2::before {
-      transform: translateX(-50%) rotate(65deg);
-    }
-
-    .fin2::after {
-      transform: translateX(-50%) rotate(-65deg);
-    }
-
-    /* concrete chunks (particles) */
+    .fin::before { transform: translateX(-50%) rotate(25deg); }
+    .fin::after { transform: translateX(-50%) rotate(-25deg); }
+    .fin2::before { transform: translateX(-50%) rotate(65deg); }
+    .fin2::after { transform: translateX(-50%) rotate(-65deg); }
     .chunk {
-      position: absolute;
-      background: #c0c8d0;
+      position: absolute; background: #c0c8d0;
       border-radius: 40% 60% 40% 60% / 60% 40% 60% 40%;
-      width: 14px;
-      height: 14px;
-      opacity: 0.8;
-      box-shadow: 0 0 5px #a0a8b0;
+      opacity: 0.8; box-shadow: 0 0 5px #a0a8b0;
       animation: chunkFloat 2.8s infinite alternate ease-in-out;
       pointer-events: none;
     }
-
-    .chunk:nth-child(1) {
-      top: 15%;
-      left: 10%;
-      width: 18px;
-      height: 18px;
-      animation-delay: 0s;
-    }
-
-    .chunk:nth-child(2) {
-      bottom: 20%;
-      right: 12%;
-      width: 12px;
-      height: 12px;
-      animation-delay: 0.4s;
-    }
-
-    .chunk:nth-child(3) {
-      top: 45%;
-      right: 8%;
-      width: 20px;
-      height: 16px;
-      animation-delay: 0.9s;
-    }
-
-    .chunk:nth-child(4) {
-      bottom: 30%;
-      left: 18%;
-      width: 10px;
-      height: 10px;
-      animation-delay: 1.3s;
-    }
-
-    /* progress bar – cement pour */
-    .progress-section {
-      width: 100%;
-      margin: 25px 0 20px;
-    }
-
+    .chunk:nth-child(1) { top: 15%; left: 10%; width: 18px; height: 18px; animation-delay: 0s; }
+    .chunk:nth-child(2) { bottom: 20%; right: 12%; width: 12px; height: 12px; animation-delay: 0.4s; }
+    .chunk:nth-child(3) { top: 45%; right: 8%; width: 20px; height: 16px; animation-delay: 0.9s; }
+    .chunk:nth-child(4) { bottom: 30%; left: 18%; width: 10px; height: 10px; animation-delay: 1.3s; }
+    .progress-section { width: 100%; margin: 25px 0 20px; }
     .progress-label {
-      display: flex;
-      justify-content: space-between;
-      color: #d0dae6;
-      font-size: 0.9rem;
-      font-weight: 600;
-      letter-spacing: 0.5px;
+      display: flex; justify-content: space-between;
+      color: #d0dae6; font-size: 0.9rem; font-weight: 600;
       margin-bottom: 8px;
     }
-
     .progress-track {
-      background: #1e2a36;
-      height: 20px;
-      border-radius: 30px;
-      box-shadow: inset 0 3px 8px rgba(0, 0, 0, 0.6), 0 1px 0 #5e6e7e;
-      overflow: hidden;
-      border: 1px solid #2e3e4e;
+      background: #1e2a36; height: 20px; border-radius: 30px;
+      box-shadow: inset 0 3px 8px rgba(0,0,0,0.6);
+      overflow: hidden; border: 1px solid #2e3e4e;
     }
-
     .progress-fill {
-      height: 100%;
-      width: 0%;
+      height: 100%; width: 0%;
       background: linear-gradient(90deg, #cfd9e3, #9aacbc, #cfd9e3);
-      border-radius: 30px;
-      box-shadow: 0 0 12px #b0c8e0;
-      transition: width 0.1s linear;
+      border-radius: 30px; box-shadow: 0 0 12px #b0c8e0;
       animation: fillProgress 2.8s ease-in-out forwards;
     }
-
-    @keyframes fillProgress {
-      0% { width: 0%; }
-      15% { width: 18%; }
-      40% { width: 45%; }
-      70% { width: 80%; }
-      100% { width: 100%; }
-    }
-
-    /* status text */
+    @keyframes fillProgress { 0% { width: 0%; } 100% { width: 100%; } }
     .status-text {
-      color: #ced9e3;
-      font-size: 1rem;
-      font-weight: 500;
-      letter-spacing: 1px;
-      margin-top: 10px;
-      background: #2e3e4e;
-      padding: 10px 16px;
-      border-radius: 40px;
+      color: #ced9e3; font-size: 1rem; font-weight: 500;
+      margin-top: 10px; background: #2e3e4e;
+      padding: 10px 16px; border-radius: 40px;
       display: inline-block;
       box-shadow: inset 0 -2px 0 #1e2a36;
     }
-
-    /* Download & install section — MOST IMPORTANT */
-    .download-section {
-      margin-top: 35px;
-      padding-top: 20px;
+    .install-section {
+      margin-top: 30px; padding-top: 20px;
       border-top: 3px solid #5a6a7a;
-      display: flex;
-      flex-direction: column;
-      gap: 18px;
     }
-
-    .download-header {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 12px;
-      color: #e6eef7;
-      font-weight: 700;
-      font-size: 1.2rem;
-      background: #2c3a48;
-      padding: 8px 18px;
-      border-radius: 40px;
-      letter-spacing: 1px;
-      text-shadow: 1px 1px 0 #1e2a36;
+    .btn-install {
+      background: #3b6e4b; border: none; color: white;
+      padding: 14px 28px; border-radius: 60px;
+      font-size: 1.1rem; font-weight: 700;
+      cursor: pointer; width: 100%;
+      box-shadow: 0 8px 0 #1e2a36, 0 5px 15px rgba(0,0,0,0.4);
+      transition: transform 0.08s;
     }
-
-    .download-header span {
-      font-size: 1.6rem;
-    }
-
-    .platform-buttons {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 12px;
-      justify-content: center;
-    }
-
-    .btn-download {
-      background: #4a6a8a;
-      border: none;
-      color: white;
-      padding: 12px 18px;
-      border-radius: 60px;
-      font-size: 1rem;
-      font-weight: 700;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      cursor: pointer;
-      box-shadow: 0 8px 0 #1e2a36, 0 5px 15px rgba(0, 0, 0, 0.4);
-      transition: transform 0.08s, box-shadow 0.15s;
-      text-decoration: none;
-      flex: 1 1 auto;
-      min-width: 140px;
-      letter-spacing: 0.5px;
-      border-bottom: 2px solid #6a8aaa;
-    }
-
-    .btn-download:active {
-      transform: translateY(5px);
-      box-shadow: 0 3px 0 #1e2a36, 0 5px 15px rgba(0, 0, 0, 0.3);
-    }
-
-    .btn-download i {
-      font-size: 1.3rem;
-      filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.3));
-    }
-
-    /* specific button colors */
-    .btn-android {
-      background: #3b6e4b;
-      border-bottom-color: #5b9e6b;
-    }
-
-    .btn-ios {
-      background: #5a4a7a;
-      border-bottom-color: #7a6a9a;
-    }
-
-    .btn-pwa {
-      background: #3a5a7a;
-      border-bottom-color: #5a7a9a;
-    }
-
-    /* tiny note for install prompt */
-    .install-note {
-      color: #a8bccc;
-      font-size: 0.8rem;
-      margin-top: 6px;
-      font-style: italic;
-      letter-spacing: 0.3px;
-    }
-
-    /* PWA install banner (real) */
-    #pwa-install-banner {
-      position: fixed;
-      bottom: 20px;
-      left: 20px;
-      right: 20px;
-      background: #2e4a6a;
-      color: white;
-      padding: 15px 20px;
-      border-radius: 60px;
-      display: none;
-      align-items: center;
-      justify-content: space-between;
-      gap: 15px;
-      box-shadow: 0 10px 30px black;
-      z-index: 999;
-      border: 1px solid #7a9aba;
-      max-width: 480px;
-      margin: 0 auto;
-    }
-
-    #pwa-install-banner button {
-      background: #ffb347;
-      border: none;
-      padding: 10px 22px;
-      border-radius: 40px;
-      font-weight: 700;
-      font-size: 1rem;
-      cursor: pointer;
-      color: #1e2a36;
-      box-shadow: 0 3px 0 #b87c2a;
-      transition: 0.1s;
-      white-space: nowrap;
-    }
-
-    #pwa-install-banner button:active {
-      transform: translateY(3px);
-      box-shadow: none;
-    }
-
-    /* ANIMATIONS */
-    @keyframes rotateDrum {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-
-    @keyframes slosh {
-      0% { transform: translate(0, 0) scale(1); }
-      100% { transform: translate(5px, 10px) scale(1.05); }
-    }
-
-    @keyframes chunkFloat {
-      0% { transform: translateY(0) rotate(0deg); }
-      100% { transform: translateY(-12px) rotate(15deg); }
-    }
-
-    /* responsive */
-    @media (max-width: 400px) {
-      .loader-container {
-        padding: 1.5rem 1rem;
-      }
-      h1 {
-        font-size: 1.5rem;
-      }
-      .drum-wrapper {
-        width: 140px;
-        height: 140px;
-      }
-      .btn-download {
-        font-size: 0.9rem;
-        padding: 10px 12px;
-        min-width: 120px;
-      }
-    }
-
-    /* disable text selection on buttons */
-    .btn-download, .download-header, .progress-label {
-      user-select: none;
-    }
+    .btn-install:active { transform: translateY(5px); box-shadow: 0 3px 0 #1e2a36; }
+    .btn-install:disabled { opacity: 0.5; cursor: not-allowed; }
+    .hint { color: #a8bccc; font-size: 0.8rem; margin-top: 10px; font-style: italic; }
+    @keyframes rotateDrum { to { transform: rotate(360deg); } }
+    @keyframes slosh { to { transform: translate(5px, 10px) scale(1.05); } }
+    @keyframes chunkFloat { to { transform: translateY(-12px) rotate(15deg); } }
   </style>
 </head>
 <body>
 
-  <!-- MAIN LOADER CARD -->
-  <div class="loader-container" id="loaderCard">
-    <h1>Maricopa Concrete</h1>
-    <div class="subhead">& Allied Company</div>
+<div class="loader-container">
+  <h1>Maricopa Concrete</h1>
+  <div class="subhead">& Allied Company</div>
 
-    <!-- Concrete mixer animation -->
-    <div class="mixer-stage">
-      <div class="drum-wrapper">
-        <div class="drum">
-          <div class="fin"></div>
-          <div class="fin2"></div>
-          <!-- concrete chunks (particles) -->
-          <div class="chunk"></div>
-          <div class="chunk"></div>
-          <div class="chunk"></div>
-          <div class="chunk"></div>
-        </div>
-      </div>
-    </div>
-
-    <!-- progress bar -->
-    <div class="progress-section">
-      <div class="progress-label">
-        <span>MIXING CONCRETE</span>
-        <span id="percentDisplay">0%</span>
-      </div>
-      <div class="progress-track">
-        <div class="progress-fill" id="progressFill"></div>
-      </div>
-      <div class="status-text" id="statusText">Pouring foundation...</div>
-    </div>
-
-    <!-- ========== DOWNLOAD SECTION – MOST IMPORTANT ========== -->
-    <div class="download-section">
-      <div class="download-header">
-        <span>⬇️</span> DOWNLOAD APP <span>⬇️</span>
-      </div>
-      <div class="platform-buttons">
-        <!-- ANDROID APK -->
-        <button class="btn-download btn-android" id="androidBtn">
-          <i>🤖</i> Android APK
-        </button>
-        <!-- iOS IPA -->
-        <button class="btn-download btn-ios" id="iosBtn">
-          <i>🍏</i> iOS (IPA)
-        </button>
-        <!-- PWA / Desktop -->
-        <button class="btn-download btn-pwa" id="pwaBtn">
-          <i>💻</i> Install PWA
-        </button>
-      </div>
-      <div class="install-note">
-        * Tap to download APK / IPA. For PWA, use browser install.
+  <div class="mixer-stage">
+    <div class="drum-wrapper">
+      <div class="drum">
+        <div class="fin"></div>
+        <div class="fin2"></div>
+        <div class="chunk"></div>
+        <div class="chunk"></div>
+        <div class="chunk"></div>
+        <div class="chunk"></div>
       </div>
     </div>
   </div>
 
-  <!-- PWA INSTALL BANNER (hidden by default) -->
-  <div id="pwa-install-banner">
-    <span>📲 Install Maricopa Concrete as app</span>
-    <button id="pwaInstallBtn">Install</button>
+  <div class="progress-section">
+    <div class="progress-label">
+      <span>MIXING CONCRETE</span>
+      <span id="percentDisplay">0%</span>
+    </div>
+    <div class="progress-track">
+      <div class="progress-fill"></div>
+    </div>
+    <div class="status-text" id="statusText">Pouring foundation...</div>
   </div>
 
-  <script>
-    (function() {
-      // ---------- PROGRESS & REDIRECT ----------
-      const progressFill = document.getElementById('progressFill');
-      const percentDisplay = document.getElementById('percentDisplay');
-      const statusText = document.getElementById('statusText');
+  <div class="install-section">
+    <button class="btn-install" id="installBtn" disabled>Install App</button>
+    <div class="hint">On Android Chrome, use menu → "Install app". On iOS Safari, use Share → "Add to Home Screen".</div>
+  </div>
+</div>
 
-      // set progress to 0 initially, then animate via CSS & JS
-      let width = 0;
-      // Because CSS animation controls width, we just sync the % number
-      // The CSS animation duration is 2.8s, so we update % accordingly.
-      // We'll also redirect after 3 seconds.
-      
-      // we want to redirect to home.html after loading completes
-      // to show the percentage, we use interval
-      let percent = 0;
-      const interval = setInterval(() => {
-        // 2.8s = 2800ms -> about 3% each 100ms
-        if (percent < 100) {
-          percent += 3.6; // 100/28 ≈ 3.57, take 3.6
-          if (percent > 100) percent = 100;
-          percentDisplay.innerText = Math.floor(percent) + '%';
+<script>
+  // Redirect after loading animation
+  let percent = 0;
+  const percentDisplay = document.getElementById('percentDisplay');
+  const statusText = document.getElementById('statusText');
 
-          // update status text based on progress
-          if (percent < 30) {
-            statusText.innerText = 'Mixing gravel & cement...';
-          } else if (percent < 60) {
-            statusText.innerText = 'Adding water & additives...';
-          } else if (percent < 90) {
-            statusText.innerText = 'Pouring concrete...';
-          } else {
-            statusText.innerText = 'Finishing & curing...';
-          }
-        } else {
-          clearInterval(interval);
-          statusText.innerText = 'Ready! Redirecting...';
-        }
-      }, 100);
+  const interval = setInterval(() => {
+    percent += 3.6;
+    if (percent > 100) percent = 100;
+    percentDisplay.innerText = Math.floor(percent) + '%';
+    if (percent < 30) statusText.innerText = 'Mixing gravel & cement...';
+    else if (percent < 60) statusText.innerText = 'Adding water & additives...';
+    else if (percent < 90) statusText.innerText = 'Pouring concrete...';
+    else statusText.innerText = 'Finishing & curing...';
+    if (percent >= 100) {
+      clearInterval(interval);
+      statusText.innerText = 'Ready! Redirecting...';
+    }
+  }, 100);
 
-      // Redirect after 3.2 seconds (allow the CSS animation to finish)
-      setTimeout(() => {
-        // Make sure percent shows 100
-        percentDisplay.innerText = '100%';
-        statusText.innerText = 'Redirecting to Home...';
-        // Redirect to home.html
-        window.location.href = 'home.html';
-      }, 3200);
+  setTimeout(() => {
+    window.location.href = 'home.html';
+  }, 3200);
 
-      // ---------- DOWNLOAD LOGIC (THE MOST IMPORTANT PART) ----------
-      // Android APK download – triggers download of a small placeholder .apk
-      document.getElementById('androidBtn').addEventListener('click', function(e) {
-        e.preventDefault();
-        // Create a dummy APK file download (minimal valid-like, but it's a text file with .apk extension)
-        // For real APK, you would host a real file. Here we generate a tiny file.
-        const apkContent = 'Maricopa Concrete APK placeholder. Replace with actual signed APK.';
-        const blob = new Blob([apkContent], { type: 'application/vnd.android.package-archive' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = 'MaricopaConcrete.apk';
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-      });
+  // PWA install prompt handling
+  let deferredPrompt = null;
+  const installBtn = document.getElementById('installBtn');
 
-      // iOS IPA download – similar placeholder
-      document.getElementById('iosBtn').addEventListener('click', function(e) {
-        e.preventDefault();
-        const ipaContent = 'Maricopa Concrete IPA placeholder. Replace with actual .ipa file for iOS.';
-        const blob = new Blob([ipaContent], { type: 'application/octet-stream' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = 'MaricopaConcrete.ipa';
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-      });
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+    installBtn.disabled = false;
+    installBtn.textContent = 'Install Maricopa Concrete';
+  });
 
-      // PWA / Desktop install
-      const pwaBtn = document.getElementById('pwaBtn');
-      const pwaInstallBanner = document.getElementById('pwa-install-banner');
-      const pwaInstallBtn = document.getElementById('pwaInstallBtn');
-      let deferredPrompt = null;
-
-      // Check if browser supports PWA install
-      window.addEventListener('beforeinstallprompt', (e) => {
-        // Prevent the mini-infobar from appearing on mobile
-        e.preventDefault();
-        // Stash the event so it can be triggered later.
-        deferredPrompt = e;
-        // Show the install banner (custom)
-        pwaInstallBanner.style.display = 'flex';
-        console.log('PWA install prompt available');
-      });
-
-      // When user clicks "Install PWA" button in the download section
-      pwaBtn.addEventListener('click', async (e) => {
-        e.preventDefault();
-        if (deferredPrompt) {
-          // Show the install prompt
-          deferredPrompt.prompt();
-          // Wait for the user to respond to the prompt
-          const { outcome } = await deferredPrompt.userChoice;
-          console.log(`User response to install prompt: ${outcome}`);
-          // Clear the deferred prompt
-          deferredPrompt = null;
-          // Hide the banner
-          pwaInstallBanner.style.display = 'none';
-        } else {
-          // If no deferredPrompt, check if already installed or fallback
-          if (window.matchMedia('(display-mode: standalone)').matches) {
-            alert('This app is already installed as PWA!');
-          } else {
-            // Fallback: instruct the user to use browser install
-            alert('To install as PWA: open browser menu (⋮) and choose "Install App" or "Add to Home Screen".');
-          }
-        }
-      });
-
-      // When user clicks the custom install banner's install button
-      pwaInstallBtn.addEventListener('click', async () => {
-        if (deferredPrompt) {
-          deferredPrompt.prompt();
-          const { outcome } = await deferredPrompt.userChoice;
-          console.log(`User response: ${outcome}`);
-          deferredPrompt = null;
-          pwaInstallBanner.style.display = 'none';
-        } else {
-          pwaInstallBanner.style.display = 'none';
-          alert('Install option not available now. Use browser menu to install.');
-        }
-      });
-
-      // Hide banner if user ignores
-      window.addEventListener('appinstalled', () => {
-        pwaInstallBanner.style.display = 'none';
-        console.log('PWA installed successfully');
-      });
-
-      // If already installed, hide banner
-      if (window.matchMedia('(display-mode: standalone)').matches) {
-        pwaInstallBanner.style.display = 'none';
-      }
-
-      // also hide banner if no beforeinstallprompt after 3 sec? no, keep it if available
-      // but set a timeout to hide if it wasn't triggered? It's okay.
-
-      // Additionally, for desktop PWA, if no beforeinstallprompt, we still allow manual install.
-      // We'll display a note.
-
-    })();
-  </script>
+  installBtn.addEventListener('click', async () => {
+    if (!deferredPrompt) return;
+    deferredPrompt.prompt();
+    const { outcome } = await deferredPrompt.userChoice;
+    if (outcome === 'accepted') {
+      installBtn.disabled = true;
+      installBtn.textContent = 'Installed!';
+    }
+    deferredPrompt = null;
+  });
+</script>
 </body>
 </html>
